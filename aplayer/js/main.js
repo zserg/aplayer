@@ -10,6 +10,8 @@
     var isFirstActivation = true;
     var systemMediaControls = null;
     var audtag = null;
+    var playBut = null;
+    var rewBut = null;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
@@ -95,7 +97,7 @@
                 if (!audtag) {
                     audtag = document.createElement('audio');
                     audtag.setAttribute("id", "audtag");
-                    //audtag.setAttribute("controls", "false");
+                    audtag.setAttribute("controls", "false");
                     audtag.setAttribute("msAudioCategory", "Meda");
                     audtag.setAttribute("src", fileLocation);
                     audtag.addEventListener("playing", audioPlaying, false);
@@ -104,6 +106,16 @@
                     audtag.load();
                     WinJS.log && WinJS.log("Audio Tag Loaded", "sample", "status");
                     log(getTimeStampedMessage("test"));
+
+                    playBut = document.createElement('button');
+                    playBut.appendChild(document.createTextNode('Play/Pause'))
+                    playBut.addEventListener("click", pClick, false);
+                    document.getElementById("MediaElement").appendChild(playBut);
+
+                    rewBut = document.createElement('button');
+                    rewBut.appendChild(document.createTextNode('Rew'))
+                    rewBut.addEventListener("click", rClick, false);
+                    document.getElementById("MediaElement").appendChild(rewBut);
                 }
 
             } else {
@@ -130,6 +142,30 @@
             default:
                 break;
         }
+    }
+    function pClick() {
+        switch (systemMediaControls.playbackStatus) {
+            case Windows.Media.MediaPlaybackStatus.paused:
+                // Handle the Play event and print status to screen..
+                WinJS.log && WinJS.log("Play Received", "sample", "status");
+                audtag.play();
+                break;
+
+            case Windows.Media.MediaPlaybackStatus.playing:
+                // Handle the Pause event and print status to screen.
+                WinJS.log && WinJS.log("Pause Received", "sample", "status");
+                audtag.pause();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    function rClick() {
+        audtag.pause();
+        audtag.currentTime -= 5.0;
+        window.setTimeout("audtag.play()", 1000);
     }
 
     function mediaPropertyChanged(e) {
