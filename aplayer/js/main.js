@@ -95,7 +95,7 @@
                 if (!audtag) {
                     audtag = document.createElement('audio');
                     audtag.setAttribute("id", "audtag");
-                    audtag.setAttribute("controls", "true");
+                    //audtag.setAttribute("controls", "false");
                     audtag.setAttribute("msAudioCategory", "Meda");
                     audtag.setAttribute("src", fileLocation);
                     audtag.addEventListener("playing", audioPlaying, false);
