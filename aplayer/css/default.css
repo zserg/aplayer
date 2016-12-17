@@ -1,2 +1,27 @@
 ﻿body {
 }
+
+#contentGrid {
+    display: -ms-grid; 
+             -ms-grid-rows: 40px 40px 300px 1000px;
+              margin: 20px 20px 20px 20px;
+}
+
+#button1 {
+    -ms-grid-row: 1;
+    width: auto;
+    height: 20px;
+}
+
+#MediaElement {
+    -ms-grid-row: 2;
+    width: auto;
+    height: 20px;
+}
+
+#ButtonsElement {
+    -ms-grid-row: 4;
+    width: auto;
+    height: 200px;
+}
+

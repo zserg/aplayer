@@ -12,6 +12,8 @@
     var audtag = null;
     var playBut = null;
     var rewBut = null;
+    var playImg = null;
+    var rewImg = null;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
@@ -91,6 +93,7 @@
                 systemMediaControls.addEventListener("buttonpressed", mediaButtonPressed, false);
                 systemMediaControls.isPlayEnabled = true;
                 systemMediaControls.isPauseEnabled = true;
+                systemMediaControls.playbackStatus = Windows.Media.MediaPlaybackStatus.paused;
 
                 var fileLocation = window.URL.createObjectURL(file, { oneTimeOnly: true });
 
@@ -105,18 +108,30 @@
                     document.getElementById("MediaElement").appendChild(audtag);
                     audtag.load();
                     WinJS.log && WinJS.log("Audio Tag Loaded", "sample", "status");
-                    log(getTimeStampedMessage("test"));
+                
+                    rewBut = document.createElement('button');
+                    rewBut.addEventListener("click", rClick, false);
+                    document.getElementById("ButtonsElement").appendChild(rewBut);
+                    rewImg = document.createElement('img');
+                    rewImg.src = "/images/rewind.png";
+                    rewImg.width = 100;
+                    rewImg.hight = 100;
+                    rewBut.appendChild(rewImg)
 
                     playBut = document.createElement('button');
-                    playBut.appendChild(document.createTextNode('Play/Pause'))
                     playBut.addEventListener("click", pClick, false);
-                    document.getElementById("MediaElement").appendChild(playBut);
+                    document.getElementById("ButtonsElement").appendChild(playBut);
+                    playImg = document.createElement('img');
+                    playImg.src = "/images/play-stop.png";
+                    playImg.width = 150;
+                    playImg.hight = 150;
+                    playBut.appendChild(playImg)
 
-                    rewBut = document.createElement('button');
-                    rewBut.appendChild(document.createTextNode('Rew'))
-                    rewBut.addEventListener("click", rClick, false);
-                    document.getElementById("MediaElement").appendChild(rewBut);
-                }
+                } else {
+                    audtag.pause();
+                    systemMediaControls.playbackStatus = Windows.Media.MediaPlaybackStatus.paused;
+                    audtag.setAttribute("src", fileLocation);
+                    }
 
             } else {
                 WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
@@ -174,20 +189,20 @@
                 //Catch SoundLevel notifications and determine SoundLevel state.  If it's muted, we'll pause the player.
                 var soundLevel = e.target.soundLevel;
 
-                switch (soundLevel) {
+                //switch (soundLevel) {
 
-                    case Windows.Media.SoundLevel.muted:
-                        log(getTimeStampedMessage("App sound level is: Muted"));
-                        break;
-                    case Windows.Media.SoundLevel.low:
-                        log(getTimeStampedMessage("App sound level is: Low"));
-                        break;
-                    case Windows.Media.SoundLevel.full:
-                        log(getTimeStampedMessage("App sound level is: Full"));
-                        break;
-                }
+                //    case Windows.Media.SoundLevel.muted:
+                //        log(getTimeStampedMessage("App sound level is: Muted"));
+                //        break;
+                //    case Windows.Media.SoundLevel.low:
+                //        log(getTimeStampedMessage("App sound level is: Low"));
+                //        break;
+                //    case Windows.Media.SoundLevel.full:
+                //        log(getTimeStampedMessage("App sound level is: Full"));
+                //        break;
+                //}
 
-                appMuted();
+                //appMuted();
                 break;
 
             default:
