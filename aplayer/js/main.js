@@ -14,6 +14,8 @@
     var rewBut = null;
     var playImg = null;
     var rewImg = null;
+    var sessionState = null;
+    var fileLocation = null;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
@@ -23,6 +25,34 @@
         else if (args.detail.kind === activation.ActivationKind.launch) {
             // Активация Launch выполняется, когда пользователь запускает ваше приложение с помощью плитки
             // или вызывает всплывающее уведомление, щелкнув основной текст или коснувшись его.
+            // Create the media control.
+            sessionState = WinJS.Application.sessionState;
+            systemMediaControls = Windows.Media.SystemMediaTransportControls.getForCurrentView();
+
+            // Add event listeners for PBM notifications to illustrate app is
+            // getting a new SoundLevel and pass the audio tag along to the function
+
+            systemMediaControls.addEventListener("propertychanged", mediaPropertyChanged, false);
+
+            // Add event listener for the mandatory media commands and enable them.
+            // These are necessary to play streams of type 'backgroundCapableMedia'
+            systemMediaControls.addEventListener("buttonpressed", mediaButtonPressed, false);
+            systemMediaControls.isPlayEnabled = true;
+            systemMediaControls.isPauseEnabled = true;
+            systemMediaControls.playbackStatus = Windows.Media.MediaPlaybackStatus.paused;
+
+            audtag = document.getElementById("audtag")
+            audtag.addEventListener("playing", audioPlaying, false);
+            audtag.addEventListener("pause", audioPaused, false);
+            if (sessionState.fileLocation) {
+                audtag.setAttribute("src", sessionState.fileLocation);
+            }
+            rewBut = document.getElementById('rewbutton');
+            rewBut.addEventListener("click", rClick, false);
+
+            playBut = document.getElementById('playbutton');
+            playBut.addEventListener("click", pClick, false);
+
             if (args.detail.arguments) {
                 // TODO: если приложение поддерживает всплывающие уведомления, используйте это значение из полезных данных всплывающего уведомления, чтобы определить, в какую часть приложения
                 // перенаправить пользователя после вызова им всплывающего уведомления.
@@ -67,6 +97,7 @@
         // TODO: действие приложения будет приостановлено. Сохраните здесь все состояния, которые понадобятся после приостановки.
         // Вы можете использовать объект WinJS.Application.sessionState, который автоматически сохраняется и восстанавливается после приостановки.
         // Если вам нужно завершить асинхронную операцию до того, как действие приложения будет приостановлено, вызовите args.setPromise().
+        sessionState.fileLocation = fileLocation;
     };
 
    
@@ -79,59 +110,11 @@
         openPicker.fileTypeFilter.replaceAll([".mp3", ".mp4", ".m4a", ".wma", ".wav"]);
         openPicker.pickSingleFileAsync().done(function (file) {
             if (file) {
-                // Create the media control.
 
-                systemMediaControls = Windows.Media.SystemMediaTransportControls.getForCurrentView();
+                fileLocation = window.URL.createObjectURL(file, { oneTimeOnly: true });
 
-                // Add event listeners for PBM notifications to illustrate app is
-                // getting a new SoundLevel and pass the audio tag along to the function
-
-                systemMediaControls.addEventListener("propertychanged", mediaPropertyChanged, false);
-
-                // Add event listener for the mandatory media commands and enable them.
-                // These are necessary to play streams of type 'backgroundCapableMedia'
-                systemMediaControls.addEventListener("buttonpressed", mediaButtonPressed, false);
-                systemMediaControls.isPlayEnabled = true;
-                systemMediaControls.isPauseEnabled = true;
-                systemMediaControls.playbackStatus = Windows.Media.MediaPlaybackStatus.paused;
-
-                var fileLocation = window.URL.createObjectURL(file, { oneTimeOnly: true });
-
-                if (!audtag) {
-                    audtag = document.createElement('audio');
-                    audtag.setAttribute("id", "audtag");
-                    audtag.setAttribute("controls", "false");
-                    audtag.setAttribute("msAudioCategory", "Meda");
-                    audtag.setAttribute("src", fileLocation);
-                    audtag.addEventListener("playing", audioPlaying, false);
-                    audtag.addEventListener("pause", audioPaused, false);
-                    document.getElementById("MediaElement").appendChild(audtag);
-                    audtag.load();
-                    WinJS.log && WinJS.log("Audio Tag Loaded", "sample", "status");
-                
-                    rewBut = document.createElement('button');
-                    rewBut.addEventListener("click", rClick, false);
-                    document.getElementById("ButtonsElement").appendChild(rewBut);
-                    rewImg = document.createElement('img');
-                    rewImg.src = "/images/rewind.png";
-                    rewImg.width = 100;
-                    rewImg.hight = 100;
-                    rewBut.appendChild(rewImg)
-
-                    playBut = document.createElement('button');
-                    playBut.addEventListener("click", pClick, false);
-                    document.getElementById("ButtonsElement").appendChild(playBut);
-                    playImg = document.createElement('img');
-                    playImg.src = "/images/play-stop.png";
-                    playImg.width = 150;
-                    playImg.hight = 150;
-                    playBut.appendChild(playImg)
-
-                } else {
-                    audtag.pause();
-                    systemMediaControls.playbackStatus = Windows.Media.MediaPlaybackStatus.paused;
-                    audtag.setAttribute("src", fileLocation);
-                    }
+                audtag = document.getElementById("audtag")
+                audtag.setAttribute("src", fileLocation);
 
             } else {
                 WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
