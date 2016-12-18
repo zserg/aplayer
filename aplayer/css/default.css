@@ -3,7 +3,7 @@
 
 #contentGrid {
     display: -ms-grid;
-    -ms-grid-rows: 40px 40px 50px auto;
+    -ms-grid-rows: 40px 40px 200px auto;
     margin: 20px 20px 20px 20px;
     border: 1px solid gray;
 }
