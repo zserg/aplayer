@@ -16,6 +16,9 @@
     var rewImg = null;
     var sessionState = null;
     var fileLocation = null;
+    var filePath = null;
+    var storageFolder = null;
+    var g_dispRequest = null;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
@@ -44,14 +47,24 @@
             audtag = document.getElementById("audtag")
             audtag.addEventListener("playing", audioPlaying, false);
             audtag.addEventListener("pause", audioPaused, false);
-            if (sessionState.fileLocation) {
-                audtag.setAttribute("src", sessionState.fileLocation);
+            if (sessionState.filePath) {
+                Windows.Storage.StorageFile.getFileFromPathAsync(sessionState.filePath).done(getFile);
             }
             rewBut = document.getElementById('rewbutton');
             rewBut.addEventListener("click", rClick, false);
 
             playBut = document.getElementById('playbutton');
             playBut.addEventListener("click", pClick, false);
+
+            if (g_dispRequest === null) {
+                try {
+                    // This call creates an instance of the displayRequest object
+                    g_dispRequest = new Windows.System.Display.DisplayRequest;
+                    g_dispRequest.requestActive();
+                } catch (e) {
+                    WinJS.log && WinJS.log("Failed: displayRequest object creation, error: " + e.message, "sample", "error");
+                }
+            }
 
             if (args.detail.arguments) {
                 // TODO: если приложение поддерживает всплывающие уведомления, используйте это значение из полезных данных всплывающего уведомления, чтобы определить, в какую часть приложения
@@ -98,6 +111,7 @@
         // Вы можете использовать объект WinJS.Application.sessionState, который автоматически сохраняется и восстанавливается после приостановки.
         // Если вам нужно завершить асинхронную операцию до того, как действие приложения будет приостановлено, вызовите args.setPromise().
         sessionState.fileLocation = fileLocation;
+        sessionState.filePath = filePath;
     };
 
    
@@ -111,9 +125,9 @@
         openPicker.pickSingleFileAsync().done(function (file) {
             if (file) {
 
-                fileLocation = window.URL.createObjectURL(file, { oneTimeOnly: true });
-
-                audtag = document.getElementById("audtag")
+                fileLocation = window.URL.createObjectURL(file, { oneTimeOnly: false });
+                filePath = file.path;
+                audtag = document.getElementById("audtag");
                 audtag.setAttribute("src", fileLocation);
 
             } else {
@@ -122,6 +136,20 @@
 
         });
     }
+
+    function getFile(file) {
+            if (file) {
+                fileLocation = window.URL.createObjectURL(file, { oneTimeOnly: true });
+                filePath = file.path;
+                audtag = document.getElementById("audtag");
+                audtag.setAttribute("src", fileLocation);
+
+            } else {
+                WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
+            }
+
+        };
+  
 
     function mediaButtonPressed(e) {
         switch (e.button) {
