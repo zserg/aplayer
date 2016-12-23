@@ -1,0 +1,27 @@
+body {
+  background-color: black;
+}
+
+.progress-bar
+  {
+  width: 500px;
+  height: 60px;
+  border: 1px solid white;
+}
+
+#pointer
+  {
+  position: relative;
+  left: 50px;
+}
+
+#bar
+  {
+  width: 400px;
+  height: 5px;
+  background-color: blue;
+  position: relative;
+  left: 50px;
+  top: 35px;
+}
+
