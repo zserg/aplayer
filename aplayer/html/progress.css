@@ -9,19 +9,55 @@ body {
   border: 1px solid white;
 }
 
+#pointer-route
+  {
+  width: 350px;
+  height: 35px;
+  position: relative;
+  left: 63px;
+}
 #pointer
   {
+  width: 25px;
+  height: 35px;
   position: relative;
-  left: 50px;
+  left: 0%;
 }
 
 #bar
   {
-  width: 400px;
+  width: 350px;
   height: 5px;
-  background-color: blue;
+  background-color: white;
   position: relative;
-  left: 50px;
-  top: 35px;
+  left: 75px;
+}
+
+#bar-front
+  {
+  width: 0%;
+  height: 100%;
+  background-color: blue;
+}
+
+#counter-left
+  {
+  width: 25px;
+  height: 35px;
+  position: absolute;
+  font: 16px arial;
+  color: #ff8080;
+  left: 17px;
+  margin-top: -12px;
+}
+#counter-right
+  {
+  width: 25px;
+  height: 35px;
+  position: absolute;
+  font: 16px arial;
+  color: #ff8080;
+  left: 444px;
+  margin-top: -12px;
 }
 
