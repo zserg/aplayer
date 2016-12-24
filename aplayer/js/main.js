@@ -7,6 +7,8 @@
 
     var app = WinJS.Application;
     var activation = Windows.ApplicationModel.Activation;
+    var MediaPlayer = Windows.Media.Playback.MediaPlayer;
+    var sessionState = WinJS.Application.sessionState;
     var isFirstActivation = true;
     var systemMediaControls = null;
     var audtag = null;
@@ -14,11 +16,21 @@
     var rewBut = null;
     var playImg = null;
     var rewImg = null;
-    var sessionState = null;
     var fileLocation = null;
     var filePath = null;
     var storageFolder = null;
     var g_dispRequest = null;
+    var openPicker = null;
+    var mPlayer = null;
+    var mPlayerSession = null;
+    var _startX = 0;            // mouse starting positions
+    var _startY = 0;
+    var _offsetX = 0;           // current element offset
+    var _offsetY = 0;
+    var bLeft = null;
+    var bRight = null;
+    var dragInProgress = false;
+    var playPos = 0;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
@@ -29,32 +41,33 @@
             // Активация Launch выполняется, когда пользователь запускает ваше приложение с помощью плитки
             // или вызывает всплывающее уведомление, щелкнув основной текст или коснувшись его.
             // Create the media control.
-            sessionState = WinJS.Application.sessionState;
             systemMediaControls = Windows.Media.SystemMediaTransportControls.getForCurrentView();
-
-            // Add event listeners for PBM notifications to illustrate app is
-            // getting a new SoundLevel and pass the audio tag along to the function
-
             systemMediaControls.addEventListener("propertychanged", mediaPropertyChanged, false);
-
-            // Add event listener for the mandatory media commands and enable them.
-            // These are necessary to play streams of type 'backgroundCapableMedia'
             systemMediaControls.addEventListener("buttonpressed", mediaButtonPressed, false);
             systemMediaControls.isPlayEnabled = true;
             systemMediaControls.isPauseEnabled = true;
             systemMediaControls.playbackStatus = Windows.Media.MediaPlaybackStatus.paused;
 
-            audtag = document.getElementById("audtag")
-            audtag.addEventListener("playing", audioPlaying, false);
-            audtag.addEventListener("pause", audioPaused, false);
-            if (sessionState.filePath) {
+            mPlayer = new MediaPlayer();
+            mPlayer.autoPlay = false;
+            mPlayerSession = mPlayer.playbackSession;
+            mPlayerSession.addEventListener("positionchanged", onPositionChanged)
+
+            openPicker = new Windows.Storage.Pickers.FileOpenPicker();
+            openPicker.viewMode = Windows.Storage.Pickers.PickerViewMode.list;
+            openPicker.fileTypeFilter.replaceAll([".mp3"]);
+
+            filePath = WinJS.Application.sessionState.filePath
+            if (filePath) {
                 Windows.Storage.StorageFile.getFileFromPathAsync(sessionState.filePath).done(getFile);
             }
+
             rewBut = document.getElementById('rewbutton');
             rewBut.addEventListener("click", rClick, false);
-
             playBut = document.getElementById('playbutton');
             playBut.addEventListener("click", pClick, false);
+            bLeft = document.getElementById("bar").getBoundingClientRect().left;
+            bRight = document.getElementById("bar").getBoundingClientRect().right;
 
             if (g_dispRequest === null) {
                 try {
@@ -65,6 +78,12 @@
                     WinJS.log && WinJS.log("Failed: displayRequest object creation, error: " + e.message, "sample", "error");
                 }
             }
+
+            document.getElementById("pointer").onpointerdown = OnMouseDown;
+            document.getElementById("pointer").onpointerup = OnMouseUp;
+            document.getElementById("progress-bar").onpointerleave = OnMouseLeave;
+            document.getElementById("pointer").onpointermove = null;
+
 
             if (args.detail.arguments) {
                 // TODO: если приложение поддерживает всплывающие уведомления, используйте это значение из полезных данных всплывающего уведомления, чтобы определить, в какую часть приложения
@@ -91,8 +110,8 @@
             args.setPromise(WinJS.UI.processAll());
 
             // Add your code to retrieve the button and register the event handler.
-            var helloButton = document.getElementById("button1");
-            helloButton.addEventListener("click", doSomething5, false);
+            var openButton = document.getElementById("button1");
+            openButton.addEventListener("click", pickFile, false);
 
         }
 
@@ -110,59 +129,71 @@
         // TODO: действие приложения будет приостановлено. Сохраните здесь все состояния, которые понадобятся после приостановки.
         // Вы можете использовать объект WinJS.Application.sessionState, который автоматически сохраняется и восстанавливается после приостановки.
         // Если вам нужно завершить асинхронную операцию до того, как действие приложения будет приостановлено, вызовите args.setPromise().
-        sessionState.fileLocation = fileLocation;
         sessionState.filePath = filePath;
+        sessionState.tes = "hello";
+
     };
 
-   
 
-    function doSomething5() {
 
-        var openPicker = new Windows.Storage.Pickers.FileOpenPicker();
-        openPicker.viewMode = Windows.Storage.Pickers.PickerViewMode.list;
-        openPicker.suggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.musicLibrary;
-        openPicker.fileTypeFilter.replaceAll([".mp3", ".mp4", ".m4a", ".wma", ".wav"]);
+    function pickFile() {
         openPicker.pickSingleFileAsync().done(function (file) {
             if (file) {
-
-                fileLocation = window.URL.createObjectURL(file, { oneTimeOnly: false });
-                filePath = file.path;
-                audtag = document.getElementById("audtag");
-                audtag.setAttribute("src", fileLocation);
-
+                // Store the file to access again later
+                sessionState.lastFileToken = Windows.Storage.AccessCache.StorageApplicationPermissions.futureAccessList.add(file);
+                file.getParentAsync().done(function (folder) {
+                    openAudio(file);
+                })
             } else {
-                WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
+                // No file
             }
+        }
+      )
+    };
 
-        });
-    }
+    function openAudio(file) {
+        if (file) {
+            fileLocation = window.URL.createObjectURL(file, { oneTimeOnly: true });
+            filePath = file.path;
+            mPlayer.source = Windows.Media.Core.MediaSource.createFromStorageFile(file);
+            // audtag = document.getElementById("audtag");
+            // audtag.setAttribute("src", fileLocation);
+
+        } else {
+            WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
+        }
+
+    };
 
     function getFile(file) {
             if (file) {
-                fileLocation = window.URL.createObjectURL(file, { oneTimeOnly: true });
-                filePath = file.path;
-                audtag = document.getElementById("audtag");
-                audtag.setAttribute("src", fileLocation);
+                mPlayer.source = Windows.Media.Core.MediaSource.createFromStorageFile(file);
+                // fileLocation = window.URL.createObjectURL(file, { oneTimeOnly: true });
+                // filePath = file.path;
+                // audtag = document.getElementById("audtag");
+                // audtag.setAttribute("src", fileLocation);
 
             } else {
                 WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
             }
 
         };
-  
+
 
     function mediaButtonPressed(e) {
         switch (e.button) {
             case Windows.Media.SystemMediaTransportControlsButton.play:
                 // Handle the Play event and print status to screen..
                 WinJS.log && WinJS.log("Play Received", "sample", "status");
-                audtag.play();
+                mPlayer.play()
+                // audtag.play();
                 break;
 
             case Windows.Media.SystemMediaTransportControlsButton.pause:
                 // Handle the Pause event and print status to screen.
                 WinJS.log && WinJS.log("Pause Received", "sample", "status");
-                audtag.pause();
+                // audtag.pause();
+                mPlayer.pause()
                 break;
 
             default:
@@ -170,17 +201,19 @@
         }
     }
     function pClick() {
-        switch (systemMediaControls.playbackStatus) {
-            case Windows.Media.MediaPlaybackStatus.paused:
+        switch (mPlayerSession.playbackState) {
+          case Windows.Media.Playback.MediaPlayerState.paused:
                 // Handle the Play event and print status to screen..
                 WinJS.log && WinJS.log("Play Received", "sample", "status");
-                audtag.play();
+                mPlayer.play()
+                // audtag.play();
                 break;
 
-            case Windows.Media.MediaPlaybackStatus.playing:
+          case Windows.Media.Playback.MediaPlayerState.playing:
                 // Handle the Pause event and print status to screen.
                 WinJS.log && WinJS.log("Pause Received", "sample", "status");
-                audtag.pause();
+                mPlayer.pause()
+                // audtag.pause();
                 break;
 
             default:
@@ -189,9 +222,21 @@
     }
 
     function rClick() {
-        audtag.pause();
-        audtag.currentTime -= 5.0;
-        window.setTimeout("audtag.play()", 1000);
+         mPlayerSession.position-=5000.0;
+         if(mPlayerSession.playbackState == Windows.Media.Playback.MediaPlayerState.playing){
+            mPlayer.pause()
+            window.setTimeout(function () { mPlayer.play()}, 1000);
+         }
+    }
+
+    function onPositionChanged() {
+      if(!dragInProgress){
+         var pos = (mPlayerSession.position/mPlayerSession.naturalDuration*100).toFixed(2);
+         var time = new Date();
+         time.setTime((mPlayerSession.position).toFixed(0));
+         document.getElementById("pointer").style.left = pos+"%";
+         document.getElementById("bar-front").style.width = pos+"%";
+      }
     }
 
     function mediaPropertyChanged(e) {
@@ -200,20 +245,6 @@
                 //Catch SoundLevel notifications and determine SoundLevel state.  If it's muted, we'll pause the player.
                 var soundLevel = e.target.soundLevel;
 
-                //switch (soundLevel) {
-
-                //    case Windows.Media.SoundLevel.muted:
-                //        log(getTimeStampedMessage("App sound level is: Muted"));
-                //        break;
-                //    case Windows.Media.SoundLevel.low:
-                //        log(getTimeStampedMessage("App sound level is: Low"));
-                //        break;
-                //    case Windows.Media.SoundLevel.full:
-                //        log(getTimeStampedMessage("App sound level is: Full"));
-                //        break;
-                //}
-
-                //appMuted();
                 break;
 
             default:
@@ -252,6 +283,71 @@
         var message = eventCalled + "\t\t" + time;
         return message;
     }
+
+    function OnMouseDown(e) {
+        if (e.button == 0) {
+            dragInProgress = true;
+            var pos = xCalculate(bLeft, bRight, e.clientX);
+            document.getElementById("pointer").style.left = pos+"%";
+            document.getElementById("bar-front").style.width = pos+"%";
+            document.onpointermove = OnMouseMove;
+        }
+    };
+
+    function OnMouseMove(e)
+    {
+      playPos = xCalculate(bLeft, bRight, e.clientX);
+      document.getElementById("pointer").style.left = playPos+"%";
+      document.getElementById("bar-front").style.width = playPos+"%";
+      document.getElementById("counter-left").innerHTML = playPos+"%";
+      document.getElementById("counter-right").innerHTML = 100-playPos+"%";
+
+    }
+
+
+  function OnMouseUp(e)
+    {
+      document.onpointermove = null;
+      dragInProgress = false;
+      mPlayerSession.position = mPlayerSession.naturalDuration * playPos/100.0;
+    };
+
+  function OnMouseLeave(e)
+    {
+      document.onpointermove = null;
+      dragInProgress = false;
+    };
+
+  function xCalculate(boundLeft, boudRight, x)
+    {
+      var x_int;
+      if(x < boundLeft){
+        x_int = boundLeft;
+      }else if(x > boudRight) {
+        x_int = boudRight;
+      }else{
+        x_int = x;
+      }
+      return (((x_int-boundLeft)/(boudRight-boundLeft))*100).toFixed(2);
+    };
+
+
+  function countersCalculate(pos)
+    {
+      var x_int;
+      if(x < boundLeft){
+        x_int = boundLeft;
+      }else if(x > boudRight) {
+        x_int = boudRight;
+      }else{
+        x_int = x;
+      }
+      return (((x_int-boundLeft)/(boudRight-boundLeft))*100).toFixed(2);
+         document.getElementById("counter-left").innerHTML = time.getHours()+':'+
+                                                             time.getMinutes()+':'+
+                                                             time.getSeconds();
+    };
+
 
     app.start();
 })();

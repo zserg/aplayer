@@ -1,4 +1,5 @@
 ﻿body {
+  background-color: gray;
 }
 
 #contentGrid {
@@ -26,5 +27,67 @@
 #ButtonsElement {
     -ms-grid-row: 4;
      border: 1px solid gray;
+}
+
+#progress-bar
+  {
+  width: 350px;
+  height: 100px;
+  margin: auto;
+  border: 1px solid white;
+  position: relative;
+}
+
+#pointer-route
+  {
+  width: 205px;
+  height: 35px;
+  position: relative;
+  left: 63px;
+  background-color: yellow;
+}
+#pointer
+  {
+  width: 25px;
+  height: 35px;
+  position: relative;
+  left: 0%;
+}
+
+#bar
+  {
+  width: 205px;
+  height: 5px;
+  background-color: white;
+  position: relative;
+  left: 75px;
+}
+
+#bar-front
+  {
+  width: 0%;
+  height: 100%;
+  background-color: blue;
+}
+
+#counter-left
+  {
+  width: 25px;
+  height: 35px;
+  position: absolute;
+  font: 16px arial;
+  color: #ff8080;
+  left: 10px;
+  margin-top: -12px;
+}
+#counter-right
+  {
+  width: 25px;
+  height: 35px;
+  position: absolute;
+  font: 16px arial;
+  color: #ff8080;
+  left: 290px;
+  margin-top: -12px;
 }
 
