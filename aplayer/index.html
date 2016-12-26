@@ -11,36 +11,47 @@
     <script src="js/main.js"></script>
 </head>
 <body class="win-type-body">
-            <div id="topline">
-               <button id="button1" class="win-button">Select Audio File</button>
-             </div>
-            <div id="title">
-                Title
-            </div>
+  <!-- Создаем Pivot – элемент с названием 'WINJS - PIVOT' -->
+      <div data-win-control="WinJS.UI.Pivot" data-win-options="{title: 'WINJS - PIVOT' }">
+      <!-- Чтобы добавить вкладки, добавьте внутрь дочерние элементы WinJS.UI.PivotItem. -->
+      <!-- Создаем элемент с заголовком ‘one’ -->
+              <div class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'one'}">
+                    <div id="topline">
+                       <button id="button1" class="win-button">Select Audio File</button>
+                     </div>
+                    <div id="title">
+                        Title
+                    </div>
 
-            <div id="progress-bar">
+                    <div id="progress-bar">
 
-              <div id="pointer-route">
-                <div id="pointer">
-                  <img src="/images/pointer.png" draggable="false" alt="pointer" style="width:25px; height:35px;">
-                </div>
+                      <div id="pointer-route">
+                        <div id="pointer">
+                          <img src="/images/pointer.png" draggable="false" alt="pointer" style="width:25px; height:35px;">
+                        </div>
+                      </div>
+                      <div id="bar">
+                         <div id="bar-front"></div>
+                      </div>
+
+                      <div id="counter-left">0:00:00</div>
+                      <div id="counter-right">9:99:99</div>
+
+                    </div>
+
+                    <div id="ButtonsElement">
+                        <button id="rewbutton">
+                            <img src="/images/rewind.png" width="100" height="100" />
+                        </button>
+                        <button id="playbutton">
+                            <img src="/images/play-stop.png" width="150" height="150" />
+                        </button>
+                     </div>
               </div>
-              <div id="bar">
-                 <div id="bar-front"></div>
+      <!-- Создаем элемент с заголовком ‘two’ -->
+              <div class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'two'}">
+                <div id="library"></div>
               </div>
-
-              <div id="counter-left">0:00:00</div>
-              <div id="counter-right">9:99:99</div>
-
-            </div>
-
-            <div id="ButtonsElement">
-                <button id="rewbutton">
-                    <img src="/images/rewind.png" width="100" height="100" />
-                </button>
-                <button id="playbutton">
-                    <img src="/images/play-stop.png" width="150" height="150" />
-                </button>
-             </div>
+      </div>
 </body>
 </html>

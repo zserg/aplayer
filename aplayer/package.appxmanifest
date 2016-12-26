@@ -27,5 +27,6 @@
   </Applications>
   <Capabilities>
     <uap:Capability Name="musicLibrary" />
+    <uap:Capability Name="removableStorage" />
   </Capabilities>
 </Package>

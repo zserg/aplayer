@@ -1,5 +1,6 @@
 ﻿body {
-  background-color: gray;
+  background-color: black;
+  color: white;
 }
 
 #contentGrid {
@@ -34,7 +35,6 @@
   width: 350px;
   height: 100px;
   margin: auto;
-  border: 1px solid white;
   position: relative;
 }
 
@@ -44,7 +44,6 @@
   height: 35px;
   position: relative;
   left: 63px;
-  background-color: yellow;
 }
 #pointer
   {

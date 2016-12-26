@@ -9,6 +9,9 @@
     var activation = Windows.ApplicationModel.Activation;
     var MediaPlayer = Windows.Media.Playback.MediaPlayer;
     var sessionState = WinJS.Application.sessionState;
+    var musicLibId = Windows.Storage.KnownLibraryId.Music;
+    var search = Windows.Storage.Search;
+
     var isFirstActivation = true;
     var systemMediaControls = null;
     var audtag = null;
@@ -31,6 +34,7 @@
     var bRight = null;
     var dragInProgress = false;
     var playPos = 0;
+    var queryOptions = null;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
@@ -52,6 +56,20 @@
             mPlayer.autoPlay = false;
             mPlayerSession = mPlayer.playbackSession;
             mPlayerSession.addEventListener("positionchanged", onPositionChanged)
+
+            queryOptions = new search.QueryOptions(search..CommonFileQuery.OrderByTitle, [".mp3"]);
+            queryOptions.folderDepth = search.FolderDepth.deep;
+            var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
+
+
+            query.getFilesAsync().done(function (files) {
+                // Process results
+                files.forEach(function (file) {
+                    // Process file
+                    document.getElementById("library").innerHTML+="<p>"+file.displayName+"</p>";
+                });
+            });
+
 
             openPicker = new Windows.Storage.Pickers.FileOpenPicker();
             openPicker.viewMode = Windows.Storage.Pickers.PickerViewMode.list;
