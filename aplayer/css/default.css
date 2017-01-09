@@ -3,6 +3,9 @@
   color: white;
 }
 
+#myListView .win-listview {
+    border: 2px solid red;
+}
 #contentGrid {
     display: -ms-grid;
     -ms-grid-rows: 40px 40px 200px auto;

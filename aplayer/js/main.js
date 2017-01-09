@@ -35,6 +35,10 @@
     var dragInProgress = false;
     var playPos = 0;
     var queryOptions = null;
+    var listView = null;
+    var f = null;
+    var props = null;
+    var myData = [];
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
@@ -57,18 +61,36 @@
             mPlayerSession = mPlayer.playbackSession;
             mPlayerSession.addEventListener("positionchanged", onPositionChanged)
 
-            queryOptions = new search.QueryOptions(search..CommonFileQuery.OrderByTitle, [".mp3"]);
+            queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
             queryOptions.folderDepth = search.FolderDepth.deep;
             var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
 
 
+            var filePromises = [];
             query.getFilesAsync().done(function (files) {
-                // Process results
-                files.forEach(function (file) {
-                    // Process file
-                    document.getElementById("library").innerHTML+="<p>"+file.displayName+"</p>";
+                // Get image properties
+               files.forEach(function (file) {
+                  props = file.properties;
+                  filePromises.push(props.getMusicPropertiesAsync())
+                  });
+
+               Promise.all(filePromises).then(function (musicProperties){
+                   musicProperties.forEach(function (musicProp) {
+                      myData.push({title: musicProp.title ? musicProp.title : "Empty Title" })
+                    });
+            var listDiv = document.querySelector("#myListView");  // Your html element on the page.
+            var listView = new WinJS.UI.ListView(listDiv, null);  // Declare a new list view by hand.
+
+            var itemDiv = document.getElementById("mylisttemplate");  // Your template container
+            var itemTemplate = new WinJS.Binding.Template(itemDiv, null);  // Create a template
+            listView.itemTemplate = itemDiv;  // Bind the list view to the element
+                var dataList = new WinJS.Binding.List(myData);
+                listView.itemDataSource = dataList.dataSource;
+                listView.forceLayout();
+                listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
                 });
-            });
+
+              });
 
 
             openPicker = new Windows.Storage.Pickers.FileOpenPicker();
@@ -126,7 +148,6 @@
             // TODO: приложение было активировано и не выполнялось. Выполните здесь общую инициализацию запуска.
             document.addEventListener("visibilitychange", onVisibilityChanged);
             args.setPromise(WinJS.UI.processAll());
-
             // Add your code to retrieve the button and register the event handler.
             var openButton = document.getElementById("button1");
             openButton.addEventListener("click", pickFile, false);
@@ -153,8 +174,18 @@
     };
 
 
+  function itemInvokedHandler(eventObject) {
+                eventObject.detail.itemPromise.done(function (invokedItem) {
 
-    function pickFile() {
+                    // Access item data from the itemPromise
+                    WinJS.log && WinJS.log("The item at index " + invokedItem.index + " is "
+                        + invokedItem.data.title + " with a text value of "
+                        + invokedItem.data.text, "sample", "status");
+                });
+            };
+
+
+  function pickFile() {
         openPicker.pickSingleFileAsync().done(function (file) {
             if (file) {
                 // Store the file to access again later
@@ -181,6 +212,10 @@
             WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
         }
 
+    };
+
+    function openAudioFromPath() {
+            Windows.Storage.StorageFile.getFileFromPathAsync(filePath).done(openAudio);
     };
 
     function getFile(file) {
