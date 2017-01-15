@@ -39,6 +39,7 @@
     var f = null;
     var props = null;
     var myData = [];
+    var slider = null;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
@@ -60,6 +61,9 @@
             mPlayer.autoPlay = false;
             mPlayerSession = mPlayer.playbackSession;
             mPlayerSession.addEventListener("positionchanged", onPositionChanged)
+            mPlayerSession.addEventListener("naturaldurationchanged", function(){
+                slider.max = mPlayerSession.naturalDuration.toFixed(2);
+                });
 
             queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
             queryOptions.folderDepth = search.FolderDepth.deep;
@@ -71,23 +75,24 @@
                 // Get image properties
                files.forEach(function (file) {
                   props = file.properties;
+                  myData.push({path:file.path, name:file.displayName});
                   filePromises.push(props.getMusicPropertiesAsync())
                   });
 
                Promise.all(filePromises).then(function (musicProperties){
-                   musicProperties.forEach(function (musicProp) {
-                      myData.push({title: musicProp.title ? musicProp.title : "Empty Title" })
+                    musicProperties.forEach(function (musicProp, ndx) {
+                        myData[ndx].title = musicProp.title ? musicProp.title : myData[ndx].name;
                     });
-            var listDiv = document.querySelector("#myListView");  // Your html element on the page.
-            var listView = new WinJS.UI.ListView(listDiv, null);  // Declare a new list view by hand.
+                    var listDiv = document.querySelector("#myListView");  // Your html element on the page.
+                    var listView = new WinJS.UI.ListView(listDiv, null);  // Declare a new list view by hand.
 
-            var itemDiv = document.getElementById("mylisttemplate");  // Your template container
-            var itemTemplate = new WinJS.Binding.Template(itemDiv, null);  // Create a template
-            listView.itemTemplate = itemDiv;  // Bind the list view to the element
-                var dataList = new WinJS.Binding.List(myData);
-                listView.itemDataSource = dataList.dataSource;
-                listView.forceLayout();
-                listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
+                    var itemDiv = document.getElementById("mylisttemplate");  // Your template container
+                    var itemTemplate = new WinJS.Binding.Template(itemDiv, null);  // Create a template
+                    listView.itemTemplate = itemDiv;  // Bind the list view to the element
+                    var dataList = new WinJS.Binding.List(myData);
+                    listView.itemDataSource = dataList.dataSource;
+                    listView.forceLayout();
+                    listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
                 });
 
               });
@@ -102,13 +107,15 @@
                 Windows.Storage.StorageFile.getFileFromPathAsync(sessionState.filePath).done(getFile);
             }
 
+            slider = document.getElementById("progress");
+            slider.addEventListener("change", sliderChange, false);
+            slider.onpointerdown = sliderMouseDown;
+            slider.onpointerup = sliderMouseUp;
+
             rewBut = document.getElementById('rewbutton');
             rewBut.addEventListener("click", rClick, false);
             playBut = document.getElementById('playbutton');
             playBut.addEventListener("click", pClick, false);
-            bLeft = document.getElementById("bar").getBoundingClientRect().left;
-            bRight = document.getElementById("bar").getBoundingClientRect().right;
-
             if (g_dispRequest === null) {
                 try {
                     // This call creates an instance of the displayRequest object
@@ -118,12 +125,6 @@
                     WinJS.log && WinJS.log("Failed: displayRequest object creation, error: " + e.message, "sample", "error");
                 }
             }
-
-            document.getElementById("pointer").onpointerdown = OnMouseDown;
-            document.getElementById("pointer").onpointerup = OnMouseUp;
-            document.getElementById("progress-bar").onpointerleave = OnMouseLeave;
-            document.getElementById("pointer").onpointermove = null;
-
 
             if (args.detail.arguments) {
                 // TODO: если приложение поддерживает всплывающие уведомления, используйте это значение из полезных данных всплывающего уведомления, чтобы определить, в какую часть приложения
@@ -149,8 +150,6 @@
             document.addEventListener("visibilitychange", onVisibilityChanged);
             args.setPromise(WinJS.UI.processAll());
             // Add your code to retrieve the button and register the event handler.
-            var openButton = document.getElementById("button1");
-            openButton.addEventListener("click", pickFile, false);
 
         }
 
@@ -173,17 +172,15 @@
 
     };
 
-
   function itemInvokedHandler(eventObject) {
                 eventObject.detail.itemPromise.done(function (invokedItem) {
-
+                openAudioFromPath(invokedItem.data.path);
                     // Access item data from the itemPromise
                     WinJS.log && WinJS.log("The item at index " + invokedItem.index + " is "
                         + invokedItem.data.title + " with a text value of "
                         + invokedItem.data.text, "sample", "status");
                 });
             };
-
 
   function pickFile() {
         openPicker.pickSingleFileAsync().done(function (file) {
@@ -205,8 +202,7 @@
             fileLocation = window.URL.createObjectURL(file, { oneTimeOnly: true });
             filePath = file.path;
             mPlayer.source = Windows.Media.Core.MediaSource.createFromStorageFile(file);
-            // audtag = document.getElementById("audtag");
-            // audtag.setAttribute("src", fileLocation);
+            mPlayer.play();
 
         } else {
             WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
@@ -214,7 +210,7 @@
 
     };
 
-    function openAudioFromPath() {
+    function openAudioFromPath(filePath) {
             Windows.Storage.StorageFile.getFileFromPathAsync(filePath).done(openAudio);
     };
 
@@ -284,11 +280,10 @@
 
     function onPositionChanged() {
       if(!dragInProgress){
+         slider.value = mPlayerSession.position.toFixed(2);
          var pos = (mPlayerSession.position/mPlayerSession.naturalDuration*100).toFixed(2);
          var time = new Date();
          time.setTime((mPlayerSession.position).toFixed(0));
-         document.getElementById("pointer").style.left = pos+"%";
-         document.getElementById("bar-front").style.width = pos+"%";
       }
     }
 
@@ -340,22 +335,27 @@
     function OnMouseDown(e) {
         if (e.button == 0) {
             dragInProgress = true;
-            var pos = xCalculate(bLeft, bRight, e.clientX);
-            document.getElementById("pointer").style.left = pos+"%";
-            document.getElementById("bar-front").style.width = pos+"%";
             document.onpointermove = OnMouseMove;
         }
     };
 
     function OnMouseMove(e)
     {
-      playPos = xCalculate(bLeft, bRight, e.clientX);
-      document.getElementById("pointer").style.left = playPos+"%";
-      document.getElementById("bar-front").style.width = playPos+"%";
-      document.getElementById("counter-left").innerHTML = playPos+"%";
-      document.getElementById("counter-right").innerHTML = 100-playPos+"%";
-
     }
+
+  function sliderMouseUp(e)
+    {
+      dragInProgress = false;
+    };
+
+    function sliderMouseDown(e) {
+        dragInProgress = true;
+    };
+
+  function sliderChange(e)
+    {
+        mPlayerSession.position = slider.value;
+    };
 
 
   function OnMouseUp(e)

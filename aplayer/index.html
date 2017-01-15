@@ -12,6 +12,13 @@
 </head>
 <body class="win-type-body">
 
+          <div id="mylisttemplate"
+                   data-win-control="WinJS.Binding.Template">
+                  <div data-win-bind="innerText:title"
+                       style="color: white; background: black; width: 300px; height: 50px;
+                              border: solid red 2px">
+                  </div>
+              </div>
 
       <!-- Simple template for the ListView instantiation  -->
         <div id="smallListIconTextTemplate" data-win-control="WinJS.Binding.Template" style="display: none">
@@ -23,28 +30,16 @@
       <!-- Чтобы добавить вкладки, добавьте внутрь дочерние элементы WinJS.UI.PivotItem. -->
       <!-- Создаем элемент с заголовком ‘one’ -->
               <div id="my" class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'one'}">
-                    <div id="topline">
-                       <button id="button1" class="win-button">Select Audio File</button>
-                     </div>
-                    <div id="title">
-                        Title
-                    </div>
+                    <input id="progress" type="range" min="0" max="500" value="0" list="ticks"
+                           class="win-slider">
 
-                    <div id="progress-bar">
-
-                      <div id="pointer-route">
-                        <div id="pointer">
-                          <img src="/images/pointer.png" draggable="false" alt="pointer" style="width:25px; height:35px;">
-                        </div>
-                      </div>
-                      <div id="bar">
-                         <div id="bar-front"></div>
-                      </div>
-
-                      <div id="counter-left">0:00:00</div>
-                      <div id="counter-right">9:99:99</div>
-
-                    </div>
+                    <datalist id="ticks">
+                        <option>0</option>
+                        <option>25</option>
+                        <option>50</option>
+                        <option>75</option>
+                        <option>100</option>
+                    </datalist>
 
                     <div id="ButtonsElement">
                         <button id="rewbutton">
@@ -69,13 +64,6 @@
                 </div>
           -->
 
-          <div id="mylisttemplate"
-                   data-win-control="WinJS.Binding.Template">
-                  <div data-win-bind="innerText:title"
-                       style="color: white; background: black; width: 300px; height: 50px;
-                              border: solid red 2px">
-                  </div>
-              </div>
               <div id="myListView"
                        data-win-control="WinJS.UI.ListView"
                        data-win-options="{
