@@ -12,18 +12,12 @@
 </head>
 <body class="win-type-body">
 
-          <div id="mylisttemplate"
-                   data-win-control="WinJS.Binding.Template">
-                  <div data-win-bind="innerText:title"
-                       style="color: white; background: black; width: 300px; height: 50px;
-                              border: solid red 2px">
-                  </div>
+      <div id="mylisttemplate" data-win-control="WinJS.Binding.Template">
+              <div data-win-bind="innerText:title"
+                   style="color: white; background: black;
+                          border: solid red 2px">
               </div>
-
-      <!-- Simple template for the ListView instantiation  -->
-        <div id="smallListIconTextTemplate" data-win-control="WinJS.Binding.Template" style="display: none">
-                    <h4 data-win-bind="innerText: title"></h4>
-        </div>
+      </div>
 
   <!-- Создаем Pivot – элемент с названием 'WINJS - PIVOT' -->
       <div data-win-control="WinJS.UI.Pivot" data-win-options="{title: 'WINJS - PIVOT' }">
@@ -52,25 +46,7 @@
               </div>
       <!-- Создаем элемент с заголовком ‘two’ -->
               <div class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'two'}">
-          <!--
-                <div id="listView"
-                      data-win-control="WinJS.UI.ListView"
-                      data-win-options="{ itemDataSource: myData.dataSource,
-                                          itemTemplate: smallListIconTextTemplate,
-                                          selectionMode: 'none',
-                                          tapBehavior: 'none',
-                                          swipeBehavior: 'none',
-                                          layout: { type: WinJS.UI.GridLayout } }">
-                </div>
-          -->
-
-              <div id="myListView"
-                       data-win-control="WinJS.UI.ListView"
-                       data-win-options="{
-                       itemTemplate: select('#mylisttemplate'),
-                       layout: {type: WinJS.UI.ListLayout} }">
-                  </div>
-
+                 <div id="myListView"> </div>
               </div>
       </div>
 </body>

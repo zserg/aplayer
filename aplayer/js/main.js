@@ -23,7 +23,6 @@
     var filePath = null;
     var storageFolder = null;
     var g_dispRequest = null;
-    var openPicker = null;
     var mPlayer = null;
     var mPlayerSession = null;
     var _startX = 0;            // mouse starting positions
@@ -84,7 +83,7 @@
                         myData[ndx].title = musicProp.title ? musicProp.title : myData[ndx].name;
                     });
                     var listDiv = document.querySelector("#myListView");  // Your html element on the page.
-                    var listView = new WinJS.UI.ListView(listDiv, null);  // Declare a new list view by hand.
+                    var listView = new WinJS.UI.ListView(listDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
 
                     var itemDiv = document.getElementById("mylisttemplate");  // Your template container
                     var itemTemplate = new WinJS.Binding.Template(itemDiv, null);  // Create a template
@@ -97,10 +96,6 @@
 
               });
 
-
-            openPicker = new Windows.Storage.Pickers.FileOpenPicker();
-            openPicker.viewMode = Windows.Storage.Pickers.PickerViewMode.list;
-            openPicker.fileTypeFilter.replaceAll([".mp3"]);
 
             filePath = WinJS.Application.sessionState.filePath
             if (filePath) {
@@ -182,20 +177,6 @@
                 });
             };
 
-  function pickFile() {
-        openPicker.pickSingleFileAsync().done(function (file) {
-            if (file) {
-                // Store the file to access again later
-                sessionState.lastFileToken = Windows.Storage.AccessCache.StorageApplicationPermissions.futureAccessList.add(file);
-                file.getParentAsync().done(function (folder) {
-                    openAudio(file);
-                })
-            } else {
-                // No file
-            }
-        }
-      )
-    };
 
     function openAudio(file) {
         if (file) {
