@@ -24,18 +24,21 @@
       <!-- Чтобы добавить вкладки, добавьте внутрь дочерние элементы WinJS.UI.PivotItem. -->
       <!-- Создаем элемент с заголовком ‘one’ -->
               <div id="my" class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'one'}">
-                    <input id="progress" type="range" min="0" max="500" value="0" list="ticks"
+                  <div id="slider">
+                    <input id="progress" type="range" min="0" max="500" value="0" list="bookmarks"
                            class="win-slider">
+                  </div>
 
-                    <datalist id="ticks">
+                    <datalist id="bookmarks">
                         <option>0</option>
                         <option>25</option>
                         <option>50</option>
                         <option>75</option>
-                        <option>100</option>
+                        <option>10000</option>
                     </datalist>
-
                     <div id="ButtonsElement">
+                      <button id="button1" style="height:150px; width:150px">B1</button>
+                      <button id="button2" style="height:150px; width:150px">B2</button>
                         <button id="rewbutton">
                             <img src="/images/rewind.png" width="100" height="100" />
                         </button>

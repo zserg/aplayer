@@ -4,7 +4,7 @@
 
 (function () {
     "use strict";
-
+    WinJS.log = console.log.bind(console);
     var app = WinJS.Application;
     var activation = Windows.ApplicationModel.Activation;
     var MediaPlayer = Windows.Media.Playback.MediaPlayer;
@@ -39,6 +39,10 @@
     var props = null;
     var myData = [];
     var slider = null;
+    var db = null;
+    var trackData = {};
+    var filePlayed = null;
+    var createBmBut = null;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
@@ -49,6 +53,8 @@
             // Активация Launch выполняется, когда пользователь запускает ваше приложение с помощью плитки
             // или вызывает всплывающее уведомление, щелкнув основной текст или коснувшись его.
             // Create the media control.
+            WinJS.Utilities.startLog();
+            createDB();
             systemMediaControls = Windows.Media.SystemMediaTransportControls.getForCurrentView();
             systemMediaControls.addEventListener("propertychanged", mediaPropertyChanged, false);
             systemMediaControls.addEventListener("buttonpressed", mediaButtonPressed, false);
@@ -61,7 +67,7 @@
             mPlayerSession = mPlayer.playbackSession;
             mPlayerSession.addEventListener("positionchanged", onPositionChanged)
             mPlayerSession.addEventListener("naturaldurationchanged", function(){
-                slider.max = mPlayerSession.naturalDuration.toFixed(2);
+                slider.max = mPlayerSession.naturalDuration.toFixed(0);
                 });
 
             queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
@@ -111,6 +117,9 @@
             rewBut.addEventListener("click", rClick, false);
             playBut = document.getElementById('playbutton');
             playBut.addEventListener("click", pClick, false);
+            createBmBut = document.getElementById('button1');
+            createBmBut.addEventListener("click", createBookmark, false);
+
             if (g_dispRequest === null) {
                 try {
                     // This call creates an instance of the displayRequest object
@@ -167,6 +176,136 @@
 
     };
 
+    function createDB() {
+        WinJS.log && WinJS.log("createDB start", "IndexedDB", "info");
+        // Create the request to open the database, named BookDB. If it doesn't exist, create it and immediately
+        // upgrade to version 1.
+        var dbRequest = window.indexedDB.open("PlayerDB", 1);
+
+        // Add asynchronous callback functions
+        dbRequest.onerror = function () { WinJS.log && WinJS.log("Error creating database.", "sample", "error"); };
+        dbRequest.onsuccess = function (evt) { dbSuccess(evt); };
+        dbRequest.onupgradeneeded = function (evt) { dbVersionUpgrade(evt); };
+        dbRequest.onblocked = function () { WinJS.log && WinJS.log("Database create blocked.", "sample", "error");  };
+
+    }
+
+    // Whenever an IndexedDB is created, the version is set to "", but can be immediately upgraded by calling createDB.
+    function dbVersionUpgrade(evt) {
+        db = evt.target.result;
+
+        // Get the version update transaction handle, since we want to create the schema as part of the same transaction.
+        var txn = evt.target.transaction;
+
+        // Create the object store, with an index on the file path. Note that we set the returned object store to a variable
+        // in order to make further calls (index creation) on that object store.
+        if(!db.objectStoreNames.contains("tracks")) {
+                db.createObjectStore("tracks", { keyPath: "path"});
+            }
+
+        // Once the creation of the object stores is finished (they are created asynchronously), log success.
+        txn.oncomplete = function () { WinJS.log && WinJS.log("Database schema created.", "sample", "status"); };
+    };
+
+    function dbSuccess(evt) {
+        db = evt.target.result;
+        WinJS.log && WinJS.log("Database open success", "sample", "info");
+        };
+
+    function readBookmarks(filepath) {
+        WinJS.log && WinJS.log("readBookmarks start", "readData", "info");
+        // Create a transaction with which to query the IndexedDB.
+        var txn = db.transaction(["tracks"], "readonly");
+        var objectStore = txn.objectStore("tracks");
+        var request = objectStore.get(filePath);
+
+        // Set the event callbacks for the transaction.
+        request.onerror = function () { WinJS.log && WinJS.log("Error reading data.", "readData", "error"); };
+        request.onabort = function () { WinJS.log && WinJS.log("Reading of data aborted.", "readData", "error"); };
+
+        request.onsuccess = function (e) {
+          trackData = e.target.result;
+          if(!trackData){
+             trackData = {path: filePlayed.path,
+                          duration: mPlayerSession.naturalDuration,
+                          bookmarks: []};
+          }
+          updateTicks();
+        };
+    };
+
+    function updateTicks(){
+          WinJS.log && WinJS.log(trackData.path, "updateTicks", "info");
+          var ss = String(mPlayerSession.naturalDuration)+"==" +String(trackData.duration);
+          var bmNode = document.getElementById("bookmarks");
+          while (bmNode.firstChild) {
+                bmNode.removeChild(bmNode.firstChild);
+          };
+
+          trackData.bookmarks.forEach(function (item) {
+            var tick = document.createElement("OPTION");
+            tick.innerHTML = item.toFixed(0);
+            bmNode.appendChild(tick);
+          });
+          slider.max = mPlayerSession.naturalDuration.toFixed(0);
+    };
+
+    function write(evt) {
+        WinJS.log && WinJS.log("readData start", "readData", "info");
+        // Create a transaction with which to query the IndexedDB.
+        var txn = db.transaction(["tracks"], "readonly");
+        var objectStore = txn.objectStore("tracks");
+        var request = objectStore.get(filePlayed.path);
+
+        // Set the event callbacks for the transaction.
+        request.onerror = function () { WinJS.log && WinJS.log("Error reading data.", "readData", "error"); };
+        request.onabort = function () { WinJS.log && WinJS.log("Reading of data aborted.", "readData", "error"); };
+
+        request.onsuccess = function (e) {
+          trackData = e.target.result;
+          if (trackData) {
+            if (mPlayerSession.naturalDuration == trackData.duration) {
+              var bmNode = document.getElementById("bookmarks");
+              while (bmNode.firstChild) {
+                  bmNode.removeChild(bmNode.firstChild);
+              };
+
+              trackData.bookmarks.forEach(function (item) {
+                var tick = document.createElement("OPTION");
+                tick.innerHTML = item.toFixed(0);
+                bmNode.appendChild(tick);
+              });
+              slider.max = mPlayerSession.naturalDuration.toFixed(0);
+              // var sliderNode = document.getElementById("slider");
+              // var content = sliderNode.innerHTML;
+              // sliderNode.innerHTML = content;
+
+            }
+          }
+        };
+    };
+
+    function createBookmark(evt) {
+        // Create a transaction with which to query the IndexedDB.
+        WinJS.log && WinJS.log("createBookmark start", "createBookmark", "info");
+        console.log("createBookmark");
+        var txn = db.transaction(["tracks"], "readwrite");
+        var objectStore = txn.objectStore("tracks");
+
+        trackData.bookmarks.push(mPlayerSession.position);
+        var request = objectStore.put(trackData);
+        updateTicks();
+
+        // Set the event callbacks for the transaction.
+        txn.onerror = function (e) {
+          var err = txn;
+           WinJS.log && WinJS.log("transaction onerror", "createBookmark", "error"); };
+        txn.onabort = function () { WinJS.log && WinJS.log("onabort", "createBookmark", "error"); };
+
+        request.onsuccess = function (e) { WinJS.log && WinJS.log("success", "createBookmark", "info")};
+        request.onerror = function (e) {WinJS.log && WinJS.log("request onerror", "createBookmark", "error")};
+    };
+
   function itemInvokedHandler(eventObject) {
                 eventObject.detail.itemPromise.done(function (invokedItem) {
                 openAudioFromPath(invokedItem.data.path);
@@ -180,10 +319,12 @@
 
     function openAudio(file) {
         if (file) {
-            fileLocation = window.URL.createObjectURL(file, { oneTimeOnly: true });
-            filePath = file.path;
-            mPlayer.source = Windows.Media.Core.MediaSource.createFromStorageFile(file);
+            filePlayed = file;
+            fileLocation = window.URL.createObjectURL(filePlayed, { oneTimeOnly: true });
+            filePath = filePlayed.path;
+            mPlayer.source = Windows.Media.Core.MediaSource.createFromStorageFile(filePlayed);
             mPlayer.play();
+            readBookmarks();// read bookmarks from IndexedDB
 
         } else {
             WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
