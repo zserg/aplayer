@@ -1,48 +1,35 @@
 ﻿body {
   background-color: black;
-  color: white;
+  /* color: white; */
 }
 
 input[type=range]::-ms-tooltip {
     display: none;
 }
+.win-slider {
+  -webkit-appearance: none;
+  /* width: 280px; */
+  height: 42px;
+  padding-top: 17px;
+  padding-bottom: 32px;
+}
 
 .win-slider::-ms-thumb {
-  width: 4px;
-  height: 24px;
-  border-radius: 4px;
+  width: 2px;
+  height: 36px;
   border-style: none;
 }
 
 .win-slider::-ms-track {
   color: red;
-  background-color: #ffff00;
+  background-color: white;
+  height: 8px;
+  border-style: none;
 }
 
 
 #myListView .win-listview .win-viewport.win-vertical{
     border: 2px solid red;
-}
-#contentGrid {
-    display: -ms-grid;
-    -ms-grid-rows: 40px 40px 200px auto;
-    margin: 20px 20px 20px 20px;
-    border: 1px solid gray;
-}
-
-#topline {
-    -ms-grid-row: 1;
-     border: 1px solid gray;
-}
-
-#title {
-    -ms-grid-row: 2;
-     border: 1px solid gray;
-}
-
-#MediaElement {
-    -ms-grid-row: 3;
-     border: 1px solid gray;
 }
 
 #ButtonsElement {
@@ -50,63 +37,4 @@ input[type=range]::-ms-tooltip {
      border: 1px solid gray;
 }
 
-#progress-bar
-  {
-  width: 350px;
-  height: 100px;
-  margin: auto;
-  position: relative;
-}
-
-#pointer-route
-  {
-  width: 205px;
-  height: 35px;
-  position: relative;
-  left: 63px;
-}
-#pointer
-  {
-  width: 25px;
-  height: 35px;
-  position: relative;
-  left: 0%;
-}
-
-#bar
-  {
-  width: 205px;
-  height: 5px;
-  background-color: white;
-  position: relative;
-  left: 75px;
-}
-
-#bar-front
-  {
-  width: 0%;
-  height: 100%;
-  background-color: blue;
-}
-
-#counter-left
-  {
-  width: 25px;
-  height: 35px;
-  position: absolute;
-  font: 16px arial;
-  color: #ff8080;
-  left: 10px;
-  margin-top: -12px;
-}
-#counter-right
-  {
-  width: 25px;
-  height: 35px;
-  position: absolute;
-  font: 16px arial;
-  color: #ff8080;
-  left: 290px;
-  margin-top: -12px;
-}
 
