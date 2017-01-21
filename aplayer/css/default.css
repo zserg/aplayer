@@ -37,4 +37,22 @@ input[type=range]::-ms-tooltip {
      border: 1px solid gray;
 }
 
+.win-pivot button.win-pivot-header.win-pivot-header-selected {
+  color: white;
+}
+
+.win-pivot button.win-pivot-header {
+  color: gray;
+  background-color: transparent;
+}
+
+.win-pivot button.win-pivot-header {
+  color: rgba(100, 100, 100, 1);
+  background-color: transparent;
+}
+
+
+html.win-hoverable .win-pivot button.win-pivot-header:hover {
+  color: rgba(180, 180, 180, 1);
+}
 

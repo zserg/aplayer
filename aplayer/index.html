@@ -20,10 +20,10 @@
       </div>
 
   <!-- Создаем Pivot – элемент с названием 'WINJS - PIVOT' -->
-      <div data-win-control="WinJS.UI.Pivot" data-win-options="{title: 'WINJS - PIVOT' }">
+      <div data-win-control="WinJS.UI.Pivot" >
       <!-- Чтобы добавить вкладки, добавьте внутрь дочерние элементы WinJS.UI.PivotItem. -->
       <!-- Создаем элемент с заголовком ‘one’ -->
-              <div id="my" class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'one'}">
+              <div id="my" class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Player'}">
                   <div id="slider">
                     <input id="progress" type="range" min="0" max="500" value="0" list="bookmarks"
                            class="win-slider">
@@ -48,7 +48,7 @@
                      </div>
               </div>
       <!-- Создаем элемент с заголовком ‘two’ -->
-              <div class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'two'}">
+              <div class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Library'}">
                  <div id="myListView"> </div>
               </div>
       </div>
