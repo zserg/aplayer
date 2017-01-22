@@ -43,6 +43,9 @@
     var trackData = {};
     var filePlayed = null;
     var createBmBut = null;
+    var butPrevBm = null;
+    var butNextBm = null;
+    var ONE_SECOND = 1000;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
@@ -67,7 +70,7 @@
             mPlayerSession = mPlayer.playbackSession;
             mPlayerSession.addEventListener("positionchanged", onPositionChanged)
             mPlayerSession.addEventListener("naturaldurationchanged", function(){
-                slider.max = mPlayerSession.naturalDuration.toFixed(0);
+                slider.max = mPlayerSession.naturalDuration.toFixed(2);
                 });
 
             queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
@@ -117,8 +120,14 @@
             rewBut.addEventListener("click", rClick, false);
             playBut = document.getElementById('playbutton');
             playBut.addEventListener("click", pClick, false);
-            createBmBut = document.getElementById('button1');
+            createBmBut = document.getElementById('butAddBm');
             createBmBut.addEventListener("click", createBookmark, false);
+
+            butPrevBm = document.getElementById('butPrevBm');
+            butPrevBm.addEventListener("click", findPrevBookmark, false);
+
+            butNextBm = document.getElementById('butNextBm');
+            butNextBm.addEventListener("click", findNextBookmark, false);
 
             if (g_dispRequest === null) {
                 try {
@@ -247,43 +256,9 @@
             tick.innerHTML = item.toFixed(0);
             bmNode.appendChild(tick);
           });
-          slider.max = mPlayerSession.naturalDuration.toFixed(0);
+          slider.max = mPlayerSession.naturalDuration.toFixed(2);
     };
 
-    function write(evt) {
-        WinJS.log && WinJS.log("readData start", "readData", "info");
-        // Create a transaction with which to query the IndexedDB.
-        var txn = db.transaction(["tracks"], "readonly");
-        var objectStore = txn.objectStore("tracks");
-        var request = objectStore.get(filePlayed.path);
-
-        // Set the event callbacks for the transaction.
-        request.onerror = function () { WinJS.log && WinJS.log("Error reading data.", "readData", "error"); };
-        request.onabort = function () { WinJS.log && WinJS.log("Reading of data aborted.", "readData", "error"); };
-
-        request.onsuccess = function (e) {
-          trackData = e.target.result;
-          if (trackData) {
-            if (mPlayerSession.naturalDuration == trackData.duration) {
-              var bmNode = document.getElementById("bookmarks");
-              while (bmNode.firstChild) {
-                  bmNode.removeChild(bmNode.firstChild);
-              };
-
-              trackData.bookmarks.forEach(function (item) {
-                var tick = document.createElement("OPTION");
-                tick.innerHTML = item.toFixed(0);
-                bmNode.appendChild(tick);
-              });
-              slider.max = mPlayerSession.naturalDuration.toFixed(0);
-              // var sliderNode = document.getElementById("slider");
-              // var content = sliderNode.innerHTML;
-              // sliderNode.innerHTML = content;
-
-            }
-          }
-        };
-    };
 
     function createBookmark(evt) {
         // Create a transaction with which to query the IndexedDB.
@@ -293,6 +268,7 @@
         var objectStore = txn.objectStore("tracks");
 
         trackData.bookmarks.push(mPlayerSession.position);
+        trackData.bookmarks.sort(function(a, b){return a-b});
         var request = objectStore.put(trackData);
         updateTicks();
 
@@ -493,36 +469,30 @@
       dragInProgress = false;
     };
 
-  function xCalculate(boundLeft, boudRight, x)
-    {
-      var x_int;
-      if(x < boundLeft){
-        x_int = boundLeft;
-      }else if(x > boudRight) {
-        x_int = boudRight;
-      }else{
-        x_int = x;
+    function findPrevBookmark() {
+      var cur_pos = mPlayerSession.position;
+      var new_pos = 0;
+      var bmLength = trackData.bookmarks.length;
+      for(var i=0; i< bmLength;i++){
+        if(trackData.bookmarks[i] < cur_pos && Math.abs(trackData.bookmarks[i]-cur_pos) > ONE_SECOND){
+           new_pos = trackData.bookmarks[i];
+        }else{
+          break;
+        }
       }
-      return (((x_int-boundLeft)/(boudRight-boundLeft))*100).toFixed(2);
+      mPlayerSession.position = new_pos;
     };
 
-
-  function countersCalculate(pos)
-    {
-      var x_int;
-      if(x < boundLeft){
-        x_int = boundLeft;
-      }else if(x > boudRight) {
-        x_int = boudRight;
-      }else{
-        x_int = x;
+    function findNextBookmark() {
+      var cur_pos = mPlayerSession.position;
+      var bmLength = trackData.bookmarks.length;
+      for(var i=0; i< bmLength;i++){
+        if(trackData.bookmarks[i] > cur_pos) {
+           mPlayerSession.position = trackData.bookmarks[i];
+           break;
+        }
       }
-      return (((x_int-boundLeft)/(boudRight-boundLeft))*100).toFixed(2);
-         document.getElementById("counter-left").innerHTML = time.getHours()+':'+
-                                                             time.getMinutes()+':'+
-                                                             time.getSeconds();
     };
-
 
     app.start();
 })();
