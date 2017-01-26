@@ -28,6 +28,11 @@ input[type=range]::-ms-tooltip {
 }
 
 
+#chapter{
+    color: white;
+     border: 1px solid gray;
+}
+
 #myListView .win-listview .win-viewport.win-vertical{
     border: 2px solid red;
 }

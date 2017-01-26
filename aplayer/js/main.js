@@ -25,12 +25,6 @@
     var g_dispRequest = null;
     var mPlayer = null;
     var mPlayerSession = null;
-    var _startX = 0;            // mouse starting positions
-    var _startY = 0;
-    var _offsetX = 0;           // current element offset
-    var _offsetY = 0;
-    var bLeft = null;
-    var bRight = null;
     var dragInProgress = false;
     var playPos = 0;
     var queryOptions = null;
@@ -46,6 +40,12 @@
     var butPrevBm = null;
     var butNextBm = null;
     var ONE_SECOND = 1000;
+    var startBm = null;
+    var endBm = null;
+    var mode = null;
+    var TRACK_TO_END = 0;
+    var CHAPTER_TO_END = 1;
+    var CHAPTER_CYCLE = 2;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
@@ -128,6 +128,8 @@
 
             butNextBm = document.getElementById('butNextBm');
             butNextBm.addEventListener("click", findNextBookmark, false);
+
+            mode = CHAPTER_TO_END;
 
             if (g_dispRequest === null) {
                 try {
@@ -240,6 +242,7 @@
                           bookmarks: []};
           }
           updateTicks();
+          findChapter();
         };
     };
 
@@ -257,6 +260,7 @@
             bmNode.appendChild(tick);
           });
           slider.max = mPlayerSession.naturalDuration.toFixed(2);
+
     };
 
 
@@ -301,6 +305,8 @@
             mPlayer.source = Windows.Media.Core.MediaSource.createFromStorageFile(filePlayed);
             mPlayer.play();
             readBookmarks();// read bookmarks from IndexedDB
+            //mode = TRACK_TO_END;
+            mode = CHAPTER_CYCLE;
 
         } else {
             WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
@@ -315,11 +321,6 @@
     function getFile(file) {
             if (file) {
                 mPlayer.source = Windows.Media.Core.MediaSource.createFromStorageFile(file);
-                // fileLocation = window.URL.createObjectURL(file, { oneTimeOnly: true });
-                // filePath = file.path;
-                // audtag = document.getElementById("audtag");
-                // audtag.setAttribute("src", fileLocation);
-
             } else {
                 WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
             }
@@ -382,6 +383,18 @@
          var pos = (mPlayerSession.position/mPlayerSession.naturalDuration*100).toFixed(2);
          var time = new Date();
          time.setTime((mPlayerSession.position).toFixed(0));
+         if(mode == CHAPTER_TO_END && (endBm != null) && (mPlayerSession.position > trackData.bookmarks[endBm])){
+           mPlayer.pause();
+         }else if(mode == CHAPTER_CYCLE && (endBm != null) && (mPlayerSession.position > trackData.bookmarks[endBm])){
+           if(startBm != null){
+              mPlayerSession.position = trackData.bookmarks[startBm];
+           }else{
+              mPlayerSession.position = 0;
+           }
+           mPlayer.pause()
+           window.setTimeout(function () { mPlayer.play()}, 1000);
+         }
+
       }
     }
 
@@ -453,6 +466,7 @@
   function sliderChange(e)
     {
         mPlayerSession.position = slider.value;
+        findChapter();
     };
 
 
@@ -481,6 +495,7 @@
         }
       }
       mPlayerSession.position = new_pos;
+      findChapter();
     };
 
     function findNextBookmark() {
@@ -492,6 +507,25 @@
            break;
         }
       }
+      findChapter();
+    };
+
+    function findChapter() {
+      var cur_pos = mPlayerSession.position;
+      var bmLength = trackData.bookmarks.length;
+      startBm = null;
+      endBm = null;
+      for(var i=0; i< bmLength;i++){
+        if(trackData.bookmarks[i] <= cur_pos) {
+           startBm = i;
+        }
+        if(trackData.bookmarks[i] > cur_pos) {
+           endBm = i;
+           break;
+        }
+      }
+      var chapE = document.getElementById("chapter");
+      chapE.innerHTML = startBm + ":" + endBm;
     };
 
     app.start();
