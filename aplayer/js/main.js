@@ -40,6 +40,7 @@
     var removeBmBut = null;
     var butPrevBm = null;
     var butNextBm = null;
+    var butMode = null;
     var ONE_SECOND = 1000;
     var startBm = null;
     var endBm = null;
@@ -119,10 +120,13 @@
 
             rewBut = document.getElementById('rewbutton');
             rewBut.addEventListener("click", rClick, false);
+
             playBut = document.getElementById('playbutton');
             playBut.addEventListener("click", pClick, false);
+
             createBmBut = document.getElementById('butAddBm');
             createBmBut.addEventListener("click", createBookmark, false);
+
             removeBmBut = document.getElementById('butRmBm');
             removeBmBut.addEventListener("click", removeBookmark, false);
 
@@ -132,7 +136,11 @@
             butNextBm = document.getElementById('butNextBm');
             butNextBm.addEventListener("click", findNextBookmark, false);
 
-            mode = CHAPTER_TO_END;
+            butMode = document.getElementById('butMode');
+            butMode.addEventListener("click", changeMode, false);
+
+            mode = CHAPTER_CYCLE;
+            changeMode();
 
             if (g_dispRequest === null) {
                 try {
@@ -330,7 +338,7 @@
             mPlayer.play();
             readBookmarks();// read bookmarks from IndexedDB
             //mode = TRACK_TO_END;
-            mode = CHAPTER_CYCLE;
+            //mode = CHAPTER_CYCLE;
 
         } else {
             WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
@@ -409,6 +417,11 @@
          time.setTime((mPlayerSession.position).toFixed(0));
          if(mode == CHAPTER_TO_END && (endBm != null) && (mPlayerSession.position > trackData.bookmarks[endBm])){
            mPlayer.pause();
+           if(startBm != null){
+              mPlayerSession.position = trackData.bookmarks[startBm];
+           }else{
+              mPlayerSession.position = 0;
+           }
          }else if(mode == CHAPTER_CYCLE && (endBm != null) && (mPlayerSession.position > trackData.bookmarks[endBm])){
            if(startBm != null){
               mPlayerSession.position = trackData.bookmarks[startBm];
@@ -562,6 +575,18 @@
       }
       storeBookmark();
     };
+
+   function changeMode(){
+     if(mode == TRACK_TO_END){
+       mode = CHAPTER_TO_END;
+     }else if(mode == CHAPTER_TO_END){
+       mode = CHAPTER_CYCLE;
+     }else{
+       mode = TRACK_TO_END;
+     }
+     var mode_button = document.getElementById("butMode");
+     mode_button.innerHTML = mode;
+   };
 
 
   app.start();
