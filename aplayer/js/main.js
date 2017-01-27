@@ -37,6 +37,7 @@
     var trackData = {};
     var filePlayed = null;
     var createBmBut = null;
+    var removeBmBut = null;
     var butPrevBm = null;
     var butNextBm = null;
     var ONE_SECOND = 1000;
@@ -122,6 +123,8 @@
             playBut.addEventListener("click", pClick, false);
             createBmBut = document.getElementById('butAddBm');
             createBmBut.addEventListener("click", createBookmark, false);
+            removeBmBut = document.getElementById('butRmBm');
+            removeBmBut.addEventListener("click", removeBookmark, false);
 
             butPrevBm = document.getElementById('butPrevBm');
             butPrevBm.addEventListener("click", findPrevBookmark, false);
@@ -285,6 +288,27 @@
         request.onsuccess = function (e) { WinJS.log && WinJS.log("success", "createBookmark", "info")};
         request.onerror = function (e) {WinJS.log && WinJS.log("request onerror", "createBookmark", "error")};
     };
+
+    function storeBookmark(evt) {
+        // Create a transaction with which to query the IndexedDB.
+        WinJS.log && WinJS.log("storeBookmark start", "storeBookmark", "info");
+        console.log("storeBookmark");
+        var txn = db.transaction(["tracks"], "readwrite");
+        var objectStore = txn.objectStore("tracks");
+
+        var request = objectStore.put(trackData);
+        updateTicks();
+
+        // Set the event callbacks for the transaction.
+        txn.onerror = function (e) {
+          var err = txn;
+           WinJS.log && WinJS.log("transaction onerror", "storeBookmark", "error"); };
+        txn.onabort = function () { WinJS.log && WinJS.log("onabort", "storeBookmark", "error"); };
+
+        request.onsuccess = function (e) { WinJS.log && WinJS.log("success", "storeBookmark", "info")};
+        request.onerror = function (e) {WinJS.log && WinJS.log("request onerror", "storeBookmark", "error")};
+    };
+
 
   function itemInvokedHandler(eventObject) {
                 eventObject.detail.itemPromise.done(function (invokedItem) {
@@ -528,7 +552,19 @@
       chapE.innerHTML = startBm + ":" + endBm;
     };
 
-    app.start();
+
+   function removeBookmark(){
+      var cur_pos = mPlayerSession.position;
+      var bmLength = trackData.bookmarks.length;
+      var index = trackData.bookmarks.indexOf(cur_pos);
+      if (index > -1){
+        trackData.bookmarks.splice(index,1)
+      }
+      storeBookmark();
+    };
+
+
+  app.start();
 })();
 
 
