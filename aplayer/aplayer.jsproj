@@ -58,6 +58,7 @@
     <AppxManifest Include="package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <Content Include="images\music.jpg" />
     <Content Include="images\play-stop.png" />
     <Content Include="images\pointer.png" />
     <Content Include="images\rewind.png" />

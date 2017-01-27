@@ -337,9 +337,13 @@
             mPlayer.source = Windows.Media.Core.MediaSource.createFromStorageFile(filePlayed);
             mPlayer.play();
             readBookmarks();// read bookmarks from IndexedDB
-            //mode = TRACK_TO_END;
-            //mode = CHAPTER_CYCLE;
-
+            file.properties.getMusicPropertiesAsync().done(function (mprops){
+              var title = mprops.title;
+              var album = mprops.album;
+              var artist = mprops.artist;
+              var info_el = document.getElementById("trackinfo")
+              info_el.innerHTML = artist+" : "+title;
+            });
         } else {
             WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
         }

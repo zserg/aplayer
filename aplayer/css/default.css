@@ -33,6 +33,11 @@ input[type=range]::-ms-tooltip {
      border: 1px solid gray;
 }
 
+#trackinfo{
+    color: white;
+     border: 1px solid gray;
+}
+
 #myListView .win-listview .win-viewport.win-vertical{
     border: 2px solid red;
 }
@@ -40,6 +45,8 @@ input[type=range]::-ms-tooltip {
 #ButtonsElement {
     -ms-grid-row: 4;
      border: 1px solid gray;
+     position: relative;
+     height: 300px;
 }
 
 .win-pivot button.win-pivot-header.win-pivot-header-selected {
@@ -59,5 +66,10 @@ input[type=range]::-ms-tooltip {
 
 html.win-hoverable .win-pivot button.win-pivot-header:hover {
   color: rgba(180, 180, 180, 1);
+}
+
+
+.buttons {
+  position: absolute;
 }
 
