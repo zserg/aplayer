@@ -13,10 +13,9 @@
 <body class="win-type-body">
 
       <div id="mylisttemplate" data-win-control="WinJS.Binding.Template">
-              <div data-win-bind="innerText:title"
-                   style="color: white; background: black;
-                          border: solid red 2px">
-              </div>
+        <div id="list_title" data-win-bind="innerText:title"></div>
+        <div id="list_artist" data-win-bind="innerText:artist"></div>
+        <div id="list_duration" data-win-bind="innerText:duration" ></div>
       </div>
 
   <!-- Создаем Pivot – элемент с названием 'WINJS - PIVOT' -->

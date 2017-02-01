@@ -92,6 +92,9 @@
                Promise.all(filePromises).then(function (musicProperties){
                     musicProperties.forEach(function (musicProp, ndx) {
                         myData[ndx].title = musicProp.title ? musicProp.title : myData[ndx].name;
+                        myData[ndx].album = musicProp.album ? musicProp.album : " ";
+                        myData[ndx].artist = musicProp.artist ? musicProp.artist : " ";
+                        myData[ndx].duration = ms2time(musicProp.duration);
                     });
                     var listDiv = document.querySelector("#myListView");  // Your html element on the page.
                     var listView = new WinJS.UI.ListView(listDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
@@ -322,6 +325,9 @@
                 eventObject.detail.itemPromise.done(function (invokedItem) {
                 openAudioFromPath(invokedItem.data.path);
                     // Access item data from the itemPromise
+                  var piv = document.getElementsByClassName("win-pivot")
+                  var myPiv = piv[0];
+                  myPiv.winControl.selectedIndex = 0;
                     WinJS.log && WinJS.log("The item at index " + invokedItem.index + " is "
                         + invokedItem.data.title + " with a text value of "
                         + invokedItem.data.text, "sample", "status");
@@ -590,6 +596,16 @@
      }
      var mode_button = document.getElementById("butMode");
      mode_button.innerHTML = mode;
+   };
+
+   function ms2time (ms){
+     var x = Math.floor(ms/1000);
+     var sec = x % 60;
+     x = Math.floor(x/60);
+     var min = x % 60;
+     var hour = Math.floor(x/60);
+     var str = hour+':'+min+':'+sec;
+     return str;
    };
 
 
