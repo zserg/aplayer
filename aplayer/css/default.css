@@ -33,9 +33,9 @@ input[type=range]::-ms-tooltip {
      border: 1px solid gray;
 }
 
-#trackinfo{
+#track-info{
     color: white;
-     border: 1px solid gray;
+    margin-left: 20px;
 }
 
 #myListView .win-listview .win-viewport.win-vertical{
@@ -104,3 +104,20 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
   background-color: #1f1f1f;
   color: white;
 }
+
+#track-info {
+  width: 66%;
+}
+
+#couter-left {
+  float: left;
+  color: white;
+  font-size: 80%;
+}
+
+#couter-right {
+  float:right;
+  color: white;
+  font-size: 80%;
+}
+

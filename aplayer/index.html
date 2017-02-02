@@ -23,14 +23,24 @@
       <!-- Чтобы добавить вкладки, добавьте внутрь дочерние элементы WinJS.UI.PivotItem. -->
       <!-- Создаем элемент с заголовком ‘one’ -->
               <div id="my" class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Player'}">
-                  <div id="thumbnail">
-                     <img src="/images/music.jpg" width="80px" height="80px" />
-                  </div>
-                  <div id="trackinfo"></div>
-                  <div id="slider">
-                    <input id="progress" type="range" min="0" max="500" value="0" list="bookmarks"
-                           class="win-slider">
-                  </div>
+
+                   <div id="track-header">
+                    <div id="thumbnail" style="float:left">
+                       <img src="/images/music.jpg" width="80px" height="80px" />
+                    </div>
+                    <div id="track-info" style="float:left"></div>
+                   </div>
+
+                    <div id="counters" style="clear:both">
+                        <div id="couter-left">0:00:00</div>
+                        <div id="couter-right">0:00:00</div>
+                    </div>
+
+
+                    <div id="slider" style="clear:both">
+                      <input id="progress" type="range" min="0" max="500" value="0" list="bookmarks"
+                             class="win-slider">
+                    </div>
 
                     <datalist id="bookmarks"></datalist>
                     <div id="chapter"></div>
@@ -43,8 +53,8 @@
                       <button class="buttons" id="butAddBm" style="top:50%; left:50%; height:25%; width:25%">Add</button>
                       <button class="buttons" id="butRmBm"  style="top:50%; left:75%; height:25%; width:25%">Rm</button>
 
-                      <button class="buttons" id="butNextBm" style="top:75%; left:0%; height:25%; width:50%">NextBm</button>
-                      <button class="buttons" id="butPrevBm" style="top:75%; left:50%; height:25%; width:50%">PrevBm</button>
+                      <button class="buttons" id="butPrevBm" style="top:75%; left:0%; height:25%; width:50%">PrevBm</button>
+                      <button class="buttons" id="butNextBm" style="top:75%; left:50%; height:25%; width:50%">NextBm</button>
                      </div>
               </div>
       <!-- Создаем элемент с заголовком ‘two’ -->

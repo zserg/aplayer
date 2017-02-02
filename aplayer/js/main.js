@@ -347,8 +347,11 @@
               var title = mprops.title;
               var album = mprops.album;
               var artist = mprops.artist;
-              var info_el = document.getElementById("trackinfo")
-              info_el.innerHTML = artist+" : "+title;
+              var info_el = document.getElementById("track-info")
+              info_el.innerHTML = title+'<p>'+artist+'</p>';
+              var r_count_el = document.getElementById("couter-right")
+              
+              r_count_el.innerHTML = ms2time(mprops.duration);
             });
         } else {
             WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
@@ -422,6 +425,10 @@
     function onPositionChanged() {
       if(!dragInProgress){
          slider.value = mPlayerSession.position.toFixed(2);
+          var l_count_el = document.getElementById("couter-left")
+          l_count_el.innerHTML = ms2time(mPlayerSession.position);
+          var r_count_el = document.getElementById("couter-right")
+          r_count_el.innerHTML = ms2time(mPlayerSession.naturalDuration - mPlayerSession.position);
          var pos = (mPlayerSession.position/mPlayerSession.naturalDuration*100).toFixed(2);
          var time = new Date();
          time.setTime((mPlayerSession.position).toFixed(0));
@@ -559,6 +566,7 @@
 
     function findChapter() {
       var cur_pos = mPlayerSession.position;
+
       var bmLength = trackData.bookmarks.length;
       startBm = null;
       endBm = null;
@@ -604,7 +612,9 @@
      x = Math.floor(x/60);
      var min = x % 60;
      var hour = Math.floor(x/60);
-     var str = hour+':'+min+':'+sec;
+     var str = hour + ':' +
+       ((min < 10) ? ("0"+min) : min) +':'+
+       ((sec<10) ? ("0"+sec) : sec);
      return str;
    };
 
