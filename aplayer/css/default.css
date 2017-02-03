@@ -121,3 +121,6 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
   font-size: 80%;
 }
 
+.win-listview {
+  height: 500px;
+}

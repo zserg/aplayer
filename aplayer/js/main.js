@@ -350,9 +350,22 @@
               var info_el = document.getElementById("track-info")
               info_el.innerHTML = title+'<p>'+artist+'</p>';
               var r_count_el = document.getElementById("couter-right")
-              
+
               r_count_el.innerHTML = ms2time(mprops.duration);
             });
+
+           file.getThumbnailAsync(
+               Windows.Storage.FileProperties.ThumbnailMode.musicView,
+               80,
+               Windows.Storage.FileProperties.ThumbnailOptions.useCurrentScale).then(
+                   function (thumbnail) {
+                     if (thumbnail.size > 0) {
+                        var imageBlob = window.URL.createObjectURL(thumbnail);
+                        document.getElementById("img").src = imageBlob;
+                     }
+                   }
+          );
+
         } else {
             WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
         }
@@ -580,7 +593,7 @@
         }
       }
       var chapE = document.getElementById("chapter");
-      chapE.innerHTML = startBm + ":" + endBm;
+      chapE.innerHTML = startBm  + ":" + endBm;
     };
 
 
