@@ -13,9 +13,20 @@
 <body class="win-type-body">
 
       <div id="mylisttemplate" data-win-control="WinJS.Binding.Template">
-        <div id="list_title" data-win-bind="innerText:title"></div>
-        <div id="list_artist" data-win-bind="innerText:artist"></div>
-        <div id="list_duration" data-win-bind="innerText:duration" ></div>
+        <div class="list_title" data-win-bind="innerText:title"></div>
+        <div class="list_artist" data-win-bind="innerText:artist"></div>
+        <div class="list_album" data-win-bind="innerText:album"></div>
+        <div class="list_duration" data-win-bind="innerText:duration" ></div>
+      </div>
+
+      <div id="mygroupedlisttemplate" data-win-control="WinJS.Binding.Template">
+        <div class="list_title" data-win-bind="innerText:title"></div>
+        <div class="list_artist" data-win-bind="innerText:artist"></div>
+        <div class="list_duration" data-win-bind="innerText:duration" ></div>
+      </div>
+
+      <div id="mygroupedlistheadertemplate" data-win-control="WinJS.Binding.Template">
+        <div class="group-header" data-win-bind="innerText:groupTitle"></div>
       </div>
 
   <!-- Создаем Pivot – элемент с названием 'WINJS - PIVOT' -->
@@ -57,9 +68,14 @@
                       <button class="buttons" id="butNextBm" style="top:75%; left:50%; height:25%; width:50%">NextBm</button>
                      </div>
               </div>
-      <!-- Создаем элемент с заголовком ‘two’ -->
-              <div class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Library'}">
+      <!-- Создаем элемент с заголовком 'Tracks' -->
+              <div class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Tracks'}">
                  <div id="myListView"> </div>
+              </div>
+
+      <!-- Создаем элемент с заголовком 'Albums' -->
+              <div class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Albums'}">
+                 <div id="myGroupedListView"> </div>
               </div>
       </div>
 </body>

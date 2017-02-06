@@ -92,20 +92,37 @@
                Promise.all(filePromises).then(function (musicProperties){
                     musicProperties.forEach(function (musicProp, ndx) {
                         myData[ndx].title = musicProp.title ? musicProp.title : myData[ndx].name;
-                        myData[ndx].album = musicProp.album ? musicProp.album : " ";
-                        myData[ndx].artist = musicProp.artist ? musicProp.artist : " ";
+                        myData[ndx].album = musicProp.album ? musicProp.album : "Unknown";
+                        myData[ndx].artist = musicProp.artist ? musicProp.artist : "Unknown";
                         myData[ndx].duration = ms2time(musicProp.duration);
                     });
+                 /* Track List Creating */
                     var listDiv = document.querySelector("#myListView");  // Your html element on the page.
                     var listView = new WinJS.UI.ListView(listDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
-
                     var itemDiv = document.getElementById("mylisttemplate");  // Your template container
-                    var itemTemplate = new WinJS.Binding.Template(itemDiv, null);  // Create a template
                     listView.itemTemplate = itemDiv;  // Bind the list view to the element
+
                     var dataList = new WinJS.Binding.List(myData);
                     listView.itemDataSource = dataList.dataSource;
+
+                 /* Albums List Creating */
+                    var groupedListDiv = document.querySelector("#myGroupedListView");  // Your html element on the page.
+                    var groupedListView = new WinJS.UI.ListView(groupedListDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
+                    var itemDivGrouped = document.getElementById("mygroupedlisttemplate");  // Your template container
+                    var headerDivGrouped = document.getElementById("mygroupedlistheadertemplate");  // Your template container
+                    groupedListView.itemTemplate = itemDivGrouped;  // Bind the list view to the element
+                    groupedListView.groupHeaderTemplate = headerDivGrouped;  // Bind the list view to the element
+
+                    //var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData, compareGroups);
+                    var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
+                    groupedListView.groupDataSource = groupedDataList.groups.dataSource;
+                    groupedListView.itemDataSource = groupedDataList.dataSource;
+                    groupedListView.forceLayout();
+                    groupedListDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
+
                     listView.forceLayout();
                     listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
+
                 });
 
               });
@@ -631,6 +648,17 @@
      return str;
    };
 
+   function getGroupKey(dataItem){
+      return dataItem.album;
+   }
+
+   function getGroupData(dataItem){
+      return {groupTitle: dataItem.album};
+   }
+
+    function compareGroups(left, right) {
+        return left.toUpperCase().charCodeAt(0) - right.toUpperCase().charCodeAt(0);
+    }
 
   app.start();
 })();

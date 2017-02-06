@@ -42,7 +42,7 @@ input[type=range]::-ms-tooltip {
     border: 2px solid red;
 }
 
-#list_title {
+.list_title {
   width: 80%;
   font-size: 110%;
   /* font-weight: bold; */
@@ -51,7 +51,7 @@ input[type=range]::-ms-tooltip {
   text-overflow: ellipsis
 }
 
-#list_artist {
+.list_artist {
   width: 80%;
   float: left;
   font-size: 80%;
@@ -60,7 +60,16 @@ input[type=range]::-ms-tooltip {
   text-overflow: ellipsis
 }
 
-#list_duration {
+.list_album {
+  width: 80%;
+  float: left;
+  font-size: 80%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+
+.list_duration {
   float: right;
   font-size: 80%;
 }
@@ -102,6 +111,11 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
 }
 .win-container-odd > .win-itembox {
   background-color: #1f1f1f;
+  color: white;
+}
+
+.group-header {
+  background-color: black;
   color: white;
 }
 
