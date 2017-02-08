@@ -76,7 +76,7 @@ input[type=range]::-ms-tooltip {
 
 #ButtonsElement {
     -ms-grid-row: 4;
-     border: 1px solid gray;
+     /* border: 1px solid gray; */
      position: relative;
      height: 300px;
 }
@@ -138,3 +138,39 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
 .win-listview {
   height: 500px;
 }
+
+.buttons {
+  border-style: none;
+ background-size: 100% 100%;
+ }
+
+#playbutton_act {
+ background-image: url( '/images/play_active.jpg' );
+ }
+#playbutton_inact {
+ background-image: url( '/images/play_inactive.jpg' );
+ }
+
+#rewbutton_act {
+ background-image: url( '/images/back_active.jpg' );
+ }
+#rewbutton_inact {
+ background-image: url( '/images/back_inactive.jpg' );
+ }
+
+#butAddBm {
+ background-image: url( '/images/add_inactive.jpg' );
+ }
+
+#butRmBm {
+ background-image: url( '/images/rem_inactive.jpg' );
+ }
+
+#butNextBm {
+ background-image: url( '/images/next_inactive.jpg' );
+ }
+
+#butPrevBm {
+ background-image: url( '/images/prev_inactive.jpg' );
+ }
+

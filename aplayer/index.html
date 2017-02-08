@@ -56,16 +56,20 @@
                     <datalist id="bookmarks"></datalist>
                     <div id="chapter"></div>
                     <div id="ButtonsElement">
+                      <img src="url( '/images/play_active.jpg' )" style="display:none;" alt="" />
+                      <img src="url( '/images/play_inactive.jpg' )" style="display:none;" alt="" />
                       <button class="buttons" id="butMode" style="top:0px; height:15%; width:50%">Mode</button>
 
-                      <button class="buttons" id="playbutton" style="left:50%;        height:50%; width:50%">Play</button>
-                      <button class="buttons" id="rewbutton"  style="top:25%;         height:50%; width:50%">Rew</button>
+                      <div class="buttons" id="playbutton_act" style="left:50%;        height:50%; width:50%"></div>
+                      <div class="buttons" id="playbutton_inact" style="left:50%;        height:50%; width:50%"></div>
+                      <div class="buttons" id="rewbutton_act"  style="top:25%;         height:50%; width:50%"></div>
+                      <div class="buttons" id="rewbutton_inact"  style="top:25%;         height:50%; width:50%"></div>
 
-                      <button class="buttons" id="butAddBm" style="top:50%; left:50%; height:25%; width:25%">Add</button>
-                      <button class="buttons" id="butRmBm"  style="top:50%; left:75%; height:25%; width:25%">Rm</button>
+                      <button class="buttons" id="butAddBm" style="top:50%; left:50%; height:25%; width:25%"></button>
+                      <button class="buttons" id="butRmBm"  style="top:50%; left:75%; height:25%; width:25%"></button>
 
-                      <button class="buttons" id="butPrevBm" style="top:75%; left:0%; height:25%; width:50%">PrevBm</button>
-                      <button class="buttons" id="butNextBm" style="top:75%; left:50%; height:25%; width:50%">NextBm</button>
+                      <button class="buttons" id="butPrevBm" style="top:75%; left:0%; height:25%; width:50%"></button>
+                      <button class="buttons" id="butNextBm" style="top:75%; left:50%; height:25%; width:50%"></button>
                      </div>
               </div>
       <!-- Создаем элемент с заголовком 'Tracks' -->

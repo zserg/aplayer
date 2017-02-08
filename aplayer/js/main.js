@@ -49,6 +49,18 @@
     var CHAPTER_TO_END = 1;
     var CHAPTER_CYCLE = 2;
 
+    var butt_play_a = null;
+    var butt_play_i = null;
+
+    var butt_rew_a = null;
+    var butt_rew_i = null;
+
+    var butt_add_a = null;
+    var butt_rem_i = null;
+
+    var butt_next_a = null;
+    var butt_prev_i = null;
+
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
             // TODO: обработка соответствующих ActivationKinds. Например, если приложение можно запускать с помощью голосовых команд,
@@ -138,11 +150,21 @@
             slider.onpointerdown = sliderMouseDown;
             slider.onpointerup = sliderMouseUp;
 
-            rewBut = document.getElementById('rewbutton');
-            rewBut.addEventListener("click", rClick, false);
+            // rewBut = document.getElementById('rewbutton');
+            // rewBut.addEventListener("click", rewMouseDownEv, false);
 
-            playBut = document.getElementById('playbutton');
-            playBut.addEventListener("click", pClick, false);
+            butt_play_i = document.getElementById('playbutton_inact');
+            butt_play_i.addEventListener("pointerdown", playMouseDownEv, false);
+            butt_play_i.addEventListener("pointerup", playMouseUpEv, false);
+            butt_play_a = document.getElementById('playbutton_act');
+            butt_play_a.style.opacity=0;
+
+            butt_rew_i = document.getElementById('rewbutton_inact');
+            butt_rew_i.addEventListener("pointerdown", rewMouseDownEv, false);
+            butt_rew_i.addEventListener("pointerup", rewMouseUpEv, false);
+            butt_rew_a = document.getElementById('rewbutton_act');
+            butt_rew_a.style.opacity=0;
+
 
             createBmBut = document.getElementById('butAddBm');
             createBmBut.addEventListener("click", createBookmark, false);
@@ -423,34 +445,28 @@
                 break;
         }
     }
-    function pClick() {
-        switch (mPlayerSession.playbackState) {
-          case Windows.Media.Playback.MediaPlayerState.paused:
-                // Handle the Play event and print status to screen..
-                WinJS.log && WinJS.log("Play Received", "sample", "status");
-                mPlayer.play()
-                // audtag.play();
-                break;
 
-          case Windows.Media.Playback.MediaPlayerState.playing:
-                // Handle the Pause event and print status to screen.
-                WinJS.log && WinJS.log("Pause Received", "sample", "status");
-                mPlayer.pause()
-                // audtag.pause();
-                break;
+    // function pClick() {
+    //     switch (mPlayerSession.playbackState) {
+    //       case Windows.Media.Playback.MediaPlayerState.paused:
+    //             // Handle the Play event and print status to screen..
+    //             WinJS.log && WinJS.log("Play Received", "sample", "status");
+    //             mPlayer.play()
+    //             // audtag.play();
+    //             break;
 
-            default:
-                break;
-        }
-    }
+    //       case Windows.Media.Playback.MediaPlayerState.playing:
+    //             // Handle the Pause event and print status to screen.
+    //             WinJS.log && WinJS.log("Pause Received", "sample", "status");
+    //             mPlayer.pause()
+    //             // audtag.pause();
+    //             break;
 
-    function rClick() {
-         mPlayerSession.position-=5000.0;
-         if(mPlayerSession.playbackState == Windows.Media.Playback.MediaPlayerState.playing){
-            mPlayer.pause()
-            window.setTimeout(function () { mPlayer.play()}, 1000);
-         }
-    }
+    //         default:
+    //             break;
+    //     }
+    // }
+
 
     function onPositionChanged() {
       if(!dragInProgress){
@@ -659,6 +675,57 @@
     function compareGroups(left, right) {
         return left.toUpperCase().charCodeAt(0) - right.toUpperCase().charCodeAt(0);
     }
+
+  // Button Handlers
+    function playMouseDownEv() {
+        var but_a = document.getElementById('playbutton_act');
+        var but_ina = document.getElementById('playbutton_inact');
+        butt_play_a.style.opacity = 1;
+        butt_play_i.style.opacity = 0;
+        switch (mPlayerSession.playbackState) {
+          case Windows.Media.Playback.MediaPlayerState.paused:
+                // Handle the Play event and print status to screen..
+                WinJS.log && WinJS.log("Play Received", "sample", "status");
+                mPlayer.play()
+                // audtag.play();
+                break;
+
+          case Windows.Media.Playback.MediaPlayerState.playing:
+                // Handle the Pause event and print status to screen.
+                WinJS.log && WinJS.log("Pause Received", "sample", "status");
+                mPlayer.pause()
+                // audtag.pause();
+                break;
+
+            default:
+                break;
+        }
+    };
+
+    function playMouseUpEv() {
+        window.setTimeout(function () {
+          butt_play_a.style.opacity = 0;
+          butt_play_i.style.opacity = 1;
+        }, 100);
+    };
+
+    function rewMouseDownEv() {
+         butt_rew_a.style.opacity = 1;
+         butt_rew_i.style.opacity = 0;
+         mPlayerSession.position-=5000.0;
+         if(mPlayerSession.playbackState == Windows.Media.Playback.MediaPlayerState.playing){
+            mPlayer.pause()
+            window.setTimeout(function () { mPlayer.play()}, 1000);
+         }
+    }
+
+    function rewMouseUpEv() {
+        window.setTimeout(function () {
+          butt_rew_a.style.opacity = 0;
+          butt_rew_i.style.opacity = 1;
+        }, 100);
+    };
+
 
   app.start();
 })();
