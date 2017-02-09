@@ -61,6 +61,10 @@
     var butt_next_a = null;
     var butt_prev_i = null;
 
+    var butt_mode_0 = null;
+    var butt_mode_1 = null;
+    var butt_mode_2 = null;
+
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
             // TODO: обработка соответствующих ActivationKinds. Например, если приложение можно запускать с помощью голосовых команд,
@@ -150,8 +154,13 @@
             slider.onpointerdown = sliderMouseDown;
             slider.onpointerup = sliderMouseUp;
 
-            // rewBut = document.getElementById('rewbutton');
-            // rewBut.addEventListener("click", rewMouseDownEv, false);
+            butt_mode_0 = document.getElementById('butMode0');
+            butt_mode_1 = document.getElementById('butMode1');
+            butt_mode_2 = document.getElementById('butMode2');
+            butt_mode_0.style.opacity = 1;
+            butt_mode_1.style.opacity = 0;
+            butt_mode_2.style.opacity = 0;
+            butt_mode_2.addEventListener("click", changeMode, false);
 
             butt_play_i = document.getElementById('playbutton_inact');
             butt_play_i.addEventListener("pointerdown", playMouseDownEv, false);
@@ -177,9 +186,6 @@
 
             butNextBm = document.getElementById('butNextBm');
             butNextBm.addEventListener("click", findNextBookmark, false);
-
-            butMode = document.getElementById('butMode');
-            butMode.addEventListener("click", changeMode, false);
 
             mode = CHAPTER_CYCLE;
             changeMode();
@@ -626,7 +632,7 @@
         }
       }
       var chapE = document.getElementById("chapter");
-      chapE.innerHTML = startBm  + ":" + endBm;
+      chapE.innerHTML = (startBm!=null ? startBm : "B")  + " -> " + (endBm!=null ? endBm : "E");
     };
 
 
@@ -643,13 +649,20 @@
    function changeMode(){
      if(mode == TRACK_TO_END){
        mode = CHAPTER_TO_END;
+       butt_mode_0.style.opacity = 0;
+       butt_mode_1.style.opacity = 1;
+       butt_mode_2.style.opacity = 0;
      }else if(mode == CHAPTER_TO_END){
        mode = CHAPTER_CYCLE;
+       butt_mode_0.style.opacity = 0;
+       butt_mode_1.style.opacity = 0;
+       butt_mode_2.style.opacity = 1;
      }else{
        mode = TRACK_TO_END;
+       butt_mode_0.style.opacity = 1;
+       butt_mode_1.style.opacity = 0;
+       butt_mode_2.style.opacity = 0;
      }
-     var mode_button = document.getElementById("butMode");
-     mode_button.innerHTML = mode;
    };
 
    function ms2time (ms){

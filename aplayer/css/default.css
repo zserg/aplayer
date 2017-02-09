@@ -30,7 +30,11 @@ input[type=range]::-ms-tooltip {
 
 #chapter{
     color: white;
-     border: 1px solid gray;
+    /* border: 1px solid gray; */
+    font-size: 25px;
+    position: relative;
+    left: 30px;
+    font-family: monospace;
 }
 
 #track-info{
@@ -145,32 +149,42 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
  }
 
 #playbutton_act {
- background-image: url( '/images/play_active.jpg' );
+ background-image: url( '/images/play_active_w.jpg' );
  }
 #playbutton_inact {
- background-image: url( '/images/play_inactive.jpg' );
+ background-image: url( '/images/play_inactive_w.jpg' );
  }
 
 #rewbutton_act {
- background-image: url( '/images/back_active.jpg' );
+ background-image: url( '/images/back_active_w.jpg' );
  }
 #rewbutton_inact {
- background-image: url( '/images/back_inactive.jpg' );
+ background-image: url( '/images/back_inactive_w.jpg' );
  }
 
 #butAddBm {
- background-image: url( '/images/add_inactive.jpg' );
+ background-image: url( '/images/add_inactive_w.jpg' );
  }
 
 #butRmBm {
- background-image: url( '/images/rem_inactive.jpg' );
+ background-image: url( '/images/rem_inactive_w.jpg' );
  }
 
 #butNextBm {
- background-image: url( '/images/next_inactive.jpg' );
+ background-image: url( '/images/next_inactive_w.jpg' );
  }
 
 #butPrevBm {
- background-image: url( '/images/prev_inactive.jpg' );
+ background-image: url( '/images/prev_inactive_w.jpg' );
+ }
+
+#butMode0 {
+ background-image: url( '/images/mode0.jpg' );
+ }
+#butMode1 {
+ background-image: url( '/images/mode1.jpg' );
+ }
+#butMode2 {
+ background-image: url( '/images/mode2.jpg' );
  }
 

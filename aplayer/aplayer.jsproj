@@ -59,20 +59,35 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <Content Include="images\add_active.jpg" />
+    <Content Include="images\add_active_w.jpg" />
     <Content Include="images\add_inactive.jpg" />
+    <Content Include="images\add_inactive_w.jpg" />
     <Content Include="images\back_active.jpg" />
+    <Content Include="images\back_active_w.jpg" />
     <Content Include="images\back_inactive.jpg" />
+    <Content Include="images\back_inactive_w.jpg" />
+    <Content Include="images\mode0.jpg" />
+    <Content Include="images\mode1.jpg" />
+    <Content Include="images\mode2.jpg" />
     <Content Include="images\music.jpg" />
     <Content Include="images\next_active.jpg" />
+    <Content Include="images\next_active_w.jpg" />
     <Content Include="images\next_inactive.jpg" />
+    <Content Include="images\next_inactive_w.jpg" />
     <Content Include="images\play-stop.png" />
     <Content Include="images\play_active.jpg" />
+    <Content Include="images\play_active_w.jpg" />
     <Content Include="images\play_inactive.jpg" />
+    <Content Include="images\play_inactive_w.jpg" />
     <Content Include="images\pointer.png" />
     <Content Include="images\prev_active.jpg" />
+    <Content Include="images\prev_active_w.jpg" />
     <Content Include="images\prev_inactive.jpg" />
+    <Content Include="images\prev_inactive_w.jpg" />
     <Content Include="images\rem_active.jpg" />
+    <Content Include="images\rem_active_w.jpg" />
     <Content Include="images\rem_inactive.jpg" />
+    <Content Include="images\rem_inactive_w.jpg" />
     <Content Include="images\rewind.png" />
     <Content Include="index.html" />
     <Content Include="images\LockScreenLogo.scale-200.png" />
