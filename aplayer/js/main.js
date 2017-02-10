@@ -595,7 +595,7 @@
       var bmLength = trackData.bookmarks.length;
       for(var i=0; i< bmLength;i++){
         if(trackData.bookmarks[i] < cur_pos && Math.abs(trackData.bookmarks[i]-cur_pos) > ONE_SECOND){
-           new_pos = trackData.bookmarks[i];
+           new_pos = trackData.bookmarks[i]-0.01;
         }else{
           break;
         }
@@ -609,7 +609,7 @@
       var bmLength = trackData.bookmarks.length;
       for(var i=0; i< bmLength;i++){
         if(trackData.bookmarks[i] > cur_pos) {
-           mPlayerSession.position = trackData.bookmarks[i];
+           mPlayerSession.position = trackData.bookmarks[i] + 0.01;
            break;
         }
       }
@@ -639,9 +639,12 @@
    function removeBookmark(){
       var cur_pos = mPlayerSession.position;
       var bmLength = trackData.bookmarks.length;
-      var index = trackData.bookmarks.indexOf(cur_pos);
-      if (index > -1){
-        trackData.bookmarks.splice(index,1)
+      startBm = null;
+      endBm = null;
+      for(var i=0; i< bmLength;i++){
+        if(Math.abs(trackData.bookmarks[i] - cur_pos) < 0.03) {
+           trackData.bookmarks.splice(i,1)
+        }
       }
       storeBookmark();
     };
