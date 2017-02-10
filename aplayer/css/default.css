@@ -31,15 +31,20 @@ input[type=range]::-ms-tooltip {
 #chapter{
     color: white;
     /* border: 1px solid gray; */
-    font-size: 25px;
-    position: relative;
+    font-size: 20px;
+    position: absolute;
     left: 30px;
     font-family: monospace;
+}
+
+#track-header{
+    height: 25%;
 }
 
 #track-info{
     color: white;
     margin-left: 20px;
+    width: 45%;
 }
 
 #myListView .win-listview .win-viewport.win-vertical{
@@ -78,12 +83,6 @@ input[type=range]::-ms-tooltip {
   font-size: 80%;
 }
 
-#ButtonsElement {
-    -ms-grid-row: 4;
-     /* border: 1px solid gray; */
-     position: relative;
-     height: 300px;
-}
 
 .win-pivot button.win-pivot-header.win-pivot-header-selected {
   color: white;
@@ -105,9 +104,6 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
 }
 
 
-.buttons {
-  position: absolute;
-}
 
 .win-container-even > .win-itembox {
   background-color: black;
@@ -123,8 +119,8 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
   color: white;
 }
 
-#track-info {
-  width: 66%;
+#couter-left {
+  height: 2%;
 }
 
 #couter-left {
@@ -143,23 +139,16 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
   height: 500px;
 }
 
+
+#ButtonsElement {
+  position: relative;
+  height: 300px;
+}
+
 .buttons {
   border-style: none;
- background-size: 100% 100%;
- }
-
-#playbutton_act {
- background-image: url( '/images/play_active_w.jpg' );
- }
-#playbutton_inact {
- background-image: url( '/images/play_inactive_w.jpg' );
- }
-
-#rewbutton_act {
- background-image: url( '/images/back_active_w.jpg' );
- }
-#rewbutton_inact {
- background-image: url( '/images/back_inactive_w.jpg' );
+  background-size: 100% 100%;
+  position: absolute;
  }
 
 #butAddBm {
@@ -178,13 +167,28 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
  background-image: url( '/images/prev_inactive_w.jpg' );
  }
 
-#butMode0 {
- background-image: url( '/images/mode0.jpg' );
+#butMode0, #butMode1, #butMode2 {
+ top: 30px;
+ left: 35px;
  }
-#butMode1 {
- background-image: url( '/images/mode1.jpg' );
+
+#img-mode0, #img-mode1, #img-mode2 {
+ width: 50px;
  }
-#butMode2 {
- background-image: url( '/images/mode2.jpg' );
+
+#playbutton_act, #playbutton_inact {
+  right: 0px;
  }
+#img-play-active, #img-play-inactive {
+ width: 150px;
+ }
+
+#rewbutton_act, #rewbutton_inact {
+  top: 75px;
+ }
+#img-back-active, #img-back-inactive {
+ width: 150px;
+ }
+
+
 
