@@ -56,9 +56,15 @@
     var butt_rew_i = null;
 
     var butt_add_a = null;
+    var butt_add_i = null;
+
+    var butt_rem_a = null;
     var butt_rem_i = null;
 
     var butt_next_a = null;
+    var butt_next_i = null;
+
+    var butt_prev_a = null;
     var butt_prev_i = null;
 
     var butt_mode_0 = null;
@@ -163,29 +169,34 @@
             butt_mode_2.addEventListener("click", changeMode, false);
 
             butt_play_i = document.getElementById('playbutton_inact');
-            butt_play_i.addEventListener("pointerdown", playMouseDownEv, false);
-            butt_play_i.addEventListener("pointerup", playMouseUpEv, false);
+            butt_play_i.addEventListener("click", playClickEv, false);
             butt_play_a = document.getElementById('playbutton_act');
             butt_play_a.style.opacity=0;
 
             butt_rew_i = document.getElementById('rewbutton_inact');
-            butt_rew_i.addEventListener("pointerdown", rewMouseDownEv, false);
-            butt_rew_i.addEventListener("pointerup", rewMouseUpEv, false);
+            butt_rew_i.addEventListener("click", rewClickEv, false);
             butt_rew_a = document.getElementById('rewbutton_act');
             butt_rew_a.style.opacity=0;
 
+            butt_add_a = document.getElementById('addbutton_act');
+            butt_add_i = document.getElementById('addbutton_inact');
+            butt_add_i.addEventListener("click", createBookmark, false);
+            butt_add_a.style.opacity=0;
 
-            createBmBut = document.getElementById('butAddBm');
-            createBmBut.addEventListener("click", createBookmark, false);
+            butt_rem_a = document.getElementById('rembutton_act');
+            butt_rem_i = document.getElementById('rembutton_inact');
+            butt_rem_i.addEventListener("click", removeBookmark, false);
+            butt_rem_a.style.opacity=0;
 
-            removeBmBut = document.getElementById('butRmBm');
-            removeBmBut.addEventListener("click", removeBookmark, false);
+            butt_prev_a = document.getElementById('prevbutton_act');
+            butt_prev_i = document.getElementById('prevbutton_inact');
+            butt_prev_i.addEventListener("click", findPrevBookmark, false);
+            butt_prev_a.style.opacity=0;
 
-            butPrevBm = document.getElementById('butPrevBm');
-            butPrevBm.addEventListener("click", findPrevBookmark, false);
-
-            butNextBm = document.getElementById('butNextBm');
-            butNextBm.addEventListener("click", findNextBookmark, false);
+            butt_next_a = document.getElementById('nextbutton_act');
+            butt_next_i = document.getElementById('nextbutton_inact');
+            butt_next_i.addEventListener("click", findNextBookmark, false);
+            butt_next_a.style.opacity=0;
 
             mode = CHAPTER_CYCLE;
             changeMode();
@@ -326,23 +337,29 @@
     function createBookmark(evt) {
         // Create a transaction with which to query the IndexedDB.
         WinJS.log && WinJS.log("createBookmark start", "createBookmark", "info");
-        console.log("createBookmark");
-        var txn = db.transaction(["tracks"], "readwrite");
-        var objectStore = txn.objectStore("tracks");
+        butt_add_a.style.opacity = 1;
+        butt_add_i.style.opacity = 0;
+        window.setTimeout(function () {
+          butt_add_a.style.opacity = 0;
+          butt_add_i.style.opacity = 1;
+        },
+          200);
+        if(trackData.bookmarks){
+            var txn = db.transaction(["tracks"], "readwrite");
+            var objectStore = txn.objectStore("tracks");
 
-        trackData.bookmarks.push(mPlayerSession.position);
-        trackData.bookmarks.sort(function(a, b){return a-b});
-        var request = objectStore.put(trackData);
-        updateTicks();
+            trackData.bookmarks.push(mPlayerSession.position);
+            trackData.bookmarks.sort(function(a, b){return a-b});
+            var request = objectStore.put(trackData);
+            updateTicks();
 
-        // Set the event callbacks for the transaction.
-        txn.onerror = function (e) {
-          var err = txn;
-           WinJS.log && WinJS.log("transaction onerror", "createBookmark", "error"); };
-        txn.onabort = function () { WinJS.log && WinJS.log("onabort", "createBookmark", "error"); };
+            // Set the event callbacks for the transaction.
+            txn.onerror = function (e) { WinJS.log && WinJS.log("transaction onerror", "createBookmark", "error"); };
+            txn.onabort = function () { WinJS.log && WinJS.log("onabort", "createBookmark", "error"); };
 
-        request.onsuccess = function (e) { WinJS.log && WinJS.log("success", "createBookmark", "info")};
-        request.onerror = function (e) {WinJS.log && WinJS.log("request onerror", "createBookmark", "error")};
+            request.onsuccess = function (e) { WinJS.log && WinJS.log("success", "createBookmark", "info")};
+            request.onerror = function (e) {WinJS.log && WinJS.log("request onerror", "createBookmark", "error")};
+        }
     };
 
     function storeBookmark(evt) {
@@ -365,6 +382,26 @@
         request.onerror = function (e) {WinJS.log && WinJS.log("request onerror", "storeBookmark", "error")};
     };
 
+   function removeBookmark(){
+      butt_rem_a.style.opacity = 1;
+      butt_rem_i.style.opacity = 0;
+      window.setTimeout(function () {
+        butt_rem_a.style.opacity = 0;
+        butt_rem_i.style.opacity = 1;
+      }, 200);
+      if(trackData.bookmarks){
+        var cur_pos = mPlayerSession.position;
+        var bmLength = trackData.bookmarks.length;
+        startBm = null;
+        endBm = null;
+        for(var i=0; i< bmLength;i++){
+          if(Math.abs(trackData.bookmarks[i] - cur_pos) < 0.03) {
+             trackData.bookmarks.splice(i,1)
+          }
+        }
+        storeBookmark();
+      }
+   };
 
   function itemInvokedHandler(eventObject) {
                 eventObject.detail.itemPromise.done(function (invokedItem) {
@@ -451,27 +488,6 @@
                 break;
         }
     }
-
-    // function pClick() {
-    //     switch (mPlayerSession.playbackState) {
-    //       case Windows.Media.Playback.MediaPlayerState.paused:
-    //             // Handle the Play event and print status to screen..
-    //             WinJS.log && WinJS.log("Play Received", "sample", "status");
-    //             mPlayer.play()
-    //             // audtag.play();
-    //             break;
-
-    //       case Windows.Media.Playback.MediaPlayerState.playing:
-    //             // Handle the Pause event and print status to screen.
-    //             WinJS.log && WinJS.log("Pause Received", "sample", "status");
-    //             mPlayer.pause()
-    //             // audtag.pause();
-    //             break;
-
-    //         default:
-    //             break;
-    //     }
-    // }
 
 
     function onPositionChanged() {
@@ -590,30 +606,48 @@
     };
 
     function findPrevBookmark() {
-      var cur_pos = mPlayerSession.position;
-      var new_pos = 0;
-      var bmLength = trackData.bookmarks.length;
-      for(var i=0; i< bmLength;i++){
-        if(trackData.bookmarks[i] < cur_pos && Math.abs(trackData.bookmarks[i]-cur_pos) > ONE_SECOND){
-           new_pos = trackData.bookmarks[i]-0.01;
-        }else{
-          break;
+        butt_prev_a.style.opacity = 1;
+        butt_prev_i.style.opacity = 0;
+        window.setTimeout(function () {
+          butt_prev_a.style.opacity = 0;
+          butt_prev_i.style.opacity = 1;
+        }, 200);
+
+        if(trackData.bookmarks){
+          var cur_pos = mPlayerSession.position;
+          var new_pos = 0;
+          var bmLength = trackData.bookmarks.length;
+          for(var i=0; i< bmLength;i++){
+            if(trackData.bookmarks[i] < cur_pos && Math.abs(trackData.bookmarks[i]-cur_pos) > ONE_SECOND){
+               new_pos = trackData.bookmarks[i]-0.01;
+            }else{
+              break;
+            }
+          }
+          mPlayerSession.position = new_pos;
+          findChapter();
         }
-      }
-      mPlayerSession.position = new_pos;
-      findChapter();
     };
 
     function findNextBookmark() {
-      var cur_pos = mPlayerSession.position;
-      var bmLength = trackData.bookmarks.length;
-      for(var i=0; i< bmLength;i++){
-        if(trackData.bookmarks[i] > cur_pos) {
-           mPlayerSession.position = trackData.bookmarks[i] + 0.01;
-           break;
+        butt_next_a.style.opacity = 1;
+        butt_next_i.style.opacity = 0;
+        window.setTimeout(function () {
+          butt_next_a.style.opacity = 0;
+          butt_next_i.style.opacity = 1;
+        }, 200);
+
+        if(trackData.bookmarks){
+          var cur_pos = mPlayerSession.position;
+          var bmLength = trackData.bookmarks.length;
+          for(var i=0; i< bmLength;i++){
+            if(trackData.bookmarks[i] > cur_pos) {
+               mPlayerSession.position = trackData.bookmarks[i] + 0.01;
+               break;
+            }
+          }
+          findChapter();
         }
-      }
-      findChapter();
     };
 
     function findChapter() {
@@ -636,18 +670,6 @@
     };
 
 
-   function removeBookmark(){
-      var cur_pos = mPlayerSession.position;
-      var bmLength = trackData.bookmarks.length;
-      startBm = null;
-      endBm = null;
-      for(var i=0; i< bmLength;i++){
-        if(Math.abs(trackData.bookmarks[i] - cur_pos) < 0.03) {
-           trackData.bookmarks.splice(i,1)
-        }
-      }
-      storeBookmark();
-    };
 
    function changeMode(){
      if(mode == TRACK_TO_END){
@@ -693,7 +715,7 @@
     }
 
   // Button Handlers
-    function playMouseDownEv() {
+    function playClickEv() {
         var but_a = document.getElementById('playbutton_act');
         var but_ina = document.getElementById('playbutton_inact');
         butt_play_a.style.opacity = 1;
@@ -716,16 +738,14 @@
             default:
                 break;
         }
-    };
-
-    function playMouseUpEv() {
         window.setTimeout(function () {
           butt_play_a.style.opacity = 0;
           butt_play_i.style.opacity = 1;
-        }, 100);
+        }, 200);
     };
 
-    function rewMouseDownEv() {
+
+    function rewClickEv() {
          butt_rew_a.style.opacity = 1;
          butt_rew_i.style.opacity = 0;
          mPlayerSession.position-=5000.0;
@@ -733,14 +753,12 @@
             mPlayer.pause()
             window.setTimeout(function () { mPlayer.play()}, 1000);
          }
+         window.setTimeout(function () {
+           butt_rew_a.style.opacity = 0;
+           butt_rew_i.style.opacity = 1;
+         }, 200);
     }
 
-    function rewMouseUpEv() {
-        window.setTimeout(function () {
-          butt_rew_a.style.opacity = 0;
-          butt_rew_i.style.opacity = 1;
-        }, 100);
-    };
 
 
   app.start();
