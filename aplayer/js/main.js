@@ -49,23 +49,12 @@
     var CHAPTER_TO_END = 1;
     var CHAPTER_CYCLE = 2;
 
-    var butt_play_a = null;
-    var butt_play_i = null;
-
-    var butt_rew_a = null;
-    var butt_rew_i = null;
-
-    var butt_add_a = null;
-    var butt_add_i = null;
-
-    var butt_rem_a = null;
-    var butt_rem_i = null;
-
-    var butt_next_a = null;
-    var butt_next_i = null;
-
-    var butt_prev_a = null;
-    var butt_prev_i = null;
+    var butt_play = null;
+    var butt_rew = null;
+    var butt_add = null;
+    var butt_rem = null;
+    var butt_next = null;
+    var butt_prev = null;
 
     var butt_mode_0 = null;
     var butt_mode_1 = null;
@@ -161,42 +150,30 @@
             slider.onpointerup = sliderMouseUp;
 
             butt_mode_0 = document.getElementById('butMode0');
-            butt_mode_1 = document.getElementById('butMode1');
-            butt_mode_2 = document.getElementById('butMode2');
+            // butt_mode_1 = document.getElementById('butMode1');
+            // butt_mode_2 = document.getElementById('butMode2');
             butt_mode_0.style.opacity = 1;
-            butt_mode_1.style.opacity = 0;
-            butt_mode_2.style.opacity = 0;
-            butt_mode_2.addEventListener("click", changeMode, false);
+            // butt_mode_1.style.opacity = 0;
+            // butt_mode_2.style.opacity = 0;
+            // butt_mode_2.addEventListener("click", changeMode, false);
 
-            butt_play_i = document.getElementById('playbutton_inact');
-            butt_play_i.addEventListener("click", playClickEv, false);
-            butt_play_a = document.getElementById('playbutton_act');
-            butt_play_a.style.opacity=0;
+            butt_play = document.getElementById('playbutton');
+            butt_play.addEventListener("click", playClickEv, false);
 
-            butt_rew_i = document.getElementById('rewbutton_inact');
-            butt_rew_i.addEventListener("click", rewClickEv, false);
-            butt_rew_a = document.getElementById('rewbutton_act');
-            butt_rew_a.style.opacity=0;
+            butt_rew = document.getElementById('rewbutton');
+            butt_rew.addEventListener("click", rewClickEv, false);
 
-            butt_add_a = document.getElementById('addbutton_act');
-            butt_add_i = document.getElementById('addbutton_inact');
-            butt_add_i.addEventListener("click", createBookmark, false);
-            butt_add_a.style.opacity=0;
+            butt_add = document.getElementById('addbutton');
+            butt_add.addEventListener("click", createBookmark, false);
 
-            butt_rem_a = document.getElementById('rembutton_act');
-            butt_rem_i = document.getElementById('rembutton_inact');
-            butt_rem_i.addEventListener("click", removeBookmark, false);
-            butt_rem_a.style.opacity=0;
+            butt_rem = document.getElementById('rembutton');
+            butt_rem.addEventListener("click", removeBookmark, false);
 
-            butt_prev_a = document.getElementById('prevbutton_act');
-            butt_prev_i = document.getElementById('prevbutton_inact');
-            butt_prev_i.addEventListener("click", findPrevBookmark, false);
-            butt_prev_a.style.opacity=0;
+            butt_prev = document.getElementById('prevbutton');
+            butt_prev.addEventListener("click", findPrevBookmark, false);
 
-            butt_next_a = document.getElementById('nextbutton_act');
-            butt_next_i = document.getElementById('nextbutton_inact');
-            butt_next_i.addEventListener("click", findNextBookmark, false);
-            butt_next_a.style.opacity=0;
+            butt_next = document.getElementById('nextbutton');
+            butt_next.addEventListener("click", findNextBookmark, false);
 
             mode = CHAPTER_CYCLE;
             changeMode();
@@ -337,11 +314,9 @@
     function createBookmark(evt) {
         // Create a transaction with which to query the IndexedDB.
         WinJS.log && WinJS.log("createBookmark start", "createBookmark", "info");
-        butt_add_a.style.opacity = 1;
-        butt_add_i.style.opacity = 0;
+        butt_add.classList.toggle("buttonActive");
         window.setTimeout(function () {
-          butt_add_a.style.opacity = 0;
-          butt_add_i.style.opacity = 1;
+           butt_add.classList.toggle("buttonActive");
         },
           200);
         if(trackData.bookmarks){
@@ -383,11 +358,9 @@
     };
 
    function removeBookmark(){
-      butt_rem_a.style.opacity = 1;
-      butt_rem_i.style.opacity = 0;
+      butt_rem.classList.toggle("buttonActive");
       window.setTimeout(function () {
-        butt_rem_a.style.opacity = 0;
-        butt_rem_i.style.opacity = 1;
+         butt_rem.classList.toggle("buttonActive");
       }, 200);
       if(trackData.bookmarks){
         var cur_pos = mPlayerSession.position;
@@ -606,11 +579,9 @@
     };
 
     function findPrevBookmark() {
-        butt_prev_a.style.opacity = 1;
-        butt_prev_i.style.opacity = 0;
+        butt_prev.classList.toggle("buttonActive");
         window.setTimeout(function () {
-          butt_prev_a.style.opacity = 0;
-          butt_prev_i.style.opacity = 1;
+           butt_prev.classList.toggle("buttonActive");
         }, 200);
 
         if(trackData.bookmarks){
@@ -630,11 +601,9 @@
     };
 
     function findNextBookmark() {
-        butt_next_a.style.opacity = 1;
-        butt_next_i.style.opacity = 0;
+        butt_next.classList.toggle("buttonActive");
         window.setTimeout(function () {
-          butt_next_a.style.opacity = 0;
-          butt_next_i.style.opacity = 1;
+           butt_next.classList.toggle("buttonActive");
         }, 200);
 
         if(trackData.bookmarks){
@@ -675,18 +644,18 @@
      if(mode == TRACK_TO_END){
        mode = CHAPTER_TO_END;
        butt_mode_0.style.opacity = 0;
-       butt_mode_1.style.opacity = 1;
-       butt_mode_2.style.opacity = 0;
+       // butt_mode_1.style.opacity = 1;
+       // butt_mode_2.style.opacity = 0;
      }else if(mode == CHAPTER_TO_END){
        mode = CHAPTER_CYCLE;
        butt_mode_0.style.opacity = 0;
-       butt_mode_1.style.opacity = 0;
-       butt_mode_2.style.opacity = 1;
+       // butt_mode_1.style.opacity = 0;
+       // butt_mode_2.style.opacity = 1;
      }else{
        mode = TRACK_TO_END;
        butt_mode_0.style.opacity = 1;
-       butt_mode_1.style.opacity = 0;
-       butt_mode_2.style.opacity = 0;
+       // butt_mode_1.style.opacity = 0;
+       // butt_mode_2.style.opacity = 0;
      }
    };
 
@@ -716,10 +685,7 @@
 
   // Button Handlers
     function playClickEv() {
-        var but_a = document.getElementById('playbutton_act');
-        var but_ina = document.getElementById('playbutton_inact');
-        butt_play_a.style.opacity = 1;
-        butt_play_i.style.opacity = 0;
+        butt_play.classList.toggle("buttonActive");
         switch (mPlayerSession.playbackState) {
           case Windows.Media.Playback.MediaPlayerState.paused:
                 // Handle the Play event and print status to screen..
@@ -739,23 +705,20 @@
                 break;
         }
         window.setTimeout(function () {
-          butt_play_a.style.opacity = 0;
-          butt_play_i.style.opacity = 1;
+           butt_play.classList.toggle("buttonActive");
         }, 200);
     };
 
 
     function rewClickEv() {
-         butt_rew_a.style.opacity = 1;
-         butt_rew_i.style.opacity = 0;
+         butt_rew.classList.toggle("buttonActive");
          mPlayerSession.position-=5000.0;
          if(mPlayerSession.playbackState == Windows.Media.Playback.MediaPlayerState.playing){
             mPlayer.pause()
             window.setTimeout(function () { mPlayer.play()}, 1000);
          }
          window.setTimeout(function () {
-           butt_rew_a.style.opacity = 0;
-           butt_rew_i.style.opacity = 1;
+            butt_rew.classList.toggle("buttonActive");
          }, 200);
     }
 
