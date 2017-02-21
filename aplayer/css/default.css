@@ -1,6 +1,5 @@
 ﻿body {
   background-color: black;
-  /* color: white; */
 }
 
 input[type=range]::-ms-tooltip {
@@ -28,13 +27,22 @@ input[type=range]::-ms-tooltip {
 }
 
 
-#chapter{
-    color: white;
-    /* border: 1px solid gray; */
-    font-size: 20px;
-    position: absolute;
-    left: 30px;
-    font-family: monospace;
+#mode {
+  height: 50px;
+}
+
+#chapter-start, #chapter-end {
+  color: white;
+  float: left;
+  margin-top: 15px;
+}
+
+#butMode {
+  width: 50px;
+  height: 50px;
+  background-image: url("/images/mode0.svg");
+  background-size: 100%;
+  float: left;
 }
 
 #track-header{

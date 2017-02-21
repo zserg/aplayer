@@ -56,6 +56,7 @@
     var butt_next = null;
     var butt_prev = null;
 
+    var butt_mode = null;
     var butt_mode_0 = null;
     var butt_mode_1 = null;
     var butt_mode_2 = null;
@@ -145,17 +146,18 @@
             }
 
             slider = document.getElementById("progress");
-            slider.addEventListener("change", sliderChange, false);
+            // slider.addEventListener("change", sliderChange, false);
             slider.onpointerdown = sliderMouseDown;
             slider.onpointerup = sliderMouseUp;
 
-            butt_mode_0 = document.getElementById('butMode0');
+            butt_mode = document.getElementById('butMode');
             // butt_mode_1 = document.getElementById('butMode1');
             // butt_mode_2 = document.getElementById('butMode2');
-            butt_mode_0.style.opacity = 1;
+            // butt_mode_0.style.opacity = 1;
             // butt_mode_1.style.opacity = 0;
             // butt_mode_2.style.opacity = 0;
-            // butt_mode_2.addEventListener("click", changeMode, false);
+            butt_mode.style.backgroundImage = "url('/images/mode0.svg')";
+            butt_mode.addEventListener("click", changeMode, false);
 
             butt_play = document.getElementById('playbutton');
             butt_play.addEventListener("click", playClickEv, false);
@@ -398,6 +400,7 @@
             mPlayer.source = Windows.Media.Core.MediaSource.createFromStorageFile(filePlayed);
             mPlayer.play();
             readBookmarks();// read bookmarks from IndexedDB
+            slider.addEventListener("change", sliderChange, false);
             file.properties.getMusicPropertiesAsync().done(function (mprops){
               var title = mprops.title;
               var album = mprops.album;
@@ -634,8 +637,10 @@
            break;
         }
       }
-      var chapE = document.getElementById("chapter");
-      chapE.innerHTML = (startBm!=null ? startBm : "B")  + " -> " + (endBm!=null ? endBm : "E");
+      var chapB = document.getElementById("chapter-start");
+      var chapE = document.getElementById("chapter-end");
+      chapB.innerHTML = (startBm!=null ? startBm : "B");
+      chapE.innerHTML = (endBm!=null ? endBm : "E");
     };
 
 
@@ -643,19 +648,13 @@
    function changeMode(){
      if(mode == TRACK_TO_END){
        mode = CHAPTER_TO_END;
-       butt_mode_0.style.opacity = 0;
-       // butt_mode_1.style.opacity = 1;
-       // butt_mode_2.style.opacity = 0;
+       butt_mode.style.backgroundImage = "url('/images/mode1.svg')";
      }else if(mode == CHAPTER_TO_END){
        mode = CHAPTER_CYCLE;
-       butt_mode_0.style.opacity = 0;
-       // butt_mode_1.style.opacity = 0;
-       // butt_mode_2.style.opacity = 1;
+       butt_mode.style.backgroundImage = "url('/images/mode2.svg')";
      }else{
        mode = TRACK_TO_END;
-       butt_mode_0.style.opacity = 1;
-       // butt_mode_1.style.opacity = 0;
-       // butt_mode_2.style.opacity = 0;
+       butt_mode.style.backgroundImage = "url('/images/mode0.svg')";
      }
    };
 
