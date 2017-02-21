@@ -14,8 +14,8 @@ input[type=range]::-ms-tooltip {
 }
 
 .win-slider::-ms-thumb {
-  width: 2px;
-  height: 24 px;
+  width: 4px;
+  height: 20px;
   border-style: none;
 }
 
@@ -26,6 +26,17 @@ input[type=range]::-ms-tooltip {
   border-style: none;
 }
 
+.win-slider::-ms-ticks-before{
+  display: block;
+   color: rgba(255, 0, 0, 1);
+   height: 20px;
+}
+
+.win-slider::-ms-ticks-after{
+  display: block;
+   color: rgba(255, 0, 0, 1);
+   height: 10px;
+}
 
 #mode {
   height: 50px;
@@ -127,20 +138,32 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
   color: white;
 }
 
-#couter-left {
-  height: 2%;
+#slider-top {
+  clear: both;
+}
+
+#slider {
+  float: left;
+  width: 210px;
+  height: 50px;
+  margin-bottom:40px;
 }
 
 #couter-left {
   float: left;
   color: white;
   font-size: 80%;
+  margin-top: 35px;
+  margin-right: 10px;
 }
 
+
 #couter-right {
-  float:right;
+  float:left;
   color: white;
   font-size: 80%;
+  margin-top: 35px;
+  margin-left: 10px;
 }
 
 .win-listview {
@@ -152,6 +175,7 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
   position: relative;
   height: 300px;
   width: 320px;
+  clear: both;
 }
 
 .button-huge{
@@ -247,15 +271,4 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
 /*  } */
 
 
-.win-slider::-ms-ticks-before{
-  display: block;
-   color: rgba(255, 0, 0, 1);
-   height: 20px;
-}
-
-.win-slider::-ms-ticks-after{
-  display: block;
-   color: rgba(255, 0, 0, 1);
-   height: 10px;
-}
 
