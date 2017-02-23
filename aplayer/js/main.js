@@ -51,15 +51,13 @@
 
     var butt_play = null;
     var butt_rew = null;
-    var butt_add = null;
-    var butt_rem = null;
-    var butt_next = null;
-    var butt_prev = null;
 
     var butt_mode = null;
     var butt_mode_0 = null;
     var butt_mode_1 = null;
     var butt_mode_2 = null;
+
+    var appBar = null;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.voiceCommand) {
@@ -135,6 +133,11 @@
                     listView.forceLayout();
                     listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
 
+                    appBar = document.getElementById('appbar').winControl;
+                    appBar.getCommandById('cmdBack').addEventListener('click', findPrevBookmark, false);
+                    appBar.getCommandById('cmdForward').addEventListener('click', findNextBookmark, false);
+                    appBar.getCommandById('cmdAdd').addEventListener('click', createBookmark, false);
+                    appBar.getCommandById('cmdRemove').addEventListener('click', removeBookmark, false);
                 });
 
               });
@@ -165,20 +168,10 @@
             butt_rew = document.getElementById('rewbutton');
             butt_rew.addEventListener("click", rewClickEv, false);
 
-            butt_add = document.getElementById('addbutton');
-            butt_add.addEventListener("click", createBookmark, false);
-
-            butt_rem = document.getElementById('rembutton');
-            butt_rem.addEventListener("click", removeBookmark, false);
-
-            butt_prev = document.getElementById('prevbutton');
-            butt_prev.addEventListener("click", findPrevBookmark, false);
-
-            butt_next = document.getElementById('nextbutton');
-            butt_next.addEventListener("click", findNextBookmark, false);
 
             mode = CHAPTER_CYCLE;
             changeMode();
+
 
             if (g_dispRequest === null) {
                 try {
@@ -316,11 +309,6 @@
     function createBookmark(evt) {
         // Create a transaction with which to query the IndexedDB.
         WinJS.log && WinJS.log("createBookmark start", "createBookmark", "info");
-        butt_add.classList.toggle("buttonActive");
-        window.setTimeout(function () {
-           butt_add.classList.toggle("buttonActive");
-        },
-          200);
         if(trackData.bookmarks){
             var txn = db.transaction(["tracks"], "readwrite");
             var objectStore = txn.objectStore("tracks");
@@ -360,10 +348,6 @@
     };
 
    function removeBookmark(){
-      butt_rem.classList.toggle("buttonActive");
-      window.setTimeout(function () {
-         butt_rem.classList.toggle("buttonActive");
-      }, 200);
       if(trackData.bookmarks){
         var cur_pos = mPlayerSession.position;
         var bmLength = trackData.bookmarks.length;
@@ -582,11 +566,6 @@
     };
 
     function findPrevBookmark() {
-        butt_prev.classList.toggle("buttonActive");
-        window.setTimeout(function () {
-           butt_prev.classList.toggle("buttonActive");
-        }, 200);
-
         if(trackData.bookmarks){
           var cur_pos = mPlayerSession.position;
           var new_pos = 0;
@@ -604,11 +583,6 @@
     };
 
     function findNextBookmark() {
-        butt_next.classList.toggle("buttonActive");
-        window.setTimeout(function () {
-           butt_next.classList.toggle("buttonActive");
-        }, 200);
-
         if(trackData.bookmarks){
           var cur_pos = mPlayerSession.position;
           var bmLength = trackData.bookmarks.length;
