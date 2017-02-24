@@ -138,6 +138,8 @@
                     appBar.getCommandById('cmdForward').addEventListener('click', findNextBookmark, false);
                     appBar.getCommandById('cmdAdd').addEventListener('click', createBookmark, false);
                     appBar.getCommandById('cmdRemove').addEventListener('click', removeBookmark, false);
+                    appBar.getCommandById('cmdPlay').addEventListener('click', playClickEv, false);
+                    appBar.getCommandById('cmdRew').addEventListener('click', rewClickEv, false);
                 });
 
               });
@@ -159,7 +161,7 @@
             // butt_mode_0.style.opacity = 1;
             // butt_mode_1.style.opacity = 0;
             // butt_mode_2.style.opacity = 0;
-            butt_mode.style.backgroundImage = "url('/images/mode0.svg')";
+            butt_mode.style.backgroundImage = "url('/images/mode0_v2.svg')";
             butt_mode.addEventListener("click", changeMode, false);
 
             butt_play = document.getElementById('playbutton');
@@ -382,7 +384,7 @@
             fileLocation = window.URL.createObjectURL(filePlayed, { oneTimeOnly: true });
             filePath = filePlayed.path;
             mPlayer.source = Windows.Media.Core.MediaSource.createFromStorageFile(filePlayed);
-            mPlayer.play();
+            mplayerPlay();
             readBookmarks();// read bookmarks from IndexedDB
             slider.addEventListener("change", sliderChange, false);
             file.properties.getMusicPropertiesAsync().done(function (mprops){
@@ -433,15 +435,13 @@
             case Windows.Media.SystemMediaTransportControlsButton.play:
                 // Handle the Play event and print status to screen..
                 WinJS.log && WinJS.log("Play Received", "sample", "status");
-                mPlayer.play()
-                // audtag.play();
+                mplayerPlay();
                 break;
 
             case Windows.Media.SystemMediaTransportControlsButton.pause:
                 // Handle the Pause event and print status to screen.
                 WinJS.log && WinJS.log("Pause Received", "sample", "status");
-                // audtag.pause();
-                mPlayer.pause()
+                mplayerPause()
                 break;
 
             default:
@@ -461,7 +461,7 @@
          var time = new Date();
          time.setTime((mPlayerSession.position).toFixed(0));
          if(mode == CHAPTER_TO_END && (endBm != null) && (mPlayerSession.position > trackData.bookmarks[endBm])){
-           mPlayer.pause();
+           mplayerPause();
            if(startBm != null){
               mPlayerSession.position = trackData.bookmarks[startBm];
            }else{
@@ -473,8 +473,8 @@
            }else{
               mPlayerSession.position = 0;
            }
-           mPlayer.pause()
-           window.setTimeout(function () { mPlayer.play()}, 1000);
+           mplayerPause()
+           window.setTimeout(function () { mplayerPlay()}, 1000);
          }
 
       }
@@ -622,13 +622,13 @@
    function changeMode(){
      if(mode == TRACK_TO_END){
        mode = CHAPTER_TO_END;
-       butt_mode.style.backgroundImage = "url('/images/mode1.svg')";
+       butt_mode.style.backgroundImage = "url('/images/mode1_v2.svg')";
      }else if(mode == CHAPTER_TO_END){
        mode = CHAPTER_CYCLE;
-       butt_mode.style.backgroundImage = "url('/images/mode2.svg')";
+       butt_mode.style.backgroundImage = "url('/images/mode2_v2.svg')";
      }else{
        mode = TRACK_TO_END;
-       butt_mode.style.backgroundImage = "url('/images/mode0.svg')";
+       butt_mode.style.backgroundImage = "url('/images/mode0_v2.svg')";
      }
    };
 
@@ -659,19 +659,22 @@
   // Button Handlers
     function playClickEv() {
         butt_play.classList.toggle("buttonActive");
+        var cmd = appBar.getCommandById('cmdPlay');
         switch (mPlayerSession.playbackState) {
           case Windows.Media.Playback.MediaPlayerState.paused:
                 // Handle the Play event and print status to screen..
                 WinJS.log && WinJS.log("Play Received", "sample", "status");
-                mPlayer.play()
-                // audtag.play();
+                mplayerPlay()
+                cmd.icon = 'pause';
+                cmd.label = 'Pause';
                 break;
 
           case Windows.Media.Playback.MediaPlayerState.playing:
                 // Handle the Pause event and print status to screen.
                 WinJS.log && WinJS.log("Pause Received", "sample", "status");
-                mPlayer.pause()
-                // audtag.pause();
+                mplayerPause()
+                cmd.icon = 'play';
+                cmd.label = 'Play';
                 break;
 
             default:
@@ -687,12 +690,26 @@
          butt_rew.classList.toggle("buttonActive");
          mPlayerSession.position-=5000.0;
          if(mPlayerSession.playbackState == Windows.Media.Playback.MediaPlayerState.playing){
-            mPlayer.pause()
-            window.setTimeout(function () { mPlayer.play()}, 1000);
+            mplayerPause()
+            window.setTimeout(function () { mplayerPlay()}, 1000);
          }
          window.setTimeout(function () {
             butt_rew.classList.toggle("buttonActive");
          }, 200);
+    }
+
+    function mplayerPlay() {
+        var cmd = appBar.getCommandById('cmdPlay');
+        cmd.icon = 'pause';
+        cmd.label = 'Pause';
+        mPlayer.play()
+    }
+
+    function mplayerPause() {
+        var cmd = appBar.getCommandById('cmdPlay');
+        cmd.icon = 'play';
+        cmd.label = 'Play';
+        mPlayer.pause()
     }
 
 

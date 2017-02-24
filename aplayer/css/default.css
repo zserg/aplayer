@@ -1,7 +1,30 @@
-﻿body {
+﻿@media only screen and (orientation: landscape) {
+    #ButtonsElement {
+       display: none;
+    }
+}
+
+@media only screen and (orientation: portrait) {
+    #ButtonsElement {
+       display: block;
+    }
+}
+
+
+body {
   background-color: black;
 }
 
+#now-playing {
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100%;
+}
+
+/* .win-appbar .win-commandimage */
+/* { */
+/*      font-size: 10px; */
+/* } */
 
 input[type=range]::-ms-tooltip {
     display: none;
@@ -59,6 +82,7 @@ input[type=range]::-ms-tooltip {
 
 #track-header{
     height: 25%;
+    flex: 1;
 }
 
 #track-info{
@@ -141,30 +165,33 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
 
 #slider-top {
   clear: both;
+  display: flex;
+  width: 100%;
+  margin-bottom:50px;
 }
 
 #slider {
-  float: left;
-  width: 210px;
+  flex-grow: 1;
+  width: 100px;
   height: 50px;
   margin-bottom:40px;
 }
 
 #couter-left {
-  float: left;
   color: white;
   font-size: 80%;
   margin-top: 35px;
   margin-right: 10px;
+  width:50px;
 }
 
 
 #couter-right {
-  float:left;
   color: white;
   font-size: 80%;
   margin-top: 35px;
   margin-left: 10px;
+  width:50px;
 }
 
 .win-listview {
@@ -174,9 +201,9 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
 
 #ButtonsElement {
   position: relative;
-  height: 300px;
   width: 320px;
   clear: both;
+  margin-bottom: 50px;
 }
 
 .button-huge{

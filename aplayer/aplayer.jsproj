@@ -77,10 +77,13 @@
     <Content Include="images\logo.scale-400.png" />
     <Content Include="images\mode0.jpg" />
     <Content Include="images\mode0.svg" />
+    <Content Include="images\mode0_v2.svg" />
     <Content Include="images\mode1.jpg" />
     <Content Include="images\mode1.svg" />
+    <Content Include="images\mode1_v2.svg" />
     <Content Include="images\mode2.jpg" />
     <Content Include="images\mode2.svg" />
+    <Content Include="images\mode2_v2.svg" />
     <Content Include="images\next.svg" />
     <Content Include="images\phonesplashscreen.scale-100.png" />
     <Content Include="images\play.svg" />

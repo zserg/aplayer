@@ -34,7 +34,7 @@
       <!-- Чтобы добавить вкладки, добавьте внутрь дочерние элементы WinJS.UI.PivotItem. -->
       <!-- Создаем элемент с заголовком ‘one’ -->
               <div id="my" class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Player'}">
-
+                <div id="now-playing">
                    <div id="track-header">
                     <div id="thumbnail" style="float:left">
                        <img id="img" src="/images/zplayer.jpg" width="150px" height="150px" />
@@ -54,14 +54,10 @@
                     </div>
 
                     <div id="ButtonsElement">
-                        <div id="mode">
-                             <div id="chapter-start">B</div>
-                             <div id="butMode"></div>
-                             <div id="chapter-end">E</div>
-                        </div>
                         <div class="button button-huge" id="rewbutton"><img id="img-back-inactive" src="/images/back.svg"/></div>
                         <div class="button button-huge" id="playbutton"><img id="img-play-inactive" src="/images/play.svg"/></div>
                     </div>
+                </div>
               </div>
       <!-- Создаем элемент с заголовком 'Tracks' -->
               <div class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Tracks'}">
@@ -74,12 +70,21 @@
               </div>
       </div>
       <div id="appbar" data-win-control="WinJS.UI.AppBar">
-         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdBack', label: 'Back', icon:'back'}"></button>
-         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdForward', label: 'Forward', icon:'forward'}"></button>
-         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdAdd', label: 'Add Bm', icon:'add'}"></button>
-         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdRemove', label: 'Rem Bm', icon:'remove'}"></button>
-         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdPrev', label: 'Prev', icon:'previous'}"></button>
-         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdNext', label: 'Next', icon:'next'}"></button>
+         <div data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'modeDiv', label: 'Mode', type:'content'}">
+                        <div id="mode">
+                             <div id="chapter-start">B</div>
+                             <div id="butMode"></div>
+                             <div id="chapter-end">E</div>
+                        </div>
+         </div>
+         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdBack',    label: 'Back', icon:'back'}"></button>
+         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdForward', label: 'Fwd', icon:'forward'}"></button>
+         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdAdd',     label: 'Add Bm', icon:'add'}"></button>
+         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdRemove',  label: 'Rem Bm', icon:'remove'}"></button>
+         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdPlay',    label: 'Play', icon:'play'}"></button>
+         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdRew',     label: '-5s', icon:'import'}"></button>
+         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdPrev',    label: 'Prev', icon:'previous'}"></button>
+         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdNext',    label: 'Next', icon:'next'}"></button>
       </div>
 </body>
 </html>
