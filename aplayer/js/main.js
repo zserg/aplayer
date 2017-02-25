@@ -11,6 +11,7 @@
     var sessionState = WinJS.Application.sessionState;
     var musicLibId = Windows.Storage.KnownLibraryId.Music;
     var search = Windows.Storage.Search;
+    var localSettings = Windows.Storage.ApplicationData.current.localSettings;
 
     var isFirstActivation = true;
     var systemMediaControls = null;
@@ -48,6 +49,9 @@
     var TRACK_TO_END = 0;
     var CHAPTER_TO_END = 1;
     var CHAPTER_CYCLE = 2;
+    var autoplay = false;
+    var lastPosition = 0;
+    var restoreState = false;
 
     var butt_play = null;
     var butt_rew = null;
@@ -146,10 +150,6 @@
                     });
 
 
-                    filePath = WinJS.Application.sessionState.filePath
-                    if (filePath) {
-                        Windows.Storage.StorageFile.getFileFromPathAsync(sessionState.filePath).done(getFile);
-                    }
 
                     slider = document.getElementById("progress");
                     // slider.addEventListener("change", sliderChange, false);
@@ -224,7 +224,9 @@
         // Вы можете использовать объект WinJS.Application.sessionState, который автоматически сохраняется и восстанавливается после приостановки.
         // Если вам нужно завершить асинхронную операцию до того, как действие приложения будет приостановлено, вызовите args.setPromise().
         sessionState.filePath = filePath;
-        sessionState.tes = "hello";
+        localSettings.values['lastFile'] = filePath;
+        localSettings.values['lastPosition'] = mPlayerSession.position;
+
 
     };
 
@@ -271,6 +273,22 @@
     function dbSuccess(evt) {
         db = evt.target.result;
         WinJS.log && WinJS.log("Database open success", "sample", "info");
+        filePath = WinJS.Application.sessionState.filePath
+        if (filePath) {
+            Windows.Storage.StorageFile.getFileFromPathAsync(sessionState.filePath).done(getFile);
+        }else{
+          filePath = localSettings.values['lastFile'];
+          lastPosition = localSettings.values['lastPosition'];
+          if(!lastPosition)
+            lastPosition = 0;
+
+          if (filePath){
+            autoplay = false;
+            restoreState = true;
+            openAudioFromPath(filePath);
+          }
+        }
+
         };
 
     function readBookmarks(filepath) {
@@ -372,7 +390,8 @@
 
   function itemInvokedHandler(eventObject) {
                 eventObject.detail.itemPromise.done(function (invokedItem) {
-                openAudioFromPath(invokedItem.data.path);
+                autoplay = true;
+                openAudioFromPath(invokedItem.data.path, true);
                     // Access item data from the itemPromise
                   var piv = document.getElementsByClassName("win-pivot")
                   var myPiv = piv[0];
@@ -390,7 +409,12 @@
             fileLocation = window.URL.createObjectURL(filePlayed, { oneTimeOnly: true });
             filePath = filePlayed.path;
             mPlayer.source = Windows.Media.Core.MediaSource.createFromStorageFile(filePlayed);
-            mplayerPlay();
+            if(restoreState){
+                mPlayerSession.position = lastPosition;
+                restoreState = false;
+            }
+            if(autoplay)
+                mplayerPlay();
             readBookmarks();// read bookmarks from IndexedDB
             slider.addEventListener("change", sliderChange, false);
             file.properties.getMusicPropertiesAsync().done(function (mprops){
