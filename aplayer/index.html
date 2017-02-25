@@ -30,7 +30,7 @@
       </div>
 
   <!-- Создаем Pivot – элемент с названием 'WINJS - PIVOT' -->
-      <div data-win-control="WinJS.UI.Pivot" >
+      <div id="pivot" data-win-control="WinJS.UI.Pivot" >
       <!-- Чтобы добавить вкладки, добавьте внутрь дочерние элементы WinJS.UI.PivotItem. -->
       <!-- Создаем элемент с заголовком ‘one’ -->
               <div id="my" class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Player'}">
@@ -85,6 +85,7 @@
          <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdRew',     label: '-5s', icon:'import'}"></button>
          <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdPrev',    label: 'Prev', icon:'previous'}"></button>
          <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdNext',    label: 'Next', icon:'next'}"></button>
+         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdSync',    label: 'Update', icon:'sync'}"></button>
       </div>
 </body>
 </html>

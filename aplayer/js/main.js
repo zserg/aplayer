@@ -52,6 +52,7 @@
     var autoplay = false;
     var lastPosition = 0;
     var restoreState = false;
+    var pivot = null;
 
     var butt_play = null;
     var butt_rew = null;
@@ -138,13 +139,6 @@
                           listView.forceLayout();
                           listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
 
-                          appBar = document.getElementById('appbar').winControl;
-                          appBar.getCommandById('cmdBack').addEventListener('click', findPrevBookmark, false);
-                          appBar.getCommandById('cmdForward').addEventListener('click', findNextBookmark, false);
-                          appBar.getCommandById('cmdAdd').addEventListener('click', createBookmark, false);
-                          appBar.getCommandById('cmdRemove').addEventListener('click', removeBookmark, false);
-                          appBar.getCommandById('cmdPlay').addEventListener('click', playClickEv, false);
-                          appBar.getCommandById('cmdRew').addEventListener('click', rewClickEv, false);
                       });
 
                     });
@@ -206,6 +200,16 @@
             document.addEventListener("visibilitychange", onVisibilityChanged);
             args.setPromise(WinJS.UI.processAll());
             // Add your code to retrieve the button and register the event handler.
+            appBar = document.getElementById('appbar').winControl;
+            appBar.getCommandById('cmdBack').addEventListener('click', findPrevBookmark, false);
+            appBar.getCommandById('cmdForward').addEventListener('click', findNextBookmark, false);
+            appBar.getCommandById('cmdAdd').addEventListener('click', createBookmark, false);
+            appBar.getCommandById('cmdRemove').addEventListener('click', removeBookmark, false);
+            appBar.getCommandById('cmdPlay').addEventListener('click', playClickEv, false);
+            appBar.getCommandById('cmdRew').addEventListener('click', rewClickEv, false);
+
+            pivot = document.getElementById("pivot")
+            pivot.winControl.addEventListener('selectionchanged', pivotSelectionChangedHandler, false);
 
         }
 
@@ -742,7 +746,23 @@
         mPlayer.pause()
     }
 
-
+    function pivotSelectionChangedHandler(e){
+      if (e.detail.index == 0){
+        appBar.showOnlyCommands([
+           'modeDiv',
+           'cmdBack',
+           'cmdForward',
+           'cmdAdd',
+           'cmdRemove',
+           'cmdPlay',
+           'cmdRew',
+           'cmdPrev',
+           'cmdNext']);
+      }else{
+        appBar.showOnlyCommands(['cmdSync']);
+      }
+      appBar.forceLayout();
+    }
 
   app.start();
 })();
