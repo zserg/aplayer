@@ -37,7 +37,7 @@
                 <div id="now-playing">
                    <div id="track-header">
                     <div id="thumbnail" style="float:left">
-                       <img id="img" src="/images/zplayer.jpg" width="150px" height="150px" />
+                       <img id="img" src="/images/xplayer.svg" width="150px" height="150px" />
                     </div>
                     <div id="track-info" style="float:left"></div>
                    </div>
@@ -67,6 +67,12 @@
       <!-- Создаем элемент с заголовком 'Albums' -->
               <div class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Albums'}">
                  <div id="myGroupedListView"> </div>
+              </div>
+
+      <!-- Создаем элемент с заголовком 'Settings' -->
+              <div id="settings-pivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Settings'}">
+                 <div id="display-toggle-switch" data-win-control="WinJS.UI.ToggleSwitch" data-win-options="{title: 'Display Turn-Off Disable'}">
+                 </div>
               </div>
       </div>
       <div id="appbar" data-win-control="WinJS.UI.AppBar">

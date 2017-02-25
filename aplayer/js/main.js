@@ -53,6 +53,7 @@
     var lastPosition = 0;
     var restoreState = false;
     var pivot = null;
+    var displayToggleSw = null;
 
     var butt_play = null;
     var butt_rew = null;
@@ -165,15 +166,6 @@
                     changeMode();
 
 
-                    if (g_dispRequest === null) {
-                        try {
-                            // This call creates an instance of the displayRequest object
-                            g_dispRequest = new Windows.System.Display.DisplayRequest;
-                            g_dispRequest.requestActive();
-                        } catch (e) {
-                            WinJS.log && WinJS.log("Failed: displayRequest object creation, error: " + e.message, "sample", "error");
-                        }
-                    }
 
                     if (args.detail.arguments) {
                         // TODO: если приложение поддерживает всплывающие уведомления, используйте это значение из полезных данных всплывающего уведомления, чтобы определить, в какую часть приложения
@@ -208,9 +200,13 @@
             appBar.getCommandById('cmdPlay').addEventListener('click', playClickEv, false);
             appBar.getCommandById('cmdRew').addEventListener('click', rewClickEv, false);
 
-            pivot = document.getElementById("pivot")
+            pivot = document.getElementById("pivot");
             pivot.winControl.addEventListener('selectionchanged', pivotSelectionChangedHandler, false);
 
+            var displayToggleSwith_div = document.getElementById("display-toggle-switch");
+            displayToggleSw = new WinJS.UI.ToggleSwitch(displayToggleSwith_div, {title: 'Display Turn-Off Disable'});
+            displayToggleSwith_div.winControl.addEventListener('change', displaySwitchHandler, false);
+            displayToggleSw.checked = localSettings.values['display'];
         }
 
         isFirstActivation = false;
@@ -451,7 +447,7 @@
     };
 
     function openAudioFromPath(filePath) {
-            Windows.Storage.StorageFile.getFileFromPathAsync(filePath).done(openAudio);
+            Windows.Storage.StorageFile.getFileFromPathAsync(filePath).then(openAudio);
     };
 
     function getFile(file) {
@@ -763,6 +759,22 @@
       }
       appBar.forceLayout();
     }
+
+  function displaySwitchHandler(e) {
+      localSettings.values['display'] = displayToggleSw.checked;
+      displayRequestHandler(displayToggleSw.checked);
+  }
+
+  function displayRequestHandler(request){
+      if (g_dispRequest === null) {
+          g_dispRequest = new Windows.System.Display.DisplayRequest;
+      }
+      if (request) {
+        g_dispRequest.requestActive();
+      }else{
+        g_dispRequest.requestRelease();
+      }
+  }
 
   app.start();
 })();

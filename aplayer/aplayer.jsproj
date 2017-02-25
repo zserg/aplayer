@@ -118,6 +118,7 @@
     <Content Include="images\widelogo.scale-150.png" />
     <Content Include="images\widelogo.scale-200.png" />
     <Content Include="images\widelogo.scale-400.png" />
+    <Content Include="images\xplayer.svg" />
     <Content Include="images\zplayer.jpg" />
     <Content Include="index.html" />
     <Content Include="js\main.js" />

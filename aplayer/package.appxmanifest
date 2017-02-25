@@ -3,8 +3,8 @@
   <Identity Name="5aef294a-5b76-4508-811d-b8f50ec2a3a3" Version="1.0.0.0" Publisher="CN=Sergey" />
   <mp:PhoneIdentity PhoneProductId="5aef294a-5b76-4508-811d-b8f50ec2a3a3" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>aplayer</DisplayName>
-    <PublisherDisplayName>Sergey</PublisherDisplayName>
+    <DisplayName>xplayer</DisplayName>
+    <PublisherDisplayName>S. Zadyabin</PublisherDisplayName>
     <Logo>images\storelogo.png</Logo>
   </Properties>
   <Dependencies>
@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App" StartPage="index.html">
-      <uap:VisualElements DisplayName="zplayer" Description="zplayer" BackgroundColor="transparent" Square150x150Logo="images\Square150x150Logo.png" Square44x44Logo="images\Square44x44Logo.png">
+      <uap:VisualElements DisplayName="xplayer" Description="Audio player with the bookmarks feature" BackgroundColor="transparent" Square150x150Logo="images\Square150x150Logo.png" Square44x44Logo="images\Square44x44Logo.png">
         <uap:DefaultTile Square71x71Logo="images\square71x71logo.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="images\splashscreen.png" />
