@@ -68,131 +68,128 @@
             // Активация Launch выполняется, когда пользователь запускает ваше приложение с помощью плитки
             // или вызывает всплывающее уведомление, щелкнув основной текст или коснувшись его.
             // Create the media control.
-            WinJS.Utilities.startLog();
-            createDB();
-            systemMediaControls = Windows.Media.SystemMediaTransportControls.getForCurrentView();
-            systemMediaControls.addEventListener("propertychanged", mediaPropertyChanged, false);
-            systemMediaControls.addEventListener("buttonpressed", mediaButtonPressed, false);
-            systemMediaControls.isPlayEnabled = true;
-            systemMediaControls.isPauseEnabled = true;
-            systemMediaControls.playbackStatus = Windows.Media.MediaPlaybackStatus.paused;
+            if (args.detail.previousExecutionState !== activation.ApplicationExecutionState.running) {
+                  WinJS.Utilities.startLog();
+                  createDB();
+                  systemMediaControls = Windows.Media.SystemMediaTransportControls.getForCurrentView();
+                  systemMediaControls.addEventListener("propertychanged", mediaPropertyChanged, false);
+                  systemMediaControls.addEventListener("buttonpressed", mediaButtonPressed, false);
+                  systemMediaControls.isPlayEnabled = true;
+                  systemMediaControls.isPauseEnabled = true;
+                  systemMediaControls.playbackStatus = Windows.Media.MediaPlaybackStatus.paused;
 
-            mPlayer = new MediaPlayer();
-            mPlayer.autoPlay = false;
-            mPlayerSession = mPlayer.playbackSession;
-            mPlayerSession.addEventListener("positionchanged", onPositionChanged)
-            mPlayerSession.addEventListener("naturaldurationchanged", function(){
-                slider.max = mPlayerSession.naturalDuration.toFixed(2);
-                });
+                  mPlayer = new MediaPlayer();
+                  mPlayer.autoPlay = false;
+                  mPlayerSession = mPlayer.playbackSession;
+                  mPlayerSession.addEventListener("positionchanged", onPositionChanged)
+                  mPlayerSession.addEventListener("naturaldurationchanged", function(){
+                      slider.max = mPlayerSession.naturalDuration.toFixed(2);
+                      });
 
-            queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
-            queryOptions.folderDepth = search.FolderDepth.deep;
-            var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
+                  queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
+                  queryOptions.folderDepth = search.FolderDepth.deep;
+                  var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
 
 
-            var filePromises = [];
-            query.getFilesAsync().done(function (files) {
-                // Get image properties
-               files.forEach(function (file) {
-                  props = file.properties;
-                  myData.push({path:file.path, name:file.displayName});
-                  filePromises.push(props.getMusicPropertiesAsync())
-                  });
+                  var filePromises = [];
+                  query.getFilesAsync().done(function (files) {
+                      // Get image properties
+                     files.forEach(function (file) {
+                        props = file.properties;
+                        myData.push({path:file.path, name:file.displayName});
+                        filePromises.push(props.getMusicPropertiesAsync())
+                        });
 
-               Promise.all(filePromises).then(function (musicProperties){
-                    musicProperties.forEach(function (musicProp, ndx) {
-                        myData[ndx].title = musicProp.title ? musicProp.title : myData[ndx].name;
-                        myData[ndx].album = musicProp.album ? musicProp.album : "Unknown";
-                        myData[ndx].artist = musicProp.artist ? musicProp.artist : "Unknown";
-                        myData[ndx].duration = ms2time(musicProp.duration);
+                     Promise.all(filePromises).then(function (musicProperties){
+                          musicProperties.forEach(function (musicProp, ndx) {
+                              myData[ndx].title = musicProp.title ? musicProp.title : myData[ndx].name;
+                              myData[ndx].album = musicProp.album ? musicProp.album : "Unknown";
+                              myData[ndx].artist = musicProp.artist ? musicProp.artist : "Unknown";
+                              myData[ndx].duration = ms2time(musicProp.duration);
+                          });
+                       /* Track List Creating */
+                          var listDiv = document.querySelector("#myListView");  // Your html element on the page.
+                          var listView = new WinJS.UI.ListView(listDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
+                          var itemDiv = document.getElementById("mylisttemplate");  // Your template container
+                          listView.itemTemplate = itemDiv;  // Bind the list view to the element
+
+                          var dataList = new WinJS.Binding.List(myData);
+                          listView.itemDataSource = dataList.dataSource;
+
+                       /* Albums List Creating */
+                          var groupedListDiv = document.querySelector("#myGroupedListView");  // Your html element on the page.
+                          var groupedListView = new WinJS.UI.ListView(groupedListDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
+                          var itemDivGrouped = document.getElementById("mygroupedlisttemplate");  // Your template container
+                          var headerDivGrouped = document.getElementById("mygroupedlistheadertemplate");  // Your template container
+                          groupedListView.itemTemplate = itemDivGrouped;  // Bind the list view to the element
+                          groupedListView.groupHeaderTemplate = headerDivGrouped;  // Bind the list view to the element
+
+                          //var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData, compareGroups);
+                          var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
+                          groupedListView.groupDataSource = groupedDataList.groups.dataSource;
+                          groupedListView.itemDataSource = groupedDataList.dataSource;
+                          groupedListView.forceLayout();
+                          groupedListDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
+
+                          listView.forceLayout();
+                          listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
+
+                          appBar = document.getElementById('appbar').winControl;
+                          appBar.getCommandById('cmdBack').addEventListener('click', findPrevBookmark, false);
+                          appBar.getCommandById('cmdForward').addEventListener('click', findNextBookmark, false);
+                          appBar.getCommandById('cmdAdd').addEventListener('click', createBookmark, false);
+                          appBar.getCommandById('cmdRemove').addEventListener('click', removeBookmark, false);
+                          appBar.getCommandById('cmdPlay').addEventListener('click', playClickEv, false);
+                          appBar.getCommandById('cmdRew').addEventListener('click', rewClickEv, false);
+                      });
+
                     });
-                 /* Track List Creating */
-                    var listDiv = document.querySelector("#myListView");  // Your html element on the page.
-                    var listView = new WinJS.UI.ListView(listDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
-                    var itemDiv = document.getElementById("mylisttemplate");  // Your template container
-                    listView.itemTemplate = itemDiv;  // Bind the list view to the element
-
-                    var dataList = new WinJS.Binding.List(myData);
-                    listView.itemDataSource = dataList.dataSource;
-
-                 /* Albums List Creating */
-                    var groupedListDiv = document.querySelector("#myGroupedListView");  // Your html element on the page.
-                    var groupedListView = new WinJS.UI.ListView(groupedListDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
-                    var itemDivGrouped = document.getElementById("mygroupedlisttemplate");  // Your template container
-                    var headerDivGrouped = document.getElementById("mygroupedlistheadertemplate");  // Your template container
-                    groupedListView.itemTemplate = itemDivGrouped;  // Bind the list view to the element
-                    groupedListView.groupHeaderTemplate = headerDivGrouped;  // Bind the list view to the element
-
-                    //var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData, compareGroups);
-                    var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
-                    groupedListView.groupDataSource = groupedDataList.groups.dataSource;
-                    groupedListView.itemDataSource = groupedDataList.dataSource;
-                    groupedListView.forceLayout();
-                    groupedListDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
-
-                    listView.forceLayout();
-                    listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
-
-                    appBar = document.getElementById('appbar').winControl;
-                    appBar.getCommandById('cmdBack').addEventListener('click', findPrevBookmark, false);
-                    appBar.getCommandById('cmdForward').addEventListener('click', findNextBookmark, false);
-                    appBar.getCommandById('cmdAdd').addEventListener('click', createBookmark, false);
-                    appBar.getCommandById('cmdRemove').addEventListener('click', removeBookmark, false);
-                    appBar.getCommandById('cmdPlay').addEventListener('click', playClickEv, false);
-                    appBar.getCommandById('cmdRew').addEventListener('click', rewClickEv, false);
-                });
-
-              });
 
 
-            filePath = WinJS.Application.sessionState.filePath
-            if (filePath) {
-                Windows.Storage.StorageFile.getFileFromPathAsync(sessionState.filePath).done(getFile);
-            }
+                    filePath = WinJS.Application.sessionState.filePath
+                    if (filePath) {
+                        Windows.Storage.StorageFile.getFileFromPathAsync(sessionState.filePath).done(getFile);
+                    }
 
-            slider = document.getElementById("progress");
-            // slider.addEventListener("change", sliderChange, false);
-            slider.onpointerdown = sliderMouseDown;
-            slider.onpointerup = sliderMouseUp;
+                    slider = document.getElementById("progress");
+                    // slider.addEventListener("change", sliderChange, false);
+                    slider.onpointerdown = sliderMouseDown;
+                    slider.onpointerup = sliderMouseUp;
 
-            butt_mode = document.getElementById('butMode');
-            // butt_mode_1 = document.getElementById('butMode1');
-            // butt_mode_2 = document.getElementById('butMode2');
-            // butt_mode_0.style.opacity = 1;
-            // butt_mode_1.style.opacity = 0;
-            // butt_mode_2.style.opacity = 0;
-            butt_mode.style.backgroundImage = "url('/images/mode0_v2.svg')";
-            butt_mode.addEventListener("click", changeMode, false);
+                    butt_mode = document.getElementById('butMode');
+                    butt_mode.style.backgroundImage = "url('/images/mode0_v2.svg')";
+                    butt_mode.addEventListener("click", changeMode, false);
 
-            butt_play = document.getElementById('playbutton');
-            butt_play.addEventListener("click", playClickEv, false);
+                    butt_play = document.getElementById('playbutton');
+                    butt_play.addEventListener("click", playClickEv, false);
 
-            butt_rew = document.getElementById('rewbutton');
-            butt_rew.addEventListener("click", rewClickEv, false);
+                    butt_rew = document.getElementById('rewbutton');
+                    butt_rew.addEventListener("click", rewClickEv, false);
 
 
-            mode = CHAPTER_CYCLE;
-            changeMode();
+                    mode = CHAPTER_CYCLE;
+                    changeMode();
 
 
-            if (g_dispRequest === null) {
-                try {
-                    // This call creates an instance of the displayRequest object
-                    g_dispRequest = new Windows.System.Display.DisplayRequest;
-                    g_dispRequest.requestActive();
-                } catch (e) {
-                    WinJS.log && WinJS.log("Failed: displayRequest object creation, error: " + e.message, "sample", "error");
-                }
-            }
+                    if (g_dispRequest === null) {
+                        try {
+                            // This call creates an instance of the displayRequest object
+                            g_dispRequest = new Windows.System.Display.DisplayRequest;
+                            g_dispRequest.requestActive();
+                        } catch (e) {
+                            WinJS.log && WinJS.log("Failed: displayRequest object creation, error: " + e.message, "sample", "error");
+                        }
+                    }
 
-            if (args.detail.arguments) {
-                // TODO: если приложение поддерживает всплывающие уведомления, используйте это значение из полезных данных всплывающего уведомления, чтобы определить, в какую часть приложения
-                // перенаправить пользователя после вызова им всплывающего уведомления.
-            }
-            else if (args.detail.previousExecutionState === activation.ApplicationExecutionState.terminated) {
-                // TODO: это приложение было приостановлено и затем завершено для освобождения памяти.
-                // Для удобства пользователей восстановите здесь состояние приложения, как будто приложение никогда не прекращало работу.
-                // Примечание. Вам может потребоваться записать время последней приостановки приложения и только восстанавливать состояние в случае возвращения через небольшой промежуток времени.
+                    if (args.detail.arguments) {
+                        // TODO: если приложение поддерживает всплывающие уведомления, используйте это значение из полезных данных всплывающего уведомления, чтобы определить, в какую часть приложения
+                        // перенаправить пользователя после вызова им всплывающего уведомления.
+                    }
+                    else if (args.detail.previousExecutionState === activation.ApplicationExecutionState.terminated) {
+                        // TODO: это приложение было приостановлено и затем завершено для освобождения памяти.
+                        // Для удобства пользователей восстановите здесь состояние приложения, как будто приложение никогда не прекращало работу.
+                        // Примечание. Вам может потребоваться записать время последней приостановки приложения и только восстанавливать состояние в случае возвращения через небольшой промежуток времени.
+                    }
             }
         }
 
@@ -223,6 +220,15 @@
 
 
     app.oncheckpoint = function (args) {
+        // TODO: действие приложения будет приостановлено. Сохраните здесь все состояния, которые понадобятся после приостановки.
+        // Вы можете использовать объект WinJS.Application.sessionState, который автоматически сохраняется и восстанавливается после приостановки.
+        // Если вам нужно завершить асинхронную операцию до того, как действие приложения будет приостановлено, вызовите args.setPromise().
+        sessionState.filePath = filePath;
+        sessionState.tes = "hello";
+
+    };
+
+    app.onEnteredBackground = function (args) {
         // TODO: действие приложения будет приостановлено. Сохраните здесь все состояния, которые понадобятся после приостановки.
         // Вы можете использовать объект WinJS.Application.sessionState, который автоматически сохраняется и восстанавливается после приостановки.
         // Если вам нужно завершить асинхронную операцию до того, как действие приложения будет приостановлено, вызовите args.setPromise().
