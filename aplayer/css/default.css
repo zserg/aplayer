@@ -75,7 +75,7 @@ input[type=range]::-ms-tooltip {
 #butMode {
   width: 45px;
   height: 45px;
-  background-image: url("/images/mode0.svg");
+  background-image: url("/images/mode0_v2.svg");
   background-size: 100%;
   float: left;
 }

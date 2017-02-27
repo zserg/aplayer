@@ -1,0 +1,9 @@
+﻿{
+  "version": "2.3.0",
+  "output": "Warning",
+  "ignore": [],
+  "options": {
+    "white": true
+  },
+  "globalVariables": []
+}
