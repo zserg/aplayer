@@ -75,6 +75,7 @@
     var createLibrary;
     var updateLibrary;
     var groupedListView;
+    var fileErrorHandler;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.launch) {
@@ -377,13 +378,25 @@
           );
 
         } else {
-            WinJS.log && WinJS.log("Audio Tag Did Not Load Properly", "sample", "error");
+            updateLibrary();
+            var piv = document.getElementsByClassName("win-pivot");
+            var myPiv = piv[0];
+            myPiv.winControl.selectedIndex = 2;
+            WinJS.log && WinJS.log("Audio Tag Did Not Load Properly, Libary updated", "sample", "info");
         }
 
     }
 
     openAudioFromPath = function (filePath) {
-            Windows.Storage.StorageFile.getFileFromPathAsync(filePath).then(openAudio);
+            Windows.Storage.StorageFile.getFileFromPathAsync(filePath).then(openAudio, fileErrorHandler);
+    };
+
+    fileErrorHandler = function (file) {
+        updateLibrary();
+        var piv = document.getElementsByClassName("win-pivot");
+        var myPiv = piv[0];
+        myPiv.winControl.selectedIndex = 2;
+        WinJS.log && WinJS.log("File not found, Library updated", "sample", "info");
     };
 
     getFile = function (file) {
