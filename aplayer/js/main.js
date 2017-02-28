@@ -17,7 +17,6 @@
     var mPlayerSession = null;
     var dragInProgress = false;
     //var playPos = 0;
-    var queryOptions = null;
     var listView = null;
     var props = null;
     var myData = [];
@@ -73,6 +72,9 @@
     var mplayerPause;
     var sliderChange;
     var displayRequestHandler;
+    var createLibrary;
+    var updateLibrary;
+    var groupedListView;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.launch) {
@@ -97,59 +99,7 @@
                     slider.max = mPlayerSession.naturalDuration.toFixed(2);
                     });
 
-                queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
-                queryOptions.folderDepth = search.FolderDepth.deep;
-                var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
-
-
-                var filePromises = [];
-                query.getFilesAsync().done(function (files) {
-                    // Get image properties
-                   files.forEach(function (file) {
-                      props = file.properties;
-                      myData.push({path:file.path, name:file.displayName});
-                      filePromises.push(props.getMusicPropertiesAsync());
-                      });
-
-                   Promise.all(filePromises).then(function (musicProperties){
-                        musicProperties.forEach(function (musicProp, ndx) {
-                            myData[ndx].title = musicProp.title || myData[ndx].name;
-                            myData[ndx].album = musicProp.album || "Unknown";
-                            myData[ndx].artist = musicProp.artist || "Unknown";
-                            myData[ndx].duration = ms2time(musicProp.duration);
-                        });
-                     /* Track List Creating */
-                        var listDiv = document.querySelector("#myListView");  // Your html element on the page.
-                        listView = new WinJS.UI.ListView(listDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
-                        var itemDiv = document.getElementById("mylisttemplate");  // Your template container
-                        listView.itemTemplate = itemDiv;  // Bind the list view to the element
-
-                        var dataList = new WinJS.Binding.List(myData);
-                        listView.itemDataSource = dataList.dataSource;
-
-                     /* Albums List Creating */
-                        var groupedListDiv = document.querySelector("#myGroupedListView");  // Your html element on the page.
-                        var groupedListView = new WinJS.UI.ListView(groupedListDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
-                        var itemDivGrouped = document.getElementById("mygroupedlisttemplate");  // Your template container
-                        var headerDivGrouped = document.getElementById("mygroupedlistheadertemplate");  // Your template container
-                        groupedListView.itemTemplate = itemDivGrouped;  // Bind the list view to the element
-                        groupedListView.groupHeaderTemplate = headerDivGrouped;  // Bind the list view to the element
-
-                        //var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData, compareGroups);
-                        var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
-                        groupedListView.groupDataSource = groupedDataList.groups.dataSource;
-                        groupedListView.itemDataSource = groupedDataList.dataSource;
-                        groupedListView.forceLayout();
-                        groupedListDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
-
-                        listView.forceLayout();
-                        listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
-
-                    });
-
-                });
-
-
+                createLibrary();
 
                 slider = document.getElementById("progress");
                 // slider.addEventListener("change", sliderChange, false);
@@ -195,6 +145,8 @@
             cmd.winControl.onclick = ("click", playClickEv);
             cmd = document.getElementById("cmdRew");
             cmd.winControl.onclick = ("click", rewClickEv);
+            cmd = document.getElementById("cmdSync");
+            cmd.winControl.onclick = ("click", updateLibrary);
 
             pivot = document.getElementById("pivot");
             pivot.winControl.addEventListener("selectionchanged", pivotSelectionChangedHandler, false);
@@ -712,6 +664,105 @@
           g_dispRequest.requestRelease();
       }
   };
+
+  createLibrary = function (){
+        var queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
+        queryOptions.folderDepth = search.FolderDepth.deep;
+        var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
+        var filePromises = [];
+        myData = [];
+        query.getFilesAsync().done(function (files) {
+            // Get image properties
+           files.forEach(function (file) {
+              props = file.properties;
+              myData.push({path:file.path, name:file.displayName});
+              filePromises.push(props.getMusicPropertiesAsync());
+              });
+
+           Promise.all(filePromises).then(function (musicProperties){
+                musicProperties.forEach(function (musicProp, ndx) {
+                    myData[ndx].title = musicProp.title || myData[ndx].name;
+                    myData[ndx].album = musicProp.album || "Unknown";
+                    myData[ndx].artist = musicProp.artist || "Unknown";
+                    myData[ndx].duration = ms2time(musicProp.duration);
+                });
+             /* Track List Creating */
+                var listDiv = document.querySelector("#myListView");  // Your html element on the page.
+                listView = new WinJS.UI.ListView(listDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
+                var itemDiv = document.getElementById("mylisttemplate");  // Your template container
+                listView.itemTemplate = itemDiv;  // Bind the list view to the element
+
+                var dataList = new WinJS.Binding.List(myData);
+                listView.itemDataSource = dataList.dataSource;
+
+             /* Albums List Creating */
+                var groupedListDiv = document.querySelector("#myGroupedListView");  // Your html element on the page.
+                groupedListView = new WinJS.UI.ListView(groupedListDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
+                var itemDivGrouped = document.getElementById("mygroupedlisttemplate");  // Your template container
+                var headerDivGrouped = document.getElementById("mygroupedlistheadertemplate");  // Your template container
+                groupedListView.itemTemplate = itemDivGrouped;  // Bind the list view to the element
+                groupedListView.groupHeaderTemplate = headerDivGrouped;  // Bind the list view to the element
+
+                //var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData, compareGroups);
+                var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
+                groupedListView.groupDataSource = groupedDataList.groups.dataSource;
+                groupedListView.itemDataSource = groupedDataList.dataSource;
+                groupedListView.forceLayout();
+                groupedListDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
+
+                listView.forceLayout();
+                listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
+
+            });
+
+        });
+  };
+
+
+  updateLibrary = function (){
+        var queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
+        queryOptions.folderDepth = search.FolderDepth.deep;
+        var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
+        var filePromises = [];
+        myData = [];
+        query.getFilesAsync().done(function (files) {
+            // Get image properties
+           files.forEach(function (file) {
+              props = file.properties;
+              myData.push({path:file.path, name:file.displayName});
+              filePromises.push(props.getMusicPropertiesAsync());
+              });
+
+           Promise.all(filePromises).then(function (musicProperties){
+                musicProperties.forEach(function (musicProp, ndx) {
+                    myData[ndx].title = musicProp.title || myData[ndx].name;
+                    myData[ndx].album = musicProp.album || "Unknown";
+                    myData[ndx].artist = musicProp.artist || "Unknown";
+                    myData[ndx].duration = ms2time(musicProp.duration);
+                });
+
+                var dataList = new WinJS.Binding.List(myData);
+                var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
+
+                listView.itemDataSource = dataList.dataSource;
+                groupedListView.groupDataSource = groupedDataList.groups.dataSource;
+                groupedListView.itemDataSource = groupedDataList.dataSource;
+
+                // WinJS.Binding.processAll(document.getElementById("myListView"), myData);
+                // WinJS.Binding.processAll(document.getElementById("myGroupedListView"), myData);
+                groupedListView.forceLayout();
+                listView.forceLayout();
+
+            });
+
+        });
+  };
+
+
+
+
+
+
 
     app.start();
 }());
