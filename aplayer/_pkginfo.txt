@@ -1,1 +1,1 @@
-C:\Users\Sergey\documents\visual studio 2015\Projects\aplayer\aplayer\AppPackages\aplayer_1.1.6.0\aplayer_1.1.6.0_AnyCPU.appxbundle
+C:\Users\Sergey\documents\visual studio 2015\Projects\aplayer\aplayer\AppPackages\aplayer_1.1.7.0\aplayer_1.1.7.0_AnyCPU.appxbundle
