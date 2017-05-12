@@ -1,6 +1,6 @@
 ﻿(function () {
     "use strict";
-    WinJS.log = console.log.bind(console);
+    //WinJS.log = console.log.bind(console);
     var app = WinJS.Application;
     var activation = Windows.ApplicationModel.Activation;
     var MediaPlayer = Windows.Media.Playback.MediaPlayer;
@@ -81,12 +81,10 @@
         if (args.detail.kind === activation.ActivationKind.launch) {
             // Активация Launch выполняется, когда пользователь запускает ваше приложение с помощью плитки
             // или вызывает всплывающее уведомление, щелкнув основной текст или коснувшись его.
-            // Create the media control.
             if (args.detail.previousExecutionState !== activation.ApplicationExecutionState.running) {
-                WinJS.Utilities.startLog();
+                //WinJS.Utilities.startLog();
                 createDB();
                 systemMediaControls = Windows.Media.SystemMediaTransportControls.getForCurrentView();
-                // systemMediaControls.addEventListener("propertychanged", mediaPropertyChanged, false);
                 systemMediaControls.addEventListener("buttonpressed", mediaButtonPressed, false);
                 systemMediaControls.isPlayEnabled = true;
                 systemMediaControls.isPauseEnabled = true;
@@ -101,39 +99,14 @@
                     });
 
                 createLibrary();
-
-                slider = document.getElementById("progress");
-                // slider.addEventListener("change", sliderChange, false);
-                slider.onpointerdown = sliderMouseDown;
-                slider.onpointerup = sliderMouseUp;
-
-                butt_mode = document.getElementById("butMode");
-                butt_mode.style.backgroundImage = "url('/images/mode0_v2.svg')";
-                butt_mode.addEventListener("click", changeMode, false);
-
-                butt_play = document.getElementById("playbutton");
-                butt_play.addEventListener("click", playClickEv, false);
-
-                butt_rew = document.getElementById("rewbutton");
-                butt_rew.addEventListener("click", rewClickEv, false);
-
-
-                mode = CHAPTER_CYCLE;
-                changeMode();
-
             }
         }
 
         if (isFirstActivation) {
-            args.setPromise(WinJS.UI.processAll());
+            args.setPromise(WinJS.UI.processAll().then(function () { console.log("processAll end");}));
             // Add your code to retrieve the button and register the event handler.
+            console.log("AppBar setup start");
             appBar = document.getElementById("appbar").winControl;
-            // appBar.getCommandById("cmdBack").addEventListener("click", findPrevBookmark, false);
-            // appBar.getCommandById("cmdForward").addEventListener("click", findNextBookmark, false);
-            // appBar.getCommandById("cmdAdd").addEventListener("click", createBookmark, false);
-            // appBar.getCommandById("cmdRemove").addEventListener("click", removeBookmark, false);
-            // appBar.getCommandById("cmdPlay").addEventListener("click", playClickEv, false);
-            // appBar.getCommandById("cmdRew").addEventListener("click", rewClickEv, false);
             var cmd = document.getElementById("cmdBack");
             cmd.winControl.onclick = ("click", findPrevBookmark);
             cmd = document.getElementById("cmdForward");
@@ -156,7 +129,26 @@
             displayToggleSw = new WinJS.UI.ToggleSwitch(displayToggleSwith_div, {title: "Display Turn-Off Disable"});
             displayToggleSwith_div.winControl.addEventListener("change", displaySwitchHandler, false);
             displayToggleSw.checked = localSettings.values.display;
+
+                slider = document.getElementById("progress");
+                slider.onpointerdown = sliderMouseDown;
+                slider.onpointerup = sliderMouseUp;
+
+                butt_mode = document.getElementById("butMode");
+                butt_mode.style.backgroundImage = "url('/images/mode0_v2.svg')";
+                butt_mode.addEventListener("click", changeMode, false);
+
+                butt_play = document.getElementById("playbutton");
+                butt_play.addEventListener("click", playClickEv, false);
+
+                butt_rew = document.getElementById("rewbutton");
+                butt_rew.addEventListener("click", rewClickEv, false);
+
+
+                mode = CHAPTER_CYCLE;
+                changeMode();
         }
+
 
         isFirstActivation = false;
     };
@@ -359,7 +351,7 @@
               //var album = mprops.album;
               var artist = mprops.artist;
               var info_el = document.getElementById("track-info");
-              info_el.innerHTML = title+"<p>"+artist+"</p>";
+              info_el.innerHTML = "<p>"+title+"</p>"+"<p>"+artist+"</p>";
               var r_count_el = document.getElementById("couter-right");
 
               r_count_el.innerHTML = ms2time(mprops.duration);
@@ -372,7 +364,8 @@
                    function (thumbnail) {
                      if (thumbnail.size > 0) {
                         var imageBlob = window.URL.createObjectURL(thumbnail);
-                        document.getElementById("img").src = imageBlob;
+                        //document.getElementById("img").src = imageBlob;
+                        document.getElementById("thumbnail").style.backgroundImage = "url('"+imageBlob+"')";
                      }
                    }
           );
@@ -699,32 +692,15 @@
                     myData[ndx].artist = musicProp.artist || "Unknown";
                     myData[ndx].duration = ms2time(musicProp.duration);
                 });
-             /* Track List Creating */
-                var listDiv = document.querySelector("#myListView");  // Your html element on the page.
-                listView = new WinJS.UI.ListView(listDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
-                var itemDiv = document.getElementById("mylisttemplate");  // Your template container
-                listView.itemTemplate = itemDiv;  // Bind the list view to the element
+                createLibraryElements();
 
-                var dataList = new WinJS.Binding.List(myData);
-                listView.itemDataSource = dataList.dataSource;
-
-             /* Albums List Creating */
-                var groupedListDiv = document.querySelector("#myGroupedListView");  // Your html element on the page.
-                groupedListView = new WinJS.UI.ListView(groupedListDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
-                var itemDivGrouped = document.getElementById("mygroupedlisttemplate");  // Your template container
-                var headerDivGrouped = document.getElementById("mygroupedlistheadertemplate");  // Your template container
-                groupedListView.itemTemplate = itemDivGrouped;  // Bind the list view to the element
-                groupedListView.groupHeaderTemplate = headerDivGrouped;  // Bind the list view to the element
-
-                //var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData, compareGroups);
-                var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
-                groupedListView.groupDataSource = groupedDataList.groups.dataSource;
-                groupedListView.itemDataSource = groupedDataList.dataSource;
-                groupedListView.forceLayout();
-                groupedListDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
-
-                listView.forceLayout();
-                listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
+               var dataList = new WinJS.Binding.List(myData);
+               listView.itemDataSource = dataList.dataSource;
+               var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
+               groupedListView.groupDataSource = groupedDataList.groups.dataSource;
+               groupedListView.itemDataSource = groupedDataList.dataSource;
+               groupedListView.forceLayout();
+               listView.forceLayout();
 
             });
 
@@ -761,8 +737,6 @@
                 groupedListView.groupDataSource = groupedDataList.groups.dataSource;
                 groupedListView.itemDataSource = groupedDataList.dataSource;
 
-                // WinJS.Binding.processAll(document.getElementById("myListView"), myData);
-                // WinJS.Binding.processAll(document.getElementById("myGroupedListView"), myData);
                 groupedListView.forceLayout();
                 listView.forceLayout();
 
@@ -771,10 +745,62 @@
         });
   };
 
+  var getLibraryData = function (){
+        var queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
+        queryOptions.folderDepth = search.FolderDepth.deep;
+        var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
+        var filePromises = [];
+        var myData = [];
+        query.getFilesAsync().done(function (files) {
+            // Get image properties
+           files.forEach(function (file) {
+              props = file.properties;
+              myData.push({path:file.path, name:file.displayName});
+              filePromises.push(props.getMusicPropertiesAsync());
+              });
 
+           Promise.all(filePromises).then(function (musicProperties){
+                musicProperties.forEach(function (musicProp, ndx) {
+                    myData[ndx].title = musicProp.title || myData[ndx].name;
+                    myData[ndx].album = musicProp.album || "Unknown";
+                    myData[ndx].artist = musicProp.artist || "Unknown";
+                    myData[ndx].duration = ms2time(musicProp.duration);
+                });
 
+                var dataList = new WinJS.Binding.List(myData);
+                var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
 
+                listView.itemDataSource = dataList.dataSource;
+                groupedListView.groupDataSource = groupedDataList.groups.dataSource;
+                groupedListView.itemDataSource = groupedDataList.dataSource;
 
+                groupedListView.forceLayout();
+                listView.forceLayout();
+
+            });
+
+        });
+  };
+
+  var createLibraryElements = function () {
+     /* Track List Creating */
+        var listDiv = document.querySelector("#myListView");  // Your html element on the page.
+        listView = new WinJS.UI.ListView(listDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
+        var itemDiv = document.getElementById("mylisttemplate");  // Your template container
+        listView.itemTemplate = itemDiv;  // Bind the list view to the element
+
+     /* Albums List Creating */
+        var groupedListDiv = document.querySelector("#myGroupedListView");  // Your html element on the page.
+        groupedListView = new WinJS.UI.ListView(groupedListDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
+        var itemDivGrouped = document.getElementById("mygroupedlisttemplate");  // Your template container
+        var headerDivGrouped = document.getElementById("mygroupedlistheadertemplate");  // Your template container
+        groupedListView.itemTemplate = itemDivGrouped;  // Bind the list view to the element
+        groupedListView.groupHeaderTemplate = headerDivGrouped;  // Bind the list view to the element
+
+        //var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData, compareGroups);
+        groupedListDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
+        listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
+  };
 
 
     app.start();

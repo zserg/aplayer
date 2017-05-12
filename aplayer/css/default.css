@@ -15,10 +15,70 @@ body {
   background-color: black;
 }
 
+p {
+  margin:0;
+}
+
+img {
+  max-width: 100%;
+}
+
 #now-playing {
   display: flex;
   flex-flow: column nowrap;
   height: 100%;
+}
+
+#filler-bottom{
+  min-height: 50px;
+}
+#thumbnail{
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background-image: url("/images/xplayer.svg");
+   background-repeat: no-repeat;
+  background-size: contain;
+   background-position: center;
+}
+
+#track-info{
+    color: white;
+}
+
+#slider-top {
+  /* clear: both; */
+  display: flex;
+  width: 100%;
+  /* margin-bottom:50px; */
+}
+
+#slider {
+  flex-grow: 1;
+  width: 100px;
+  height: 50px;
+}
+
+#couter-left {
+  color: white;
+  font-size: 80%;
+  margin-top: 15px;
+  margin-right: 10px;
+  width:50px;
+}
+
+#ButtonsElement {
+  position: relative;
+  width: 320px;
+  clear: both;
+}
+
+#couter-right {
+  color: white;
+  font-size: 80%;
+  margin-top: 15px;
+  margin-left: 10px;
+  width:50px;
 }
 
 /* .win-appbar .win-commandimage */
@@ -32,7 +92,7 @@ input[type=range]::-ms-tooltip {
 .win-slider {
   -webkit-appearance: none;
   width: 100%;
-  height: 42px;
+  /* height: 42px; */
   padding-top: 17px;
   padding-bottom: 32px;
 }
@@ -81,14 +141,8 @@ input[type=range]::-ms-tooltip {
 }
 
 #track-header{
-    height: 25%;
-    flex: 1;
-}
-
-#track-info{
-    color: white;
-    margin-left: 20px;
-    width: 45%;
+    /* height: 25%; */
+    /* flex: 1; */
 }
 
 #myListView .win-listview .win-viewport.win-vertical{
@@ -163,48 +217,12 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
   color: white;
 }
 
-#slider-top {
-  clear: both;
-  display: flex;
-  width: 100%;
-  margin-bottom:50px;
-}
-
-#slider {
-  flex-grow: 1;
-  width: 100px;
-  height: 50px;
-  margin-bottom:40px;
-}
-
-#couter-left {
-  color: white;
-  font-size: 80%;
-  margin-top: 35px;
-  margin-right: 10px;
-  width:50px;
-}
-
-
-#couter-right {
-  color: white;
-  font-size: 80%;
-  margin-top: 35px;
-  margin-left: 10px;
-  width:50px;
-}
 
 .win-listview {
   height: 500px;
 }
 
 
-#ButtonsElement {
-  position: relative;
-  width: 320px;
-  clear: both;
-  margin-bottom: 50px;
-}
 
 .button-huge{
   width:160px;
@@ -245,58 +263,5 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
 #img-mode0, #img-mode1, #img-mode2 {
  width: 50px;
  }
-
-/* #playbutton { */
-/*   right: 0px; */
-/*   width:200px; */
-/*   height:200px; */
-
-/*  } */
-
-/* #img-play-active, #img-play-inactive { */
-/*  width: 100%; */
-/*  border: 0px !important; */
-/*  outline 0 !important; */
-/*  } */
-
-/* #rewbutton_act, #rewbutton_inact { */
-/*   top: 75px; */
-/*  } */
-/* #img-back-active, #img-back-inactive { */
-/*  width: 150px; */
-/*  } */
-
-/* #addbutton_act, #addbutton_inact { */
-/*   top: 200px; */
-/*   right: 70px; */
-/*  } */
-/* #img-add-active, #img-add-inactive { */
-/*  width: 100px; */
-/*  } */
-
-/* #rembutton_act, #rembutton_inact { */
-/*   top: 200px; */
-/*   right: 0px; */
-/*  } */
-/* #img-rem-active, #img-rem-inactive { */
-/*  width: 100px; */
-/*  } */
-
-/* #prevbutton_act, #prevbutton_inact { */
-/*   top: 190px; */
-/*   left: 0px; */
-/*  } */
-/* #img-prev-active, #img-prev-inactive { */
-/*  width: 50px; */
-/*  } */
-
-/* #nextbutton_act, #nextbutton_inact { */
-/*   top: 190px; */
-/*   left: 100px; */
-/*  } */
-/* #img-next-active, #img-next-inactive { */
-/*  width: 50px; */
-/*  } */
-
 
 

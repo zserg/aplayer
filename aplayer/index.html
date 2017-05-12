@@ -35,12 +35,13 @@
       <!-- Создаем элемент с заголовком ‘one’ -->
               <div id="my" class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Player'}">
                 <div id="now-playing">
-                   <div id="track-header">
-                    <div id="thumbnail" style="float:left">
-                       <img id="img" src="/images/xplayer.svg" width="150" height="150" />
+                   <!-- <div id="track-header"> -->
+                    <div id="thumbnail">
+                       <!-- <img id="img" src="/images/xplayer.svg" width="150" height="150" /> -->
+                       <!-- <img id="img" src="/images/xplayer.svg" /> -->
                     </div>
-                    <div id="track-info" style="float:left"></div>
-                   </div>
+                    <div id="track-info"></div>
+                   <!-- </div> -->
 
                    <div id="slider-top">
                       <div id="couter-left">0:00:00</div>
@@ -57,6 +58,7 @@
                         <div class="button button-huge" id="rewbutton"><img id="img-back-inactive" src="/images/back.svg"/></div>
                         <div class="button button-huge" id="playbutton"><img id="img-play-inactive" src="/images/play.svg"/></div>
                     </div>
+                    <div id="filler-bottom"></div>
                 </div>
               </div>
       <!-- Создаем элемент с заголовком 'Tracks' -->
