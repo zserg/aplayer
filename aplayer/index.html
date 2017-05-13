@@ -29,19 +29,42 @@
         <div class="group-header" data-win-bind="innerText:groupTitle"></div>
       </div>
 
-  <!-- Создаем Pivot – элемент с названием 'WINJS - PIVOT' -->
+      <!-- <div id="top-level"> -->
+      <!--    <div id="top-level-col"> -->
+      <!--       <div id="top-level-row1"> -->
+
+      <!--           <1!-- Landscape Mode Track Info --1> -->
+      <!--           <div id="now-playing-l"> -->
+      <!--               <div id="thumbnail-l"></div> -->
+      <!--               <div id="track-info-l"></div> -->
+      <!--           </div> -->
+
+      <!--          <div id="slider-top"> -->
+      <!--             <div id="couter-left">0:00:00</div> -->
+      <!--             <div id="slider"> -->
+      <!--               <input id="progress" type="range" min="0" max="500" value="0" list="bookmarks" -->
+      <!--                      class="win-slider"> -->
+      <!--             </div> -->
+      <!--             <div id="couter-right">0:00:00</div> -->
+
+      <!--             <datalist id="bookmarks"></datalist> -->
+      <!--           </div> -->
+
+      <!--               <div id="ButtonsElement"> -->
+      <!--                   <div class="button button-huge" id="rewbutton"><img id="img-back-inactive" src="/images/back.svg"/></div> -->
+      <!--                   <div class="button button-huge" id="playbutton"><img id="img-play-inactive" src="/images/play.svg"/></div> -->
+      <!--               </div> -->
+      <!--               <div id="filler-bottom"></div> -->
+      <!--           </div> -->
+
       <div id="pivot" data-win-control="WinJS.UI.Pivot" >
-      <!-- Чтобы добавить вкладки, добавьте внутрь дочерние элементы WinJS.UI.PivotItem. -->
+
       <!-- Создаем элемент с заголовком ‘one’ -->
               <div id="my" class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Player'}">
+      <!-- Создаем элемент с заголовком 'Player' -->
                 <div id="now-playing">
-                   <!-- <div id="track-header"> -->
-                    <div id="thumbnail">
-                       <!-- <img id="img" src="/images/xplayer.svg" width="150" height="150" /> -->
-                       <!-- <img id="img" src="/images/xplayer.svg" /> -->
-                    </div>
+                    <div id="thumbnail"></div>
                     <div id="track-info"></div>
-                   <!-- </div> -->
 
                    <div id="slider-top">
                       <div id="couter-left">0:00:00</div>
@@ -61,6 +84,7 @@
                     <div id="filler-bottom"></div>
                 </div>
               </div>
+
       <!-- Создаем элемент с заголовком 'Tracks' -->
               <div class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Tracks'}">
                  <div id="myListView"> </div>

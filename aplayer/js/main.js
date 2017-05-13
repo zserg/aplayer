@@ -219,12 +219,12 @@
 
         };
 
-    readBookmarks = function () {
+    readBookmarks = function (trackKey) {
         WinJS.log && WinJS.log("readBookmarks start", "readData", "info");
         // Create a transaction with which to query the IndexedDB.
         var txn = db.transaction(["tracks"], "readonly");
         var objectStore = txn.objectStore("tracks");
-        var request = objectStore.get(filePath);
+        var request = objectStore.get(trackKey);
 
         // Set the event callbacks for the transaction.
         request.onerror = function () { WinJS.log && WinJS.log("Error reading data.", "readData", "error"); };
@@ -233,7 +233,7 @@
         request.onsuccess = function (e) {
           trackData = e.target.result;
           if(!trackData){
-             trackData = {path: filePlayed.path,
+             trackData = {path: trackKey,
                           duration: mPlayerSession.naturalDuration,
                           bookmarks: []};
           }
@@ -344,17 +344,19 @@
             if (autoplay) {
                 mplayerPlay();
             }
-            readBookmarks();// read bookmarks from IndexedDB
+            //readBookmarks();// read bookmarks from IndexedDB
             slider.addEventListener("change", sliderChange, false);
             file.properties.getMusicPropertiesAsync().done(function (mprops){
               var title = mprops.title;
-              //var album = mprops.album;
+              var album = mprops.album;
               var artist = mprops.artist;
               var info_el = document.getElementById("track-info");
               info_el.innerHTML = "<p>"+title+"</p>"+"<p>"+artist+"</p>";
               var r_count_el = document.getElementById("couter-right");
-
               r_count_el.innerHTML = ms2time(mprops.duration);
+
+              var trackKey = title+album+artist+mprops.duration;
+              readBookmarks(trackKey);// read bookmarks from IndexedDB
             });
 
            file.getThumbnailAsync(
