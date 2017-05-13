@@ -95,6 +95,11 @@
                  <div id="myGroupedListView"> </div>
               </div>
 
+      <!-- Создаем элемент с заголовком 'History' -->
+              <div class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'History'}">
+                 <div id="myHistoryView"> </div>
+              </div>
+
       <!-- Создаем элемент с заголовком 'Settings' -->
               <div id="settings-pivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Settings'}">
                  <div id="display-toggle-switch" data-win-control="WinJS.UI.ToggleSwitch" data-win-options="{title: 'Display Turn-Off Disable'}">
@@ -118,6 +123,7 @@
          <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdPrev',    label: 'Prev', icon:'previous'}"></button>
          <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdNext',    label: 'Next', icon:'next'}"></button>
          <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdSync',    label: 'Update', icon:'sync'}"></button>
+         <button data-win-control="WinJS.UI.AppBarCommand" data-win-options="{id:'cmdClear',    label: 'Clear', icon:'clear'}"></button>
       </div>
 </body>
 </html>

@@ -1,5 +1,9 @@
 ﻿(function () {
     "use strict";
+
+
+    var HISTORY_MAX_LEN = 20;
+
     //WinJS.log = console.log.bind(console);
     var app = WinJS.Application;
     var activation = Windows.ApplicationModel.Activation;
@@ -18,6 +22,7 @@
     var dragInProgress = false;
     //var playPos = 0;
     var listView = null;
+    var histView = null;
     var props = null;
     var myData = [];
     var slider = null;
@@ -76,6 +81,7 @@
     var updateLibrary;
     var groupedListView;
     var fileErrorHandler;
+    var trackHistory = null;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.launch) {
@@ -121,6 +127,8 @@
             cmd.winControl.onclick = ("click", rewClickEv);
             cmd = document.getElementById("cmdSync");
             cmd.winControl.onclick = ("click", updateLibrary);
+            cmd = document.getElementById("cmdClear");
+            cmd.winControl.onclick = ("click", clearHistory);
 
             pivot = document.getElementById("pivot");
             pivot.winControl.addEventListener("selectionchanged", pivotSelectionChangedHandler, false);
@@ -171,7 +179,7 @@
         //WinJS.log && WinJS.log("createDB start", "IndexedDB", "info");
         // Create the request to open the database, named BookDB. If it doesn't exist, create it and immediately
         // upgrade to version 1.
-        var dbRequest = window.indexedDB.open("PlayerDB", 1);
+        var dbRequest = window.indexedDB.open("PlayerDB", 2);
 
         // Add asynchronous callback functions
         dbRequest.onerror = function () { WinJS.log && WinJS.log("Error creating database.", "sample", "error");};
@@ -194,12 +202,17 @@
             db.createObjectStore("tracks", {keyPath: "path"});
         }
 
+        if (!db.objectStoreNames.contains("history")) {
+            db.createObjectStore("history", {keyPath: "name"});
+        }
+
         // Once the creation of the object stores is finished (they are created asynchronously), log success.
         txn.oncomplete = function () { WinJS.log && WinJS.log("Database schema created.", "sample", "status");};
     };
 
     dbSuccess = function (evt) {
         db = evt.target.result;
+        readHistory();
         WinJS.log && WinJS.log("Database open success", "sample", "info");
         filePath = WinJS.Application.sessionState.filePath;
         if (filePath) {
@@ -320,6 +333,8 @@
   itemInvokedHandler = function (eventObject) {
                 eventObject.detail.itemPromise.done(function (invokedItem) {
                 autoplay = true;
+                putItemIntoHistory(invokedItem.data)
+                storeHistory();
                 openAudioFromPath(invokedItem.data.path, true);
                     // Access item data from the itemPromise
                 var piv = document.getElementsByClassName("win-pivot");
@@ -651,6 +666,8 @@
            "cmdRew",
            "cmdPrev",
            "cmdNext"]);
+      }else if (e.detail.index === 3){
+        appBar.showOnlyCommands(["cmdClear"]);
       }else{
         appBar.showOnlyCommands(["cmdSync"]);
       }
@@ -804,6 +821,70 @@
         listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
   };
 
+    var readHistory = function () {
+        WinJS.log && WinJS.log("readHistory start", "readData", "info");
+        // Create a transaction with which to query the IndexedDB.
+        var txn = db.transaction(["history"], "readonly");
+        var objectStore = txn.objectStore("history");
+        var request = objectStore.get("history");
+
+        // Set the event callbacks for the transaction.
+        request.onerror = function () { WinJS.log && WinJS.log("Error reading data.", "readData", "error"); };
+        request.onabort = function () { WinJS.log && WinJS.log("Reading of data aborted.", "readData", "error"); };
+
+        request.onsuccess = function (e) {
+          trackHistory = e.target.result;
+          if(!trackHistory){
+             trackHistory = {name: "history",
+                             data: []};
+          }
+       /* Track List Creating */
+          var histDiv = document.querySelector("#myHistoryView");  // Your html element on the page.
+          histView = new WinJS.UI.ListView(histDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
+          var itemHistDiv = document.getElementById("mylisttemplate");  // Your template container
+          histView.itemTemplate = itemHistDiv;  // Bind the list view to the element
+          histDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
+
+         var dataList = new WinJS.Binding.List(trackHistory.data);
+         histView.itemDataSource = dataList.dataSource;
+         histView.forceLayout();
+        };
+    };
+
+    var storeHistory = function () {
+        // Create a transaction with which to query the IndexedDB.
+        WinJS.log && WinJS.log("storeHistory start", "storeBookmark", "info");
+        console.log("storeHistory");
+        var txn = db.transaction(["history"], "readwrite");
+        var objectStore = txn.objectStore("history");
+
+        var request = objectStore.put(trackHistory);
+
+        // Set the event callbacks for the transaction.
+        txn.onerror = function () { WinJS.log && WinJS.log("transaction onerror", "storeBookmark", "error"); };
+        txn.onabort = function () { WinJS.log && WinJS.log("onabort", "storeBookmark", "error"); };
+        request.onsuccess = function () { readHistory();};
+        request.onerror = function () { WinJS.log && WinJS.log("request onerror", "storeBookmark", "error");};
+    };
+
+
+    var  putItemIntoHistory = function(item) {
+        var idx = trackHistory.data.findIndex(function (obj) {
+            return obj.path == item.path;
+        });
+        if (idx != -1) {
+            trackHistory.data.splice(idx, 1);
+        }
+        trackHistory.data.unshift(item);
+        if (trackHistory.data.length > HISTORY_MAX_LEN){
+            trackHistory.data.splice(HISTORY_MAX_LEN-1, trackHistory.data.length-1);
+        }
+    };
+
+    var clearHistory = function() {
+        trackHistory = {name: "history", data: [] };
+        storeHistory();
+    }
 
     app.start();
 }());
