@@ -82,6 +82,7 @@
     var groupedListView;
     var fileErrorHandler;
     var trackHistory = null;
+    var dbItems;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.launch) {
@@ -212,6 +213,12 @@
 
     dbSuccess = function (evt) {
         db = evt.target.result;
+	getAllItems(function (items) {
+	    var len = items.length;
+	    for (var i = 0; i < len; i += 1) {
+		console.log(items[i]);
+	    }
+	});
         readHistory();
         WinJS.log && WinJS.log("Database open success", "sample", "info");
         filePath = WinJS.Application.sessionState.filePath;
@@ -759,6 +766,15 @@
                 groupedListView.forceLayout();
                 listView.forceLayout();
 
+		dbItems.forEach(function(item) {
+                  var itemFound = myData.find(function(track) {
+                     return item.path == track.path;
+                  });
+                  if(itemFound === undefined){
+                    deleteFromDb(item);
+                  }
+                });
+
             });
 
         });
@@ -885,6 +901,40 @@
         trackHistory = {name: "history", data: [] };
         storeHistory();
     }
+
+    var getAllItems = function(callback) {
+	var trans = db.transaction(["tracks"], IDBTransaction.READ_ONLY);
+	var store = trans.objectStore("tracks");
+	dbItems = [];
+
+	trans.oncomplete = function(evt) {
+	    callback(dbItems);
+	};
+
+	var cursorRequest = store.openCursor();
+	cursorRequest.onerror = function(error) {
+	    console.log(error);
+	};
+
+	cursorRequest.onsuccess = function(evt) {
+	    var cursor = evt.target.result;
+	    if (cursor) {
+		dbItems.push(cursor.value);
+		cursor.continue();
+	    }
+	};
+    }
+
+    var deleteFromDb = function (item) {
+        var txn = db.transaction(["tracks"], "readwrite");
+        var objectStore = txn.objectStore("tracks");
+        var request = objectStore.delete(item.path);
+
+        txn.onerror = function () {WinJS.log && WinJS.log("transaction onerror", "storeBookmark", "error"); };
+        txn.onabort = function () { WinJS.log && WinJS.log("onabort", "storeBookmark", "error"); };
+        request.onsuccess = function () { WinJS.log && WinJS.log("success", "storeBookmark", "info");};
+        request.onerror = function () { WinJS.log && WinJS.log("request onerror", "storeBookmark", "error");};
+    };
 
     app.start();
 }());
