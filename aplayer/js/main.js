@@ -340,13 +340,13 @@
   itemInvokedHandler = function (eventObject) {
                 eventObject.detail.itemPromise.done(function (invokedItem) {
                 autoplay = true;
-                putItemIntoHistory(invokedItem.data)
-                storeHistory();
+                //putItemIntoHistory(invokedItem.data)
+                //storeHistory();
                 openAudioFromPath(invokedItem.data.path, true);
                     // Access item data from the itemPromise
                 var piv = document.getElementsByClassName("win-pivot");
                   var myPiv = piv[0];
-                  myPiv.winControl.selectedIndex = 0;
+                  //myPiv.winControl.selectedIndex = 0;
                     WinJS.log && WinJS.log("The item at index " + invokedItem.index + " is "
                         + invokedItem.data.title + " with a text value of "
                         + invokedItem.data.text, "sample", "status");
@@ -821,12 +821,14 @@
      /* Track List Creating */
         var listDiv = document.querySelector("#myListView");  // Your html element on the page.
         listView = new WinJS.UI.ListView(listDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
+        listView.itemsDraggable = false;
         var itemDiv = document.getElementById("mylisttemplate");  // Your template container
         listView.itemTemplate = itemDiv;  // Bind the list view to the element
 
      /* Albums List Creating */
         var groupedListDiv = document.querySelector("#myGroupedListView");  // Your html element on the page.
         groupedListView = new WinJS.UI.ListView(groupedListDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
+        groupedListView.itemsDraggable = false;
         var itemDivGrouped = document.getElementById("mygroupedlisttemplate");  // Your template container
         var headerDivGrouped = document.getElementById("mygroupedlistheadertemplate");  // Your template container
         groupedListView.itemTemplate = itemDivGrouped;  // Bind the list view to the element
@@ -857,6 +859,7 @@
        /* Track List Creating */
           var histDiv = document.querySelector("#myHistoryView");  // Your html element on the page.
           histView = new WinJS.UI.ListView(histDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
+          histView.itemsDraggable = false;
           var itemHistDiv = document.getElementById("mylisttemplate");  // Your template container
           histView.itemTemplate = itemHistDiv;  // Bind the list view to the element
           histDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
