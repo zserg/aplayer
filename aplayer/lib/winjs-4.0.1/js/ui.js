@@ -2,7 +2,7 @@
 /*! Copyright (c) Microsoft Corporation.  All Rights Reserved. Licensed under the MIT License. See License.txt in the project root for license information. */
 (function () {
 
-    var globalObject = 
+    var globalObject =
         typeof window !== 'undefined' ? window :
         typeof self !== 'undefined' ? self :
         typeof global !== 'undefined' ? global :
@@ -7608,7 +7608,7 @@ define('WinJS/_Accents',["require", "exports", "./Core/_Global", "./Core/_WinRT"
     var toPublish = {
         ColorTypes: ColorTypes,
         createAccentRule: createAccentRule,
-        // Exposed for tests    
+        // Exposed for tests
         _colors: colors,
         _reset: _reset,
         _isDarkTheme: isDarkTheme
@@ -7630,7 +7630,7 @@ define('WinJS/Controls/IntrinsicControls',[
 ], function (_Hoverable, _Accents) {
     "use strict";
 
-    // Shared color rule 
+    // Shared color rule
     _Accents.createAccentRule(
         ".win-link,\
          .win-progress-bar,\
@@ -21281,7 +21281,7 @@ define('WinJS/Controls/ListView',[
                         modeHandler("PointerUp"),
                         modeHandler("LostPointerCapture"),
                         modeHandler("MSHoldVisual", true),
-                        modeHandler("PointerCancel", true),
+                        modeHandler("PointerCancel"),
                         modeHandler("DragStart"),
                         modeHandler("DragOver"),
                         modeHandler("DragEnter"),
@@ -35420,7 +35420,7 @@ define('WinJS/Controls/Pivot',[
                         _ElementUtilities.empty(this._customRightHeader);
                         this._customRightHeader.appendChild(value);
                         this.forceLayout();
-                        
+
                     }
                 },
 
@@ -38774,9 +38774,9 @@ define('WinJS/Utilities/_KeyboardInfo',["require", "exports", '../Core/_BaseCore
         visualViewportClass: "win-visualviewport-space",
         scrollTimeout: 150,
     };
-    // This private module provides accurate metrics for the Visual Viewport and WWA's IHM offsets in Win10 WWA 
+    // This private module provides accurate metrics for the Visual Viewport and WWA's IHM offsets in Win10 WWA
     // where "-ms-device-fixed" CSS positioning is supported. WinJS controls will also use this module for
-    // positoning themselves relative to the viewport in a web browser outside of WWA. Their preference is still 
+    // positoning themselves relative to the viewport in a web browser outside of WWA. Their preference is still
     // to rely on "-ms-device-fixed" positioning, but currently fallback to "fixed" positioning in enviornments where
     // "-ms-device-fixed" is not supported.
     exports._KeyboardInfo;
@@ -38795,7 +38795,7 @@ define('WinJS/Utilities/_KeyboardInfo',["require", "exports", '../Core/_BaseCore
         get _extraOccluded() {
             var occluded = 0;
             // Controls using -ms-device-fixed positioning only need to reposition themselves to remain visible
-            // If the IHM has not resized the viewport.  
+            // If the IHM has not resized the viewport.
             if (!exports._KeyboardInfo._isResized && _WinRT.Windows.UI.ViewManagement.InputPane) {
                 occluded = _WinRT.Windows.UI.ViewManagement.InputPane.getForCurrentView().occludedRect.height;
             }
@@ -38842,7 +38842,7 @@ define('WinJS/Utilities/_KeyboardInfo',["require", "exports", '../Core/_BaseCore
             return boundingRect.width;
         },
         // The visual viewport space element is hidden given -ms-device-fixed positioning and used to calculate
-        // the 4 edges of the visual viewport with floating point precision. 
+        // the 4 edges of the visual viewport with floating point precision.
         get _visualViewportSpace() {
             var visualViewportSpace = _Global.document.body.querySelector("." + _Constants.visualViewportClass);
             if (!visualViewportSpace) {
@@ -38867,7 +38867,7 @@ define('WinJS/Utilities/_KeyboardInfo',["require", "exports", '../Core/_BaseCore
                     return max;
                 }
                 else {
-                    // Phone platform does not yet expose the Animation Metrics API. 
+                    // Phone platform does not yet expose the Animation Metrics API.
                     // Hard code the correct values for the time being.
                     // https://github.com/winjs/winjs/issues/1060
                     var animationDuration = 300;
@@ -40150,7 +40150,7 @@ define('WinJS/Controls/Flyout',[
                         }
                     }
                 },
-                
+
                 keyDown: function _LightDismissableLayer_keyDown(client /*: ILightDismissable */, eventObject) {
                     _LightDismissService.keyDown(this, eventObject);
                 },
@@ -40835,7 +40835,7 @@ define('WinJS/Controls/Flyout',[
                 // Horizontal auto or autohorizontal placement will be positioned to the left of the anchor if room, otherwise to the right.
                 //   - this is because right handed users would be more likely to obscure a flyout on the right of the anchor.
                 // All three auto placements will add a vertical scrollbar if necessary.
-                // 
+                //
                 _getTopLeft: function Flyout_getTopLeft() {
 
                     var that = this;
@@ -40858,9 +40858,9 @@ define('WinJS/Controls/Flyout',[
 
                     // If the anchor is centered vertically, would the flyout fit above it?
                     function fitsVerticallyWithCenteredAnchor(anchor, flyout) {
-                        // Returns true if the flyout would always fit at least top 
-                        // or bottom of its anchor, regardless of the position of the anchor, 
-                        // as long as the anchor never changed its height, nor did the height of 
+                        // Returns true if the flyout would always fit at least top
+                        // or bottom of its anchor, regardless of the position of the anchor,
+                        // as long as the anchor never changed its height, nor did the height of
                         // the visualViewport change.
                         return ((_Overlay._Overlay._keyboardInfo._visibleDocHeight - anchor.height) / 2) >= flyout.totalHeight;
                     }
@@ -41040,11 +41040,11 @@ define('WinJS/Controls/Flyout',[
                                 }
                             }
                             break;
-                        case "_cascade": 
+                        case "_cascade":
                             // Align vertically
                             // PREFERRED: When there is enough room to align a subMenu to either the top or the bottom of its
                             // anchor element, the subMenu prefers to be top aligned.
-                            // FALLBACK: When there is enough room to bottom align a subMenu but not enough room to top align it, 
+                            // FALLBACK: When there is enough room to bottom align a subMenu but not enough room to top align it,
                             // then the subMenu will align to the bottom of its anchor element.
                             // LASTRESORT: When there is not enough room to top align or bottom align the subMenu to its anchor,
                             // then the subMenu will be center aligned to it's anchor's vertical midpoint.
@@ -41060,10 +41060,10 @@ define('WinJS/Controls/Flyout',[
                             // the subMenu is pinned to the right edge of the window.
                             var rtl = _Global.getComputedStyle(this._element).direction === "rtl";
 
-                            // Cascading Menus should overlap their ancestor menu by 4 pixels and we have a unit test to 
+                            // Cascading Menus should overlap their ancestor menu by 4 pixels and we have a unit test to
                             // verify that behavior. Because we don't have access to the ancestor flyout we need to specify
-                            // the overlap in terms of our anchor element. There is a 1px border around the menu that 
-                            // contains our anchor we need to overlap our anchor by 3px to ensure that we overlap the containing 
+                            // the overlap in terms of our anchor element. There is a 1px border around the menu that
+                            // contains our anchor we need to overlap our anchor by 3px to ensure that we overlap the containing
                             // Menu by 4px.
                             var pixelsToOverlapAnchor = 3;
 
@@ -42374,7 +42374,7 @@ define('WinJS/Controls/AppBar/_Command',[
             });
 
 
-            // The list of AppBarCommand properties that we care about firing an event 
+            // The list of AppBarCommand properties that we care about firing an event
             // for, whenever they are changed after initial construction.
             var ObservablePropertyWhiteList = [
                 "label",
@@ -42431,7 +42431,7 @@ define('WinJS/Controls/AppBar/_Command',[
             }
 
             function getPropertyDescriptor(obj, propertyName) {
-                // Returns a matching property descriptor, or null, 
+                // Returns a matching property descriptor, or null,
                 // if no matching descriptor is found.
                 var desc = null;
                 while (obj && !desc) {
@@ -43738,7 +43738,7 @@ define('WinJS/Controls/CommandingSurface/_CommandingSurface',["require", "export
             _Dispose.disposeSubTree(this._dom.root);
         };
         _CommandingSurface.prototype.forceLayout = function () {
-            /// Forces the CommandingSurface to update its layout. Use this function when the window did not change 
+            /// Forces the CommandingSurface to update its layout. Use this function when the window did not change
             /// size, but the container of the CommandingSurface changed size.
             this._meaurementsDirty();
             this._machine.updateDom();
@@ -44079,7 +44079,7 @@ define('WinJS/Controls/CommandingSurface/_CommandingSurface',["require", "export
             }
             var overflowArea = this._dom.overflowArea, boundingClientRects = this.getBoundingRects(), adjustedOffset = 0;
             if (this._rtl) {
-                // In RTL the left edge of overflowarea prefers to align to the LEFT edge of the commandingSurface. 
+                // In RTL the left edge of overflowarea prefers to align to the LEFT edge of the commandingSurface.
                 // Make sure we avoid clipping through the RIGHT edge of the viewport
                 var viewportRight = window.innerWidth, rightOffsetFromViewport = boundingClientRects.overflowArea.right;
                 adjustedOffset = Math.min(viewportRight - rightOffsetFromViewport, 0);
@@ -44839,8 +44839,8 @@ define('WinJS/Controls/ToolBar/_ToolBar',["require", "exports", "../../Core/_Bas
             // the x or y planes.
             var placeHolder = _Global.document.createElement("DIV");
             _ElementUtilities.addClass(placeHolder, _Constants.ClassNames.placeHolderCssClass);
-            // If the ToolBar's original HTML parent node is disposed while the ToolBar is open and repositioned as 
-            // a temporary child of the <body>, make sure that calling dispose on the placeHolder element will trigger 
+            // If the ToolBar's original HTML parent node is disposed while the ToolBar is open and repositioned as
+            // a temporary child of the <body>, make sure that calling dispose on the placeHolder element will trigger
             // dispose on the ToolBar as well.
             _Dispose.markDisposable(placeHolder, this.dispose.bind(this));
             this._dom = {
@@ -44850,10 +44850,10 @@ define('WinJS/Controls/ToolBar/_ToolBar',["require", "exports", "../../Core/_Bas
             };
         };
         ToolBar.prototype._handleShowingKeyboard = function (event) {
-            // Because the ToolBar takes up layout space and is not an overlay, it doesn't have the same expectation 
-            // to move itself to get out of the way of a showing IHM. Instsead we just close the ToolBar to avoid 
-            // scenarios where the ToolBar is occluded, but the click-eating-div is still present since it may seem 
-            // strange to end users that an occluded ToolBar (out of sight, out of mind) is still eating their first 
+            // Because the ToolBar takes up layout space and is not an overlay, it doesn't have the same expectation
+            // to move itself to get out of the way of a showing IHM. Instsead we just close the ToolBar to avoid
+            // scenarios where the ToolBar is occluded, but the click-eating-div is still present since it may seem
+            // strange to end users that an occluded ToolBar (out of sight, out of mind) is still eating their first
             // click.
             // Mitigation:
             // Because (1) custom content in a ToolBar can only be included as a 'content' type command, because (2)
@@ -44926,15 +44926,15 @@ define('WinJS/Controls/ToolBar/_ToolBar',["require", "exports", "../../Core/_Bas
             placeHolderStyle.marginBottom = closedMargins.bottom + "px";
             placeHolderStyle.marginLeft = closedMargins.left + "px";
             _ElementUtilities._maintainFocus(function () {
-                // Move ToolBar element to the body in preparation of becoming a light dismissible. Leave an equal sized placeHolder element 
+                // Move ToolBar element to the body in preparation of becoming a light dismissible. Leave an equal sized placeHolder element
                 // at our original DOM location to avoid reflowing surrounding app content.
                 _this._dom.root.parentElement.insertBefore(placeHolder, _this._dom.root);
                 _Global.document.body.appendChild(_this._dom.root);
                 // Position the ToolBar to completely cover the same region as the placeholder element.
                 _this._dom.root.style.width = closedContentWidth + "px";
                 _this._dom.root.style.left = closedBorderBox.left - closedMargins.left + "px";
-                // Determine which direction to expand the CommandingSurface elements when opened. The overflow area will be rendered at the corresponding edge of 
-                // the ToolBar's content box, so we choose the direction that offers the most space between that edge and the corresponding edge of the viewport. 
+                // Determine which direction to expand the CommandingSurface elements when opened. The overflow area will be rendered at the corresponding edge of
+                // the ToolBar's content box, so we choose the direction that offers the most space between that edge and the corresponding edge of the viewport.
                 // This is to reduce the chance that the overflow area might clip through the edge of the viewport.
                 var topOfViewport = 0;
                 var bottomOfViewport = _Global.innerHeight;
@@ -46050,7 +46050,7 @@ define('WinJS/Controls/_LegacyAppBar',[
 
                 // Attach our css class.
                 _ElementUtilities.addClass(this._element, _Constants.appBarClass);
-                
+
                 var that = this;
                 this._dismissable = new _LightDismissService.LightDismissableElement({
                     element: this._element,
@@ -46457,7 +46457,7 @@ define('WinJS/Controls/_LegacyAppBar',[
                     if (showing) {
                         // Clean up tabbing behavior by making sure first and final divs are correct after showing.
                         this._updateFirstAndFinalDiv();
-                        
+
                         _LightDismissService.shown(this._dismissable);
                     }
                 },
@@ -46646,11 +46646,11 @@ define('WinJS/Controls/_LegacyAppBar',[
                         if (this._doNext === this._lastPositionVisited) {
                             this._doNext = "";
                         }
-                        
+
                         if (newState === appbarHiddenState) {
                             _LightDismissService.hidden(this._dismissable);
                         }
-                        
+
                         if (newPosition === displayModeVisiblePositions.hidden) {
                             // Make sure animation is finished.
                             this._element.style.visibility = "hidden";
@@ -47105,7 +47105,7 @@ define('WinJS/Controls/Menu',[
     './Menu/_Command'
 ], function menuInit(exports, _Global, _Base, _BaseUtils, _ErrorFromName, _Resources, _WriteProfilerMark, Promise, _ElementUtilities, _Hoverable, _KeyboardBehavior, _Constants, Flyout, _Overlay, _Command) {
     "use strict";
-    
+
     _Base.Namespace._moduleDefine(exports, "WinJS.UI", {
         /// <field>
         /// <summary locid="WinJS.UI.Menu">Represents a menu flyout for displaying commands.</summary>
@@ -47345,10 +47345,10 @@ define('WinJS/Controls/Menu',[
                                 _Constants.menuTouchSpacingClass
                         );
                     }
-                    // Call flyout show 
+                    // Call flyout show
                     this._baseFlyoutShow(anchor, placement, alignment);
 
-                    // Menu will need to adjust MenuCommand layouts based on the various 
+                    // Menu will need to adjust MenuCommand layouts based on the various
                     // types of commands visible in our Menu, but only after we send the beforeshow
                     // event, so the developer has a chance to show or hide more commands.
                     // Flyout's _findPosition will make that call.
@@ -47360,7 +47360,7 @@ define('WinJS/Controls/Menu',[
                     }
                     Flyout.Flyout.prototype._hide.call(this);
                 },
-                
+
                 _beforeEndHide: function Menu_beforeEndHide() {
                     _ElementUtilities.removeClass(this.element, _Constants.menuMouseSpacingClass);
                     _ElementUtilities.removeClass(this.element, _Constants.menuTouchSpacingClass);
@@ -49260,9 +49260,9 @@ define('WinJS/Controls/SearchBox',[
                 /// </deprecated>
                 /// <compatibleWith platform="Windows" minVersion="8.1"/>
                 /// </signature>
-                
+
                 _ElementUtilities._deprecated(strings.searchBoxDeprecated);
-                
+
                 this._requestingFocusOnKeyboardInputHandlerBind = this._requestingFocusOnKeyboardInputHandler.bind(this);
 
                 // Elements
@@ -49330,7 +49330,7 @@ define('WinJS/Controls/SearchBox',[
                     }
                 },
 
-                // Private methods 
+                // Private methods
                 _disableControl: function SearchBox_disableControl() {
                     AutoSuggestBox.AutoSuggestBox.prototype._disableControl.call(this);
                     this._buttonElement.disabled = true;
@@ -49589,7 +49589,7 @@ define('WinJS/Controls/SettingsFlyout',[
                 /// </deprecated>
                 /// <compatibleWith platform="Windows" minVersion="8.0"/>
                 /// </signature>
-                
+
                 _ElementUtilities._deprecated(strings.settingsFlyoutIsDeprecated);
 
                 // Make sure there's an input element
@@ -49612,7 +49612,7 @@ define('WinJS/Controls/SettingsFlyout',[
 
                 // Attach our css class
                 _ElementUtilities.addClass(this._element, _Constants.settingsFlyoutClass);
-                
+
                 var that = this;
                 this._dismissable = new _LightDismissService.LightDismissableElement({
                     element: this._element,
@@ -49628,7 +49628,7 @@ define('WinJS/Controls/SettingsFlyout',[
                                     _ElementUtilities._addEventListener(firstDiv, "focusout", function () { settingsPageIsFocusedOnce = 1; }, false);
                                     firstDiv.msSettingsFlyoutFocusOut = true;
                                 }
-                                
+
                                 settingsPageIsFocusedOnce = 0;
                                 _ElementUtilities._tryFocus(firstDiv, useSetActive);
                             }
@@ -49781,21 +49781,21 @@ define('WinJS/Controls/SettingsFlyout',[
                             if (firstDiv && firstDiv.length > 0) {
                                 firstDiv.item(0).parentNode.removeChild(firstDiv.item(0));
                             }
-    
+
                             this._addFirstDiv();
                         }
-    
+
                         if (!_ElementUtilities.hasClass(this.element.children[this.element.children.length - 1], _Constants.finalDivClass)) {
                             var finalDiv = this.element.querySelectorAll("." + _Constants.finalDivClass);
                             if (finalDiv && finalDiv.length > 0) {
                                 finalDiv.item(0).parentNode.removeChild(finalDiv.item(0));
                             }
-    
+
                             this._addFinalDiv();
                         }
-                        
+
                         this._setBackButtonsAriaLabel();
-                        
+
                         _LightDismissService.shown(this._dismissable);
                     }
                 },
@@ -49826,7 +49826,7 @@ define('WinJS/Controls/SettingsFlyout',[
                 _hide: function SettingsFlyout_hide() {
                     this._baseHide();
                 },
-                
+
                 _beforeEndHide: function SettingsFlyout_beforeEndHide() {
                     _LightDismissService.hidden(this._dismissable);
                 },
@@ -52879,7 +52879,7 @@ define('WinJS/Controls/ContentDialog',[
                     throw new _ErrorFromName("WinJS.UI.ContentDialog.DuplicateConstruction", Strings.duplicateConstruction);
                 }
                 options = options || {};
-                
+
                 this._onInputPaneShownBound = this._onInputPaneShown.bind(this);
                 this._onInputPaneHiddenBound = this._onInputPaneHidden.bind(this);
 
@@ -53002,9 +53002,9 @@ define('WinJS/Controls/ContentDialog',[
                             var nop = function () {
                             };
                             // Show returns a promise. If hidden is set while the ContentDialog is disposed, show will return a promise
-                            // error which will be impossible to handle and it'll cause the app to terminate. We'll eat the promise returned by show 
+                            // error which will be impossible to handle and it'll cause the app to terminate. We'll eat the promise returned by show
                             // to stop that from happening.
-                            this.show().done(nop, nop); 
+                            this.show().done(nop, nop);
                         } else if (hidden && !this._state.hidden) {
                             this.hide(DismissalResult.none);
                         }
@@ -53108,7 +53108,7 @@ define('WinJS/Controls/ContentDialog',[
                     dom.startBodyTab.setAttribute("x-ms-aria-flowfrom", dom.endBodyTab.id);
                     dom.endBodyTab.setAttribute("aria-flowto", dom.startBodyTab.id);
                     this._updateTabIndices();
-                    
+
                     dom.root.addEventListener("keydown", this._onKeyDownEnteringElement.bind(this), true);
                     _ElementUtilities._addEventListener(dom.root, "pointerdown", this._onPointerDown.bind(this));
                     _ElementUtilities._addEventListener(dom.root, "pointerup", this._onPointerUp.bind(this));
@@ -53179,7 +53179,7 @@ define('WinJS/Controls/ContentDialog',[
                         eventObject.preventDefault();
                     }
                 },
-                
+
                 _onKeyDownEnteringElement: function ContentDialog_onKeyDownEnteringElement(eventObject) {
                     if (eventObject.keyCode === _ElementUtilities.Key.tab) {
                         this._updateTabIndices();
@@ -54466,9 +54466,9 @@ define('WinJS/Controls/AppBar/_AppBar',["require", "exports", "../../Core/_Base"
                 eventElement: this.element,
                 onOpen: function () {
                     var openAnimation = _this._commandingSurface.createOpenAnimation(_this._getClosedHeight());
-                    // We're temporarily setting the AppBar's style from position=-ms-device-fixed to fixed to work around an animations bug in IE, 
+                    // We're temporarily setting the AppBar's style from position=-ms-device-fixed to fixed to work around an animations bug in IE,
                     // where two AppBars will end up being rendered when animating instead of one.
-                    // We need to recalculate our offsets relative to the top and bottom of the visible document because position fixed elements use layout viewport coordinates 
+                    // We need to recalculate our offsets relative to the top and bottom of the visible document because position fixed elements use layout viewport coordinates
                     // while position -ms-device-fixed use visual viewport coordinates.This difference in coordinate systems is especially pronounced if the IHM has caused the visual viewport to resize.
                     _this.element.style.position = "fixed";
                     if (_this._placement === AppBar.Placement.top) {
@@ -54486,9 +54486,9 @@ define('WinJS/Controls/AppBar/_AppBar',["require", "exports", "../../Core/_Base"
                 },
                 onClose: function () {
                     var closeAnimation = _this._commandingSurface.createCloseAnimation(_this._getClosedHeight());
-                    // We're temporarily setting the AppBar's style from position=-ms-device-fixed to fixed to work around an animations bug in IE, 
+                    // We're temporarily setting the AppBar's style from position=-ms-device-fixed to fixed to work around an animations bug in IE,
                     // where two AppBars will end up being rendered when animating instead of one.
-                    // We need to recalculate our offsets relative to the top and bottom of the visible document because position fixed elements use layout viewport coordinates 
+                    // We need to recalculate our offsets relative to the top and bottom of the visible document because position fixed elements use layout viewport coordinates
                     // while position -ms-device-fixed use visual viewport coordinates.This difference in coordinate systems is especially pronounced if the IHM has caused the visual viewport to resize.
                     _this.element.style.position = "fixed";
                     if (_this._placement === AppBar.Placement.top) {
