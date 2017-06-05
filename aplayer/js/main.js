@@ -151,7 +151,7 @@
 
                 butt_mode = document.getElementById("butMode");
                 butt_mode.style.backgroundImage = "url('/images/mode0_v2.svg')";
-                butt_mode.addEventListener("click", changeMode, false);
+                butt_mode.addEventListener("click", rotateMode, false);
 
                 butt_play = document.getElementById("playbutton");
                 butt_play.addEventListener("click", playClickEv, false);
@@ -161,7 +161,7 @@
 
 
                 mode = CHAPTER_CYCLE;
-                changeMode();
+                setMode();
         }
 
 
@@ -355,13 +355,13 @@
   itemInvokedHandler = function (eventObject) {
                 eventObject.detail.itemPromise.done(function (invokedItem) {
                 autoplay = true;
-                //putItemIntoHistory(invokedItem.data)
-                //storeHistory();
+                putItemIntoHistory(invokedItem.data)
+                storeHistory();
                 openAudioFromPath(invokedItem.data.path, true);
                     // Access item data from the itemPromise
                 var piv = document.getElementsByClassName("win-pivot");
                   var myPiv = piv[0];
-                  //myPiv.winControl.selectedIndex = 0;
+                  myPiv.winControl.selectedIndex = 0;
                     WinJS.log && WinJS.log("The item at index " + invokedItem.index + " is "
                         + invokedItem.data.title + " with a text value of "
                         + invokedItem.data.text, "sample", "status");
