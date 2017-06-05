@@ -56,7 +56,6 @@
     var itemInvokedHandler;
     var sliderMouseDown;
     var sliderMouseUp;
-    var changeMode;
     var playClickEv;
     var rewClickEv;
     var findPrevBookmark;
@@ -83,6 +82,13 @@
     var fileErrorHandler;
     var trackHistory = null;
     var dbItems;
+
+    var mode_data =
+      [
+        {next:CHAPTER_TO_END, image: "url('/images/mode0_v2.svg')"},
+        {next:CHAPTER_CYCLE,  image: "url('/images/mode1_v2.svg')"},
+        {next:TRACK_TO_END,   image: "url('/images/mode2_v2.svg')"}
+      ];
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.launch) {
@@ -168,13 +174,16 @@
         sessionState.filePath = filePath;
         localSettings.values.lastFile = filePath;
         localSettings.values.lastPosition = mPlayerSession.position;
+        localSettings.values.mode = mode;
     };
 
-    app.onEnteredBackground = function () {
-        sessionState.filePath = filePath;
-        sessionState.tes = "hello";
+    // app.onEnteredBackground = function () {
+    //     sessionState.filePath = filePath;
+    //     sessionState.tes = "hello";
+    //     localSettings.values.lastPosition = mPlayerSession.position;
+    //     localSettings.values.mode = mode;
 
-    };
+    // };
 
     createDB = function () {
         //WinJS.log && WinJS.log("createDB start", "IndexedDB", "info");
@@ -183,8 +192,12 @@
         var dbRequest = window.indexedDB.open("PlayerDB", 2);
 
         // Add asynchronous callback functions
-        dbRequest.onerror = function () { WinJS.log && WinJS.log("Error creating database.", "sample", "error");};
-        dbRequest.onsuccess = function (evt) { dbSuccess(evt);};
+        dbRequest.onerror = function (evt) {
+           WinJS.log && WinJS.log("Error creating database.", "sample", "error");
+           };
+        dbRequest.onsuccess = function (evt) {
+            dbSuccess(evt);
+            };
         dbRequest.onupgradeneeded = function (evt) { dbVersionUpgrade(evt);};
         dbRequest.onblocked = function () { WinJS.log && WinJS.log("Database create blocked.", "sample", "error");};
 
@@ -221,12 +234,14 @@
 	});
         readHistory();
         WinJS.log && WinJS.log("Database open success", "sample", "info");
-        filePath = WinJS.Application.sessionState.filePath;
+        filePath = sessionState.filePath;
         if (filePath) {
-            Windows.Storage.StorageFile.getFileFromPathAsync(sessionState.filePath).done(getFile);
+            Windows.Storage.StorageFile.getFileFromPathAsync(filePath).done(getFile);
         } else {
           filePath = localSettings.values.lastFile;
           lastPosition = localSettings.values.lastPosition;
+          mode = localSettings.values.mode;
+          setMode();
           if (!lastPosition) {
               lastPosition = 0;
           }
@@ -550,37 +565,39 @@
         var cur_pos = mPlayerSession.position;
         var i;
 
-      var bmLength = trackData.bookmarks.length;
-      startBm = null;
-      endBm = null;
-      for(i=0; i< bmLength;i+=1){
-        if(trackData.bookmarks[i] <= cur_pos) {
-           startBm = i;
-        }
-        if(trackData.bookmarks[i] > cur_pos) {
-           endBm = i;
-           break;
-        }
+      if (trackData.bookmarks){
+          var bmLength = trackData.bookmarks.length;
+          startBm = null;
+          endBm = null;
+          for(i=0; i< bmLength;i+=1){
+            if(trackData.bookmarks[i] <= cur_pos) {
+               startBm = i;
+            }
+            if(trackData.bookmarks[i] > cur_pos) {
+               endBm = i;
+               break;
+            }
+          }
+          var chapB = document.getElementById("chapter-start");
+          var chapE = document.getElementById("chapter-end");
+          chapB.innerHTML = (startBm!==null ? startBm : "B");
+          chapE.innerHTML = (endBm!==null ? endBm : "E");
       }
-      var chapB = document.getElementById("chapter-start");
-      var chapE = document.getElementById("chapter-end");
-      chapB.innerHTML = (startBm!==null ? startBm : "B");
-      chapE.innerHTML = (endBm!==null ? endBm : "E");
     };
 
 
 
-   changeMode = function (){
-     if(mode === TRACK_TO_END){
-       mode = CHAPTER_TO_END;
-       butt_mode.style.backgroundImage = "url('/images/mode1_v2.svg')";
-     }else if(mode === CHAPTER_TO_END){
-       mode = CHAPTER_CYCLE;
-       butt_mode.style.backgroundImage = "url('/images/mode2_v2.svg')";
-     }else{
+   var rotateMode = function (){
+       mode = mode_data[mode].next;
+       setMode();
+   };
+
+   var setMode = function(){
+     if (typeof mode === 'undefined' || mode === null) {
        mode = TRACK_TO_END;
-       butt_mode.style.backgroundImage = "url('/images/mode0_v2.svg')";
      }
+     butt_mode.style.backgroundImage = mode_data[mode].image;
+     findChapter();
    };
 
    ms2time = function (ms){
