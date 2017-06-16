@@ -11,8 +11,10 @@
     var sessionState = WinJS.Application.sessionState;
     var search = Windows.Storage.Search;
     var localSettings = Windows.Storage.ApplicationData.current.localSettings;
-
+    var roamingFolder = Windows.Storage.ApplicationData.current.roamingFolder;
     var isFirstActivation = true;
+    var filename = "bookmarks.dat";
+
     var systemMediaControls = null;
     //var audtag = null;
     var filePath = null;
@@ -175,6 +177,14 @@
         localSettings.values.lastFile = filePath;
         localSettings.values.lastPosition = mPlayerSession.position;
         localSettings.values.mode = mode;
+	getAllItems(function (items) {
+	    var len = items.length;
+	    for (var i = 0; i < len; i += 1) {
+		console.log(items[i]);
+	    }
+            var dbItems_json = JSON.stringify(dbItems);
+            writeDbToFile(dbItems_json);
+	});
     };
 
     // app.onEnteredBackground = function () {
@@ -231,6 +241,7 @@
 	    for (var i = 0; i < len; i += 1) {
 		console.log(items[i]);
 	    }
+          syncItemsFromFile();
 	});
         readHistory();
         WinJS.log && WinJS.log("Database open success", "sample", "info");
@@ -955,6 +966,23 @@
         request.onsuccess = function () { WinJS.log && WinJS.log("success", "storeBookmark", "info");};
         request.onerror = function () { WinJS.log && WinJS.log("request onerror", "storeBookmark", "error");};
     };
+
+   var writeDbToFile = function (data) {
+      roamingFolder.createFileAsync(filename, Windows.Storage.CreationCollisionOption.replaceExisting)
+            .then(function (file) {
+                return Windows.Storage.FileIO.writeTextAsync(file, data);
+            });
+   };
+
+   var syncItemsFromFile = function () {
+      roamingFolder.getFileAsync(filename)
+            .then(function (file) {
+                return Windows.Storage.FileIO.readTextAsync(file);
+            }).done(function (text) {
+                var items_json = JSON.parse(text);
+            });
+   };
+
 
     app.start();
 }());
