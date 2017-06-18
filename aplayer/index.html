@@ -29,6 +29,12 @@
         <div class="group-header" data-win-bind="innerText:groupTitle"></div>
       </div>
 
+      <div id="semanticZoomTemplate" data-win-control="WinJS.Binding.Template">
+         <div id="semanticZoomItem">
+            <h2 class="semanticZoomItem-Text" data-win-bind="innerText:groupTitle"></h2>
+         </div>
+      </div>
+
       <!-- <div id="top-level"> -->
       <!--    <div id="top-level-col"> -->
       <!--       <div id="top-level-row1"> -->
@@ -92,7 +98,10 @@
 
       <!-- Создаем элемент с заголовком 'Albums' -->
               <div class="listviewpivotitem" data-win-control="WinJS.UI.PivotItem" data-win-options="{ 'header': 'Albums'}">
-                 <div id="myGroupedListView"> </div>
+                <div id="semantiZoomDiv" data-win-control="WinJS.UI.SemanticZoom" data-win-options="{zoomedOut: true}">
+                   <div id="myGroupedListView"> </div>
+                   <div id="myGroupedZoomedOutListView"> </div>
+                </div>
               </div>
 
       <!-- Создаем элемент с заголовком 'History' -->

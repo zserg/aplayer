@@ -25,6 +25,7 @@
     //var playPos = 0;
     var listView = null;
     var histView = null;
+    var groupedZoomedOutListView;
     var props = null;
     var myData = [];
     var slider = null;
@@ -81,6 +82,8 @@
     var createLibrary;
     var updateLibrary;
     var groupedListView;
+    var semanticZoomView;
+
     var fileErrorHandler;
     var trackHistory = null;
     var dbItems;
@@ -241,7 +244,7 @@
 	    for (var i = 0; i < len; i += 1) {
 		console.log(items[i]);
 	    }
-          syncItemsFromFile();
+          //syncItemsFromFile();
 	});
         readHistory();
         WinJS.log && WinJS.log("Database open success", "sample", "info");
@@ -754,7 +757,10 @@
                groupedListView.groupDataSource = groupedDataList.groups.dataSource;
                groupedListView.itemDataSource = groupedDataList.dataSource;
                groupedListView.forceLayout();
+               listView.itemDataSource = dataList.dataSource;
                listView.forceLayout();
+               groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
+               groupedZoomedOutListView.forceLayout();
 
             });
 
@@ -790,6 +796,7 @@
                 listView.itemDataSource = dataList.dataSource;
                 groupedListView.groupDataSource = groupedDataList.groups.dataSource;
                 groupedListView.itemDataSource = groupedDataList.dataSource;
+                groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
 
                 groupedListView.forceLayout();
                 listView.forceLayout();
@@ -837,8 +844,11 @@
                 groupedListView.groupDataSource = groupedDataList.groups.dataSource;
                 groupedListView.itemDataSource = groupedDataList.dataSource;
 
+                groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
+
                 groupedListView.forceLayout();
                 listView.forceLayout();
+                groupedZoomedOutListView.forceLayout();
 
             });
 
@@ -854,6 +864,10 @@
         listView.itemTemplate = itemDiv;  // Bind the list view to the element
 
      /* Albums List Creating */
+        // var semanticZoomDiv = document.querySelector("#semanticZoomDiv");  // Your html element on the page.
+        // semanticZoomView = new WinJS.UI.SemanticZoom(semanticZoomDiv, {zoomedOut: true});  // Declare a new list view by hand.
+        // semanticZoomView.zoomedOut = true;
+
         var groupedListDiv = document.querySelector("#myGroupedListView");  // Your html element on the page.
         groupedListView = new WinJS.UI.ListView(groupedListDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
         groupedListView.itemsDraggable = false;
@@ -861,10 +875,16 @@
         var headerDivGrouped = document.getElementById("mygroupedlistheadertemplate");  // Your template container
         groupedListView.itemTemplate = itemDivGrouped;  // Bind the list view to the element
         groupedListView.groupHeaderTemplate = headerDivGrouped;  // Bind the list view to the element
-
-        //var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData, compareGroups);
         groupedListDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
         listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
+
+        var groupedZoomedOutListDiv = document.querySelector("#myGroupedZoomedOutListView");
+        groupedZoomedOutListView = new WinJS.UI.ListView(groupedZoomedOutListDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
+        var itemDivZoomedOutGrouped = document.getElementById("semanticZoomTemplate");  // Your template container
+        groupedZoomedOutListView.itemTemplate = itemDivZoomedOutGrouped;  // Bind the list view to the element
+
+        // semanticZoomView.zoomedInItem = groupedListView;
+        // semanticZoomView.zoomedOutItem = groupedZoomedOutListView;
   };
 
     var readHistory = function () {
@@ -980,9 +1000,9 @@
                 return Windows.Storage.FileIO.readTextAsync(file);
             }).done(function (text) {
                 var items_json = JSON.parse(text);
-            });
+            }, function (error) { WinJS.log && WinJS.log(error, "syncItemsFromFile", "info");
+       });
    };
-
 
     app.start();
 }());

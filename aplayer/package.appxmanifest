@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3" IgnorableNamespaces="uap mp uap3">
-  <Identity Name="38416S.Zadyabin.xplayer" Version="1.1.9.0" Publisher="CN=75B05853-B6F0-4B97-BE2D-5DC825524AE7" />
+  <Identity Name="38416S.Zadyabin.xplayer2" Version="1.1.0.0" Publisher="CN=75B05853-B6F0-4B97-BE2D-5DC825524AE7" />
   <mp:PhoneIdentity PhoneProductId="5aef294a-5b76-4508-811d-b8f50ec2a3a3" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>xplayer</DisplayName>
+    <DisplayName>xplayer 2</DisplayName>
     <PublisherDisplayName>S. Zadyabin</PublisherDisplayName>
     <Logo>images\storelogo.png</Logo>
   </Properties>
@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App" StartPage="index.html">
-      <uap:VisualElements DisplayName="xplayer" Description="Audio player with the bookmarks feature" BackgroundColor="transparent" Square150x150Logo="images\Square150x150Logo.png" Square44x44Logo="images\Square44x44Logo.png">
+      <uap:VisualElements DisplayName="xplayer 2" Description="Audio player with the bookmarks feature" BackgroundColor="transparent" Square150x150Logo="images\Square150x150Logo.png" Square44x44Logo="images\Square44x44Logo.png">
         <uap:DefaultTile Square71x71Logo="images\square71x71logo.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="images\splashscreen.png" />

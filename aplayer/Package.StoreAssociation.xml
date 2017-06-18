@@ -358,11 +358,13 @@
     <Language Code="zu-za" InMinimumRequirementSet="true" />
   </SupportedLocales>
   <ProductReservedInfo>
-    <MainPackageIdentityName>38416S.Zadyabin.xplayer</MainPackageIdentityName>
+    <MainPackageIdentityName>38416S.Zadyabin.xplayer2</MainPackageIdentityName>
     <ReservedNames>
-      <ReservedName>xplayer</ReservedName>
+      <ReservedName>xplayer 2</ReservedName>
     </ReservedNames>
   </ProductReservedInfo>
-  <AccountPackageIdentityNames />
-  <PackageInfoList LandingUrl="https://developer.microsoft.com/dashboard/Application?appId=9NQVL4QHH62L" />
+  <AccountPackageIdentityNames>
+    <MainPackageIdentityName>38416S.Zadyabin.xplayer</MainPackageIdentityName>
+  </AccountPackageIdentityNames>
+  <PackageInfoList LandingUrl="https://developer.microsoft.com/dashboard/Application?appId=9N77BV4D1103" />
 </StoreAssociation>
