@@ -28,6 +28,7 @@
     var groupedZoomedOutListView;
     var props = null;
     var myData = [];
+    var myAlbumsData;
     var slider = null;
     var db = null;
     var trackData = {};
@@ -370,7 +371,7 @@
                 eventObject.detail.itemPromise.done(function (invokedItem) {
                 autoplay = true;
                 putItemIntoHistory(invokedItem.data)
-                storeHistory();
+                //storeHistory();
                 openAudioFromPath(invokedItem.data.path, true);
                     // Access item data from the itemPromise
                 var piv = document.getElementsByClassName("win-pivot");
@@ -631,7 +632,7 @@
    };
 
    getGroupData = function (dataItem){
-      return {groupTitle: dataItem.album};
+      return {groupTitle: dataItem.album, groupThumbnail: myAlbumsData[dataItem.album].thumbnail};
    };
 
     // compareGroups = function (left, right) {
@@ -734,11 +735,12 @@
         var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
         var filePromises = [];
         myData = [];
+        myAlbumsData = {};
         query.getFilesAsync().done(function (files) {
             // Get image properties
            files.forEach(function (file) {
               props = file.properties;
-              myData.push({path:file.path, name:file.displayName});
+              myData.push({file:file, path:file.path, name:file.displayName});
               filePromises.push(props.getMusicPropertiesAsync());
               });
 
@@ -748,19 +750,49 @@
                     myData[ndx].album = musicProp.album || "Unknown";
                     myData[ndx].artist = musicProp.artist || "Unknown";
                     myData[ndx].duration = ms2time(musicProp.duration);
+                    if (musicProp.album){
+                       var data = {};
+                       data.file = myData[ndx].file;
+                       myAlbumsData[musicProp.album] = data;
+                    }
                 });
-                createLibraryElements();
 
-               var dataList = new WinJS.Binding.List(myData);
-               listView.itemDataSource = dataList.dataSource;
-               var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
-               groupedListView.groupDataSource = groupedDataList.groups.dataSource;
-               groupedListView.itemDataSource = groupedDataList.dataSource;
-               groupedListView.forceLayout();
-               listView.itemDataSource = dataList.dataSource;
-               listView.forceLayout();
-               groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
-               groupedZoomedOutListView.forceLayout();
+                var albumPromises = [];
+                var keyIndex = [];
+                Object.keys(myAlbumsData).forEach(function(key, ndx) {
+                    keyIndex[ndx] = key;
+                    albumPromises.push( myAlbumsData[key].file.getThumbnailAsync(
+                          Windows.Storage.FileProperties.ThumbnailMode.musicView,
+                          80,
+                          Windows.Storage.FileProperties.ThumbnailOptions.useCurrentScale)
+                    )
+                });
+
+                Promise.all(albumPromises).then(function (thumbnails){
+                      thumbnails.forEach(function (thumb, ndx) {
+                         var key = keyIndex[ndx];
+                         if (thumb.size > 0) {
+                            var imageBlob = window.URL.createObjectURL(thumb);
+                            //myAlbumsData[key].thumbnail = "url(\""+imageBlob+"\");";
+                            myAlbumsData[key].thumbnail = imageBlob;
+                         }else{
+                            myAlbumsData[key].thumbnail = "";
+                         }
+                      });
+
+                      createLibraryElements();
+
+                     var dataList = new WinJS.Binding.List(myData);
+                     listView.itemDataSource = dataList.dataSource;
+                     var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
+                     groupedListView.groupDataSource = groupedDataList.groups.dataSource;
+                     groupedListView.itemDataSource = groupedDataList.dataSource;
+                     groupedListView.forceLayout();
+                     listView.itemDataSource = dataList.dataSource;
+                     listView.forceLayout();
+                     groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
+                     groupedZoomedOutListView.forceLayout();
+                });
 
             });
 
