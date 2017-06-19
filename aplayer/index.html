@@ -26,13 +26,17 @@
       </div>
 
       <div id="mygroupedlistheadertemplate" data-win-control="WinJS.Binding.Template">
+        <img data-win-bind="src:groupThumbnail"/>
         <div class="group-header" data-win-bind="innerText:groupTitle"></div>
       </div>
 
       <div id="semanticZoomTemplate" data-win-control="WinJS.Binding.Template">
-         <div id="semanticZoomItem">
+         <div class="semZoomItem" id="semanticZoomItem">
             <img data-win-bind="src:groupThumbnail"/>
-            <h2 class="semanticZoomItem-Text" data-win-bind="innerText:groupTitle"></h2>
+            <div class="group-title">
+              <div class="groupTitle" data-win-bind="innerText:groupTitle"></div>
+              <div>Items: 20</div>
+            </div>
          </div>
       </div>
 

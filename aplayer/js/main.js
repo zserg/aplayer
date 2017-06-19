@@ -88,6 +88,8 @@
     var fileErrorHandler;
     var trackHistory = null;
     var dbItems;
+    var mql_p;
+    var mql_l;
 
     var mode_data =
       [
@@ -168,6 +170,13 @@
 
                 mode = CHAPTER_CYCLE;
                 setMode();
+
+                mql_p = window.matchMedia("(orientation: portrait)");
+                mql_l = window.matchMedia("(orientation: landscape)");
+
+                mql_p.addListener(onOrientationchanged);
+                mql_l.addListener(onOrientationchanged);
+
         }
 
 
@@ -190,6 +199,44 @@
             writeDbToFile(dbItems_json);
 	});
     };
+
+   app.onready = function () {
+        var display = Windows.Graphics.Display.DisplayProperties;
+        display.addEventListener('orientationchanged', onOrientationchanged);
+
+        onOrientationchanged();
+    }
+
+    function onOrientationchanged() {
+        if(groupedListView) { groupedListView.forceLayout();}
+        if(listView) { listView.forceLayout();}
+        if(groupedZoomedOutListView) { groupedZoomedOutListView.forceLayout();}
+        // switch (Windows.Graphics.Display.DisplayProperties.currentOrientation) {
+
+        //     case Windows.Graphics.Display.DisplayOrientations.landscape:
+        //         message.innerText = "Display Orientation - Landscape";
+        //         break;
+
+        //     case Windows.Graphics.Display.DisplayOrientations.portrait:
+        //         message.innerText = "Display Orientation - Portrait";
+        //         break;
+
+        //     case Windows.Graphics.Display.DisplayOrientations.landscapeFlipped:
+        //         message.innerText = "Display Orientation - Landscape (flipped)";
+        //         break;
+
+        //     case Windows.Graphics.Display.DisplayOrientations.portraitFlipped:
+        //         message.innerText = "Display Orientation - Portrait (flipped)";
+        //         break;
+
+        //     default:
+        //         message.innerText = "Unknown";
+        //         break;
+        // }
+    }
+  //
+
+
 
     // app.onEnteredBackground = function () {
     //     sessionState.filePath = filePath;
@@ -413,8 +460,8 @@
 
            file.getThumbnailAsync(
                Windows.Storage.FileProperties.ThumbnailMode.musicView,
-               80,
-               Windows.Storage.FileProperties.ThumbnailOptions.useCurrentScale).then(
+               640,
+               Windows.Storage.FileProperties.ThumbnailOptions.resizeThumbnail).then(
                    function (thumbnail) {
                      if (thumbnail.size > 0) {
                         var imageBlob = window.URL.createObjectURL(thumbnail);
@@ -750,11 +797,9 @@
                     myData[ndx].album = musicProp.album || "Unknown";
                     myData[ndx].artist = musicProp.artist || "Unknown";
                     myData[ndx].duration = ms2time(musicProp.duration);
-                    if (musicProp.album){
-                       var data = {};
-                       data.file = myData[ndx].file;
-                       myAlbumsData[musicProp.album] = data;
-                    }
+                    var data = {};
+                    data.file = myData[ndx].file;
+                    myAlbumsData[myData[ndx].album] = data;
                 });
 
                 var albumPromises = [];
@@ -764,7 +809,7 @@
                     albumPromises.push( myAlbumsData[key].file.getThumbnailAsync(
                           Windows.Storage.FileProperties.ThumbnailMode.musicView,
                           80,
-                          Windows.Storage.FileProperties.ThumbnailOptions.useCurrentScale)
+                          Windows.Storage.FileProperties.ThumbnailOptions.resizeThumbnail)
                     )
                 });
 
@@ -779,6 +824,7 @@
                             myAlbumsData[key].thumbnail = "";
                          }
                       });
+                      //myAlbumsData["Unknown"].thumbnail = "/images/xplayer.svg";
 
                       createLibraryElements();
 

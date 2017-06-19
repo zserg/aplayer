@@ -2,11 +2,19 @@
     #ButtonsElement {
        display: none;
     }
+
+    .semZoomItem {
+      display: flex;
+    }
 }
 
 @media only screen and (orientation: portrait) {
     #ButtonsElement {
        display: block;
+    }
+
+    .semZoomItem {
+      display: block;
     }
 }
 
@@ -264,4 +272,17 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
  width: 50px;
  }
 
+
+.group-title {
+  /* display: flex; */
+  /* flex-flow: column nowrap; */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 10px;
+}
+
+.groupTitle {
+  font-size: 24px;
+}
 
