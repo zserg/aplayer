@@ -4,7 +4,7 @@
 
     var HISTORY_MAX_LEN = 20;
 
-    //WinJS.log = console.log.bind(console);
+   // WinJS.log = console.log.bind(console);
     var app = WinJS.Application;
     var activation = Windows.ApplicationModel.Activation;
     var MediaPlayer = Windows.Media.Playback.MediaPlayer;
@@ -103,7 +103,7 @@
             // Активация Launch выполняется, когда пользователь запускает ваше приложение с помощью плитки
             // или вызывает всплывающее уведомление, щелкнув основной текст или коснувшись его.
             if (args.detail.previousExecutionState !== activation.ApplicationExecutionState.running) {
-                //WinJS.Utilities.startLog();
+                //WinJS.Utilities.startLog({type:"info", tags:"custom", excludeTags:"winjs"});
                 createDB();
                 systemMediaControls = Windows.Media.SystemMediaTransportControls.getForCurrentView();
                 systemMediaControls.addEventListener("buttonpressed", mediaButtonPressed, false);
@@ -115,10 +115,12 @@
                 mPlayer.autoPlay = false;
                 mPlayerSession = mPlayer.playbackSession;
                 mPlayerSession.addEventListener("positionchanged", onPositionChanged);
+                mPlayerSession.addEventListener("playbackstatechanged", onStateChanged);
                 mPlayerSession.addEventListener("naturaldurationchanged", function(){
                     slider.max = mPlayerSession.naturalDuration.toFixed(2);
                     });
 
+                WinJS.log && WinJS.log("createLibrary Enter", "custom", "info");
                 createLibrary();
             }
         }
@@ -250,6 +252,7 @@
         //WinJS.log && WinJS.log("createDB start", "IndexedDB", "info");
         // Create the request to open the database, named BookDB. If it doesn't exist, create it and immediately
         // upgrade to version 1.
+        console.log("11");
         var dbRequest = window.indexedDB.open("PlayerDB", 2);
 
         // Add asynchronous callback functions
@@ -520,6 +523,11 @@
         }
     };
 
+    var onStateChanged = function () {
+         var state = mPlayerSession.playbackState;
+         console.log("State",state);
+         console.log(Windows.Media.Playback.MediaPlayerState.Paused);
+    };
 
     onPositionChanged = function () {
       if(!dragInProgress){
@@ -663,6 +671,9 @@
    };
 
    ms2time = function (ms){
+     if (ms < 0){
+       ms = 0;
+     }
      var x = Math.floor(ms/1000);
      var sec = x % 60;
      x = Math.floor(x/60);
@@ -777,6 +788,7 @@
   };
 
   createLibrary = function (){
+        console.log("createLibrary");
         var queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
         queryOptions.folderDepth = search.FolderDepth.deep;
         var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
@@ -828,9 +840,11 @@
 
                       createLibraryElements();
 
+                     console.log("dataBinding");
                      var dataList = new WinJS.Binding.List(myData);
                      listView.itemDataSource = dataList.dataSource;
                      var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
+                     //console.log(JSON.stringify(groupedListView.groupDataSource));
                      groupedListView.groupDataSource = groupedDataList.groups.dataSource;
                      groupedListView.itemDataSource = groupedDataList.dataSource;
                      groupedListView.forceLayout();
