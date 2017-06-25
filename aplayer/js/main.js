@@ -51,7 +51,7 @@
 
     var butt_mode = null;
     var appBar = null;
-    var createDB = null;
+    var createDB;
     var mediaButtonPressed;
     var onPositionChanged;
     var ms2time;
@@ -90,6 +90,8 @@
     var dbItems;
     var mql_p;
     var mql_l;
+    var setupEvHandlers;
+    var appBarPlay;
 
     var mode_data =
       [
@@ -104,83 +106,34 @@
             // или вызывает всплывающее уведомление, щелкнув основной текст или коснувшись его.
             if (args.detail.previousExecutionState !== activation.ApplicationExecutionState.running) {
                 //WinJS.Utilities.startLog({type:"info", tags:"custom", excludeTags:"winjs"});
-                createDB();
-                systemMediaControls = Windows.Media.SystemMediaTransportControls.getForCurrentView();
-                systemMediaControls.addEventListener("buttonpressed", mediaButtonPressed, false);
-                systemMediaControls.isPlayEnabled = true;
-                systemMediaControls.isPauseEnabled = true;
-                systemMediaControls.playbackStatus = Windows.Media.MediaPlaybackStatus.paused;
-
-                mPlayer = new MediaPlayer();
-                mPlayer.autoPlay = false;
-                mPlayerSession = mPlayer.playbackSession;
-                mPlayerSession.addEventListener("positionchanged", onPositionChanged);
-                mPlayerSession.addEventListener("playbackstatechanged", onStateChanged);
-                mPlayerSession.addEventListener("naturaldurationchanged", function(){
-                    slider.max = mPlayerSession.naturalDuration.toFixed(2);
-                    });
-
-                WinJS.log && WinJS.log("createLibrary Enter", "custom", "info");
-                createLibrary();
             }
         }
 
         if (isFirstActivation) {
-            args.setPromise(WinJS.UI.processAll().then(function () { console.log("processAll end");}));
-            // Add your code to retrieve the button and register the event handler.
-            console.log("AppBar setup start");
-            appBar = document.getElementById("appbar").winControl;
-            var cmd = document.getElementById("cmdBack");
-            cmd.winControl.onclick = ("click", findPrevBookmark);
-            cmd = document.getElementById("cmdForward");
-            cmd.winControl.onclick = ("click", findNextBookmark);
-            cmd = document.getElementById("cmdAdd");
-            cmd.winControl.onclick = ("click", createBookmark);
-            cmd = document.getElementById("cmdRemove");
-            cmd.winControl.onclick = ("click", removeBookmark);
-            cmd = document.getElementById("cmdPlay");
-            cmd.winControl.onclick = ("click", playClickEv);
-            cmd = document.getElementById("cmdRew");
-            cmd.winControl.onclick = ("click", rewClickEv);
-            cmd = document.getElementById("cmdSync");
-            cmd.winControl.onclick = ("click", updateLibrary);
-            cmd = document.getElementById("cmdClear");
-            cmd.winControl.onclick = ("click", clearHistory);
+            // Create MediaControl
+            systemMediaControls = Windows.Media.SystemMediaTransportControls.getForCurrentView();
+            systemMediaControls.addEventListener("buttonpressed", mediaButtonPressed, false);
+            systemMediaControls.isPlayEnabled = true;
+            systemMediaControls.isPauseEnabled = true;
+            systemMediaControls.playbackStatus = Windows.Media.MediaPlaybackStatus.paused;
 
-            pivot = document.getElementById("pivot");
-            pivot.winControl.addEventListener("selectionchanged", pivotSelectionChangedHandler, false);
+            mPlayer = new MediaPlayer();
+            mPlayer.autoPlay = false;
+            mPlayerSession = mPlayer.playbackSession;
+            mPlayerSession.addEventListener("positionchanged", onPositionChanged);
+            mPlayerSession.addEventListener("playbackstatechanged", onStateChanged);
+            mPlayerSession.addEventListener("naturaldurationchanged", function(){
+                slider.max = mPlayerSession.naturalDuration.toFixed(2);
+            });
 
-            var displayToggleSwith_div = document.getElementById("display-toggle-switch");
-            displayToggleSw = new WinJS.UI.ToggleSwitch(displayToggleSwith_div, {title: "Display Turn-Off Disable"});
-            displayToggleSwith_div.winControl.addEventListener("change", displaySwitchHandler, false);
-            displayToggleSw.checked = localSettings.values.display;
-
-                slider = document.getElementById("progress");
-                slider.onpointerdown = sliderMouseDown;
-                slider.onpointerup = sliderMouseUp;
-
-                butt_mode = document.getElementById("butMode");
-                butt_mode.style.backgroundImage = "url('/images/mode0_v2.svg')";
-                butt_mode.addEventListener("click", rotateMode, false);
-
-                butt_play = document.getElementById("playbutton");
-                butt_play.addEventListener("click", playClickEv, false);
-
-                butt_rew = document.getElementById("rewbutton");
-                butt_rew.addEventListener("click", rewClickEv, false);
-
-
-                mode = CHAPTER_CYCLE;
-                setMode();
-
-                mql_p = window.matchMedia("(orientation: portrait)");
-                mql_l = window.matchMedia("(orientation: landscape)");
-
-                mql_p.addListener(onOrientationchanged);
-                mql_l.addListener(onOrientationchanged);
-
+            args.setPromise(WinJS.UI.processAll().then(
+              function () {
+                  setupEvHandlers();
+                  createDB();
+                  createLibrary();
+              }
+            ));
         }
-
 
         isFirstActivation = false;
     };
@@ -235,7 +188,7 @@
         //         message.innerText = "Unknown";
         //         break;
         // }
-    }
+    };
   //
 
 
@@ -248,7 +201,62 @@
 
     // };
 
-    createDB = function () {
+      setupEvHandlers = function () {
+          appBar = document.getElementById("appbar").winControl;
+          var cmd = document.getElementById("cmdBack");
+          cmd.winControl.onclick = ("click", findPrevBookmark);
+          cmd = document.getElementById("cmdForward");
+          cmd.winControl.onclick = ("click", findNextBookmark);
+          cmd = document.getElementById("cmdAdd");
+          cmd.winControl.onclick = ("click", createBookmark);
+          cmd = document.getElementById("cmdRemove");
+          cmd.winControl.onclick = ("click", removeBookmark);
+          cmd = document.getElementById("cmdPlay");
+          cmd.winControl.onclick = ("click", playClickEv);
+          cmd = document.getElementById("cmdRew");
+          cmd.winControl.onclick = ("click", rewClickEv);
+          cmd = document.getElementById("cmdSync");
+          cmd.winControl.onclick = ("click", updateLibrary);
+          cmd = document.getElementById("cmdClear");
+          cmd.winControl.onclick = ("click", clearHistory);
+
+          appBarPlay = appBar.getCommandById("cmdPlay");
+
+          pivot = document.getElementById("pivot");
+          pivot.winControl.addEventListener("selectionchanged", pivotSelectionChangedHandler, false);
+
+          var displayToggleSwith_div = document.getElementById("display-toggle-switch");
+          displayToggleSw = new WinJS.UI.ToggleSwitch(displayToggleSwith_div, {title: "Display Turn-Off Disable"});
+          displayToggleSwith_div.winControl.addEventListener("change", displaySwitchHandler, false);
+          displayToggleSw.checked = localSettings.values.display;
+
+          slider = document.getElementById("progress");
+          slider.onpointerdown = sliderMouseDown;
+          slider.onpointerup = sliderMouseUp;
+
+          butt_mode = document.getElementById("butMode");
+          butt_mode.style.backgroundImage = "url('/images/mode0_v2.svg')";
+          butt_mode.addEventListener("click", rotateMode, false);
+
+          butt_play = document.getElementById("playbutton");
+          butt_play.addEventListener("click", playClickEv, false);
+
+          butt_rew = document.getElementById("rewbutton");
+          butt_rew.addEventListener("click", rewClickEv, false);
+
+          mode = CHAPTER_CYCLE;
+          setMode();
+
+          mql_p = window.matchMedia("(orientation: portrait)");
+          mql_l = window.matchMedia("(orientation: landscape)");
+
+          mql_p.addListener(onOrientationchanged);
+          mql_l.addListener(onOrientationchanged);
+
+      };
+
+
+      createDB = function () {
         //WinJS.log && WinJS.log("createDB start", "IndexedDB", "info");
         // Create the request to open the database, named BookDB. If it doesn't exist, create it and immediately
         // upgrade to version 1.
@@ -257,10 +265,12 @@
 
         // Add asynchronous callback functions
         dbRequest.onerror = function (evt) {
-           WinJS.log && WinJS.log("Error creating database.", "sample", "error");
+           WinJS.log && WinJS.log("Error creating database.", "custom", "error");
            };
         dbRequest.onsuccess = function (evt) {
-            dbSuccess(evt);
+             WinJS.log && WinJS.log("Database created successfully.", "custom", "error");
+             db = evt.target.result;
+             readHistory();
             };
         dbRequest.onupgradeneeded = function (evt) { dbVersionUpgrade(evt);};
         dbRequest.onblocked = function () { WinJS.log && WinJS.log("Database create blocked.", "sample", "error");};
@@ -288,36 +298,41 @@
         txn.oncomplete = function () { WinJS.log && WinJS.log("Database schema created.", "sample", "status");};
     };
 
-    dbSuccess = function (evt) {
-        db = evt.target.result;
-	getAllItems(function (items) {
-	    var len = items.length;
-	    for (var i = 0; i < len; i += 1) {
-		console.log(items[i]);
-	    }
-          //syncItemsFromFile();
-	});
-        readHistory();
-        WinJS.log && WinJS.log("Database open success", "sample", "info");
-        filePath = sessionState.filePath;
-        if (filePath) {
-            Windows.Storage.StorageFile.getFileFromPathAsync(filePath).done(getFile);
-        } else {
-          filePath = localSettings.values.lastFile;
-          lastPosition = localSettings.values.lastPosition;
-          mode = localSettings.values.mode;
-          setMode();
-          if (!lastPosition) {
-              lastPosition = 0;
-          }
-          if (filePath){
-            autoplay = false;
-            restoreState = true;
-            openAudioFromPath(filePath);
-          }
-        }
+    //dbSuccess = function (evt) {
+    //    db = evt.target.result;
+	//getAllItems(function (items) {
+	    //var len = items.length;
 
-        };
+    //dbSuccess = function (evt) {
+    //    db = evt.target.result;
+	//getAllItems(function (items) {
+	    //var len = items.length;
+	    //for (var i = 0; i < len; i += 1) {
+		//console.log(items[i]);
+	    //}
+    //      //syncItemsFromFile();
+	//});
+    //    readHistory();
+    //    WinJS.log && WinJS.log("Database open success", "sample", "info");
+    //    filePath = sessionState.filePath;
+    //    if (filePath) {
+    //        Windows.Storage.StorageFile.getFileFromPathAsync(filePath).done(getFile);
+    //    } else {
+    //      filePath = localSettings.values.lastFile;
+    //      lastPosition = localSettings.values.lastPosition;
+    //      mode = localSettings.values.mode;
+    //      setMode();
+    //      if (!lastPosition) {
+    //          lastPosition = 0;
+    //      }
+    //      if (filePath){
+    //        autoplay = false;
+    //        restoreState = true;
+    //        openAudioFromPath(filePath);
+    //      }
+    //    }
+
+    //    };
 
     readBookmarks = function (trackKey) {
         WinJS.log && WinJS.log("readBookmarks start", "readData", "info");
@@ -524,39 +539,70 @@
     };
 
     var onStateChanged = function () {
-         var state = mPlayerSession.playbackState;
-         console.log("State",state);
-         console.log(Windows.Media.Playback.MediaPlayerState.Paused);
+        switch (mPlayerSession.playbackState) {
+          case Windows.Media.Playback.MediaPlayerState.paused:
+                console.log("paused");
+                //onPositionChanged();
+                appBarPlay.icon = "play";
+                appBarPlay.label = "Play";
+                break;
+
+          case Windows.Media.Playback.MediaPlayerState.playing:
+                console.log("play");
+                appBarPlay.icon = "pause";
+                appBarPlay.label = "Pause";
+                break;
+
+        }
     };
 
     onPositionChanged = function () {
       if(!dragInProgress){
          slider.value = mPlayerSession.position.toFixed(2);
          var l_count_el = document.getElementById("couter-left");
-          l_count_el.innerHTML = ms2time(mPlayerSession.position);
-          var r_count_el = document.getElementById("couter-right");
-          r_count_el.innerHTML = ms2time(mPlayerSession.naturalDuration - mPlayerSession.position);
+         l_count_el.innerHTML = ms2time(mPlayerSession.position);
+         var r_count_el = document.getElementById("couter-right");
+         r_count_el.innerHTML = ms2time(mPlayerSession.naturalDuration - mPlayerSession.position);
          var time = new Date();
          time.setTime((mPlayerSession.position).toFixed(0));
-         if(mode === CHAPTER_TO_END && (endBm !== null) && (mPlayerSession.position > trackData.bookmarks[endBm])){
-           mplayerPause();
-           if(startBm !== null){
-              mPlayerSession.position = trackData.bookmarks[startBm];
-           }else{
-              mPlayerSession.position = 0;
-           }
-         }else if(mode === CHAPTER_CYCLE && (endBm !== null) && (mPlayerSession.position > trackData.bookmarks[endBm])){
-           if(startBm !== null){
-              mPlayerSession.position = trackData.bookmarks[startBm];
-           }else{
-              mPlayerSession.position = 0;
-           }
-           mplayerPause();
-           window.setTimeout(function () { mplayerPlay();}, 1000);
-         }
 
+         if((endBm !== null) && (mPlayerSession.position > trackData.bookmarks[endBm]) ||
+            (endBm === null) && (mPlayerSession.position >= mPlayerSession.naturalDuration)) {
+               mplayerPause();
+               if(startBm !== null){
+                  mPlayerSession.position = trackData.bookmarks[startBm];
+               }else{
+                  mPlayerSession.position = 0;
+               }
+
+               if(mode === CHAPTER_CYCLE){
+                  window.setTimeout(function () { mplayerPlay();}, 1000);
+               }
+            }
       }
     };
+
+
+
+         // if(mode === CHAPTER_TO_END && (endBm !== null) && (mPlayerSession.position > trackData.bookmarks[endBm])){
+         //   mplayerPause();
+         //   if(startBm !== null){
+         //      mPlayerSession.position = trackData.bookmarks[startBm];
+         //   }else{
+         //      mPlayerSession.position = 0;
+         //   }
+         // }else if(mode === CHAPTER_CYCLE && (endBm !== null) && (mPlayerSession.position > trackData.bookmarks[endBm])){
+         //   if(startBm !== null){
+         //      mPlayerSession.position = trackData.bookmarks[startBm];
+         //   }else{
+         //      mPlayerSession.position = 0;
+         //   }
+         //   mplayerPause();
+         //   window.setTimeout(function () { mplayerPlay();}, 1000);
+         // }
+
+      // }
+    // };
 
     //function mediaPropertyChanged(e) {
     //    switch (e.property) {
@@ -706,16 +752,16 @@
                 // Handle the Play event and print status to screen..
                 WinJS.log && WinJS.log("Play Received", "sample", "status");
                 mplayerPlay();
-                cmd.icon = "pause";
-                cmd.label = "Pause";
+                // cmd.icon = "pause";
+                // cmd.label = "Pause";
                 break;
 
           case Windows.Media.Playback.MediaPlayerState.playing:
                 // Handle the Pause event and print status to screen.
                 WinJS.log && WinJS.log("Pause Received", "sample", "status");
                 mplayerPause();
-                cmd.icon = "play";
-                cmd.label = "Play";
+                // cmd.icon = "play";
+                // cmd.label = "Play";
                 break;
 
         }
