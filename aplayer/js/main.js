@@ -23,7 +23,6 @@
     var mPlayerSession = null;
     var dragInProgress = false;
     //var playPos = 0;
-    var listView = null;
     var histView = null;
     var groupedZoomedOutListView;
     var props = null;
@@ -165,42 +164,8 @@
 
     function onOrientationchanged() {
         if(groupedListView) { groupedListView.forceLayout();}
-        if(listView) { listView.forceLayout();}
         if(groupedZoomedOutListView) { groupedZoomedOutListView.forceLayout();}
-        // switch (Windows.Graphics.Display.DisplayProperties.currentOrientation) {
-
-        //     case Windows.Graphics.Display.DisplayOrientations.landscape:
-        //         message.innerText = "Display Orientation - Landscape";
-        //         break;
-
-        //     case Windows.Graphics.Display.DisplayOrientations.portrait:
-        //         message.innerText = "Display Orientation - Portrait";
-        //         break;
-
-        //     case Windows.Graphics.Display.DisplayOrientations.landscapeFlipped:
-        //         message.innerText = "Display Orientation - Landscape (flipped)";
-        //         break;
-
-        //     case Windows.Graphics.Display.DisplayOrientations.portraitFlipped:
-        //         message.innerText = "Display Orientation - Portrait (flipped)";
-        //         break;
-
-        //     default:
-        //         message.innerText = "Unknown";
-        //         break;
-        // }
     };
-  //
-
-
-
-    // app.onEnteredBackground = function () {
-    //     sessionState.filePath = filePath;
-    //     sessionState.tes = "hello";
-    //     localSettings.values.lastPosition = mPlayerSession.position;
-    //     localSettings.values.mode = mode;
-
-    // };
 
       setupEvHandlers = function () {
           appBar = document.getElementById("appbar").winControl;
@@ -441,11 +406,11 @@
                 openAudioFromPath(invokedItem.data.path, true);
                     // Access item data from the itemPromise
                 var piv = document.getElementsByClassName("win-pivot");
-                  var myPiv = piv[0];
-                  myPiv.winControl.selectedIndex = 0;
-                    WinJS.log && WinJS.log("The item at index " + invokedItem.index + " is "
-                        + invokedItem.data.title + " with a text value of "
-                        + invokedItem.data.text, "sample", "status");
+                var myPiv = piv[0];
+                myPiv.winControl.selectedIndex = 0;
+                  WinJS.log && WinJS.log("The item at index " + invokedItem.index + " is "
+                      + invokedItem.data.title + " with a text value of "
+                      + invokedItem.data.text, "sample", "status");
                 });
             };
 
@@ -585,49 +550,6 @@
 
 
 
-         // if(mode === CHAPTER_TO_END && (endBm !== null) && (mPlayerSession.position > trackData.bookmarks[endBm])){
-         //   mplayerPause();
-         //   if(startBm !== null){
-         //      mPlayerSession.position = trackData.bookmarks[startBm];
-         //   }else{
-         //      mPlayerSession.position = 0;
-         //   }
-         // }else if(mode === CHAPTER_CYCLE && (endBm !== null) && (mPlayerSession.position > trackData.bookmarks[endBm])){
-         //   if(startBm !== null){
-         //      mPlayerSession.position = trackData.bookmarks[startBm];
-         //   }else{
-         //      mPlayerSession.position = 0;
-         //   }
-         //   mplayerPause();
-         //   window.setTimeout(function () { mplayerPlay();}, 1000);
-         // }
-
-      // }
-    // };
-
-    //function mediaPropertyChanged(e) {
-    //    switch (e.property) {
-    //        case Windows.Media.SystemMediaTransportControlsProperty.soundLevel:
-    //            //Catch SoundLevel notifications and determine SoundLevel state.  If it's muted, we'll pause the player.
-    //            var soundLevel = e.target.soundLevel;
-
-    //            break;
-
-    //        default:
-    //            break;
-    //    }
-    //}
-
-    // function audioPlaying() {
-    //     systemMediaControls.playbackStatus = Windows.Media.MediaPlaybackStatus.playing;
-    // };
-
-    // function audioPaused() {
-    //     systemMediaControls.playbackStatus = Windows.Media.MediaPlaybackStatus.paused;
-    // };
-
-
-
   sliderMouseUp = function ()
     {
       dragInProgress = false;
@@ -679,8 +601,8 @@
     };
 
     findChapter = function () {
-        var cur_pos = mPlayerSession.position;
-        var i;
+      var cur_pos = mPlayerSession.position;
+      var i;
 
       if (trackData.bookmarks){
           var bmLength = trackData.bookmarks.length;
@@ -897,14 +819,10 @@
 
                      console.log("dataBinding");
                      dataList = new WinJS.Binding.List(myData);
-                     listView.itemDataSource = dataList.dataSource;
                      var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
-                     //console.log(JSON.stringify(groupedListView.groupDataSource));
                      groupedListView.groupDataSource = groupedDataList.groups.dataSource;
                      groupedListView.itemDataSource = groupedDataList.dataSource;
                      groupedListView.forceLayout();
-                     listView.itemDataSource = dataList.dataSource;
-                     listView.forceLayout();
                      groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
                      groupedZoomedOutListView.forceLayout();
                 });
@@ -940,13 +858,11 @@
                 dataList = new WinJS.Binding.List(myData);
                 var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
 
-                listView.itemDataSource = dataList.dataSource;
                 groupedListView.groupDataSource = groupedDataList.groups.dataSource;
                 groupedListView.itemDataSource = groupedDataList.dataSource;
                 groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
 
                 groupedListView.forceLayout();
-                listView.forceLayout();
 
 		dbItems.forEach(function(item) {
                   var itemFound = myData.find(function(track) {
@@ -987,14 +903,12 @@
                 var dataList = new WinJS.Binding.List(myData);
                 var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
 
-                listView.itemDataSource = dataList.dataSource;
                 groupedListView.groupDataSource = groupedDataList.groups.dataSource;
                 groupedListView.itemDataSource = groupedDataList.dataSource;
 
                 groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
 
                 groupedListView.forceLayout();
-                listView.forceLayout();
                 groupedZoomedOutListView.forceLayout();
 
             });
@@ -1003,17 +917,8 @@
   };
 
   var createLibraryElements = function () {
-     /* Track List Creating */
-        var listDiv = document.querySelector("#myListView");  // Your html element on the page.
-        listView = new WinJS.UI.ListView(listDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
-        listView.itemsDraggable = false;
-        var itemDiv = document.getElementById("mylisttemplate");  // Your template container
-        listView.itemTemplate = itemDiv;  // Bind the list view to the element
 
      /* Albums List Creating */
-        // var semanticZoomDiv = document.querySelector("#semanticZoomDiv");  // Your html element on the page.
-        // semanticZoomView = new WinJS.UI.SemanticZoom(semanticZoomDiv, {zoomedOut: true});  // Declare a new list view by hand.
-        // semanticZoomView.zoomedOut = true;
 
         var groupedListDiv = document.querySelector("#myGroupedListView");  // Your html element on the page.
         groupedListView = new WinJS.UI.ListView(groupedListDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
@@ -1023,7 +928,6 @@
         groupedListView.itemTemplate = itemDivGrouped;  // Bind the list view to the element
         groupedListView.groupHeaderTemplate = headerDivGrouped;  // Bind the list view to the element
         groupedListDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
-        listDiv.winControl.addEventListener("iteminvoked", itemInvokedHandler, false);
 
         var groupedZoomedOutListDiv = document.querySelector("#myGroupedZoomedOutListView");
         groupedZoomedOutListView = new WinJS.UI.ListView(groupedZoomedOutListDiv, {layout: {type: WinJS.UI.ListLayout}});  // Declare a new list view by hand.
