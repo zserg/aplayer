@@ -436,7 +436,7 @@
                 eventObject.detail.itemPromise.done(function (invokedItem) {
                 autoplay = true;
                 putItemIntoHistory(invokedItem.data)
-                //storeHistory();
+                storeHistory();
                 openAudioFromPath(invokedItem.data.path, true);
                     // Access item data from the itemPromise
                 var piv = document.getElementsByClassName("win-pivot");
@@ -1080,6 +1080,8 @@
         if (idx != -1) {
             trackHistory.data.splice(idx, 1);
         }
+        //remove file from object to name Clone Error in IndexedDB
+        item.file = null;
         trackHistory.data.unshift(item);
         if (trackHistory.data.length > HISTORY_MAX_LEN){
             trackHistory.data.splice(HISTORY_MAX_LEN-1, trackHistory.data.length-1);
