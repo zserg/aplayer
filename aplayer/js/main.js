@@ -92,6 +92,7 @@
     var mql_l;
     var setupEvHandlers;
     var appBarPlay;
+    var dataList;
 
     var mode_data =
       [
@@ -736,7 +737,15 @@
    };
 
    getGroupData = function (dataItem){
-      return {groupTitle: dataItem.album, groupThumbnail: myAlbumsData[dataItem.album].thumbnail};
+     var key = getGroupKey(dataItem);
+
+     var filteredList = dataList.createFiltered(function (item) {
+       return key == getGroupKey(item);
+     });
+
+      return {groupTitle: dataItem.album,
+              groupThumbnail: myAlbumsData[dataItem.album].thumbnail,
+              count: filteredList.length};
    };
 
     // compareGroups = function (left, right) {
@@ -887,7 +896,7 @@
                       createLibraryElements();
 
                      console.log("dataBinding");
-                     var dataList = new WinJS.Binding.List(myData);
+                     dataList = new WinJS.Binding.List(myData);
                      listView.itemDataSource = dataList.dataSource;
                      var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
                      //console.log(JSON.stringify(groupedListView.groupDataSource));
@@ -928,7 +937,7 @@
                     myData[ndx].duration = ms2time(musicProp.duration);
                 });
 
-                var dataList = new WinJS.Binding.List(myData);
+                dataList = new WinJS.Binding.List(myData);
                 var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
 
                 listView.itemDataSource = dataList.dataSource;
