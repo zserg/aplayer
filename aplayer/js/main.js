@@ -86,7 +86,7 @@
 
     var fileErrorHandler;
     var trackHistory = null;
-    var dbItems;
+    //var dbItems;
     var mql_p;
     var mql_l;
     var setupEvHandlers;
@@ -145,14 +145,14 @@
         localSettings.values.lastFile = filePath;
         localSettings.values.lastPosition = mPlayerSession.position;
         localSettings.values.mode = mode;
-	getAllItems(function (items) {
-	    var len = items.length;
-	    for (var i = 0; i < len; i += 1) {
-		console.log(items[i]);
-	    }
-            var dbItems_json = JSON.stringify(dbItems);
-            writeDbToFile(dbItems_json);
-	});
+	// getAllItems(function (items) {
+	//     var len = items.length;
+	//     for (var i = 0; i < len; i += 1) {
+	// 	console.log(items[i]);
+	//     }
+            // var dbItems_json = JSON.stringify(dbItems);
+            // writeDbToFile(dbItems_json);
+	// });
     };
 
    app.onready = function () {
@@ -865,14 +865,14 @@
 
                 groupedListView.forceLayout();
 
-		dbItems.forEach(function(item) {
-                  var itemFound = myData.find(function(track) {
-                     return item.path == track.path;
-                  });
-                  if(itemFound === undefined){
-                    deleteFromDb(item);
-                  }
-                });
+		// dbItems.forEach(function(item) {
+                  // var itemFound = myData.find(function(track) {
+                     // return item.path == track.path;
+                  // });
+                  // if(itemFound === undefined){
+                    // deleteFromDb(item);
+                  // }
+                // });
 
             });
 
@@ -1008,28 +1008,28 @@
         storeHistory();
     }
 
-    var getAllItems = function(callback) {
-	var trans = db.transaction(["tracks"], IDBTransaction.READ_ONLY);
-	var store = trans.objectStore("tracks");
-	dbItems = [];
+    // var getAllItems = function(callback) {
+	// var trans = db.transaction(["tracks"], IDBTransaction.READ_ONLY);
+	// var store = trans.objectStore("tracks");
+	// dbItems = [];
 
-	trans.oncomplete = function(evt) {
-	    callback(dbItems);
-	};
+	// trans.oncomplete = function(evt) {
+	    // callback(dbItems);
+	// };
 
-	var cursorRequest = store.openCursor();
-	cursorRequest.onerror = function(error) {
-	    console.log(error);
-	};
+	// var cursorRequest = store.openCursor();
+	// cursorRequest.onerror = function(error) {
+	    // console.log(error);
+	// };
 
-	cursorRequest.onsuccess = function(evt) {
-	    var cursor = evt.target.result;
-	    if (cursor) {
-		dbItems.push(cursor.value);
-		cursor.continue();
-	    }
-	};
-    }
+	// cursorRequest.onsuccess = function(evt) {
+	    // var cursor = evt.target.result;
+	    // if (cursor) {
+		// dbItems.push(cursor.value);
+		// cursor.continue();
+	    // }
+	// };
+    // }
 
     var deleteFromDb = function (item) {
         var txn = db.transaction(["tracks"], "readwrite");
@@ -1042,22 +1042,22 @@
         request.onerror = function () { WinJS.log && WinJS.log("request onerror", "storeBookmark", "error");};
     };
 
-   var writeDbToFile = function (data) {
-      roamingFolder.createFileAsync(filename, Windows.Storage.CreationCollisionOption.replaceExisting)
-            .then(function (file) {
-                return Windows.Storage.FileIO.writeTextAsync(file, data);
-            });
-   };
+   // var writeDbToFile = function (data) {
+   //    roamingFolder.createFileAsync(filename, Windows.Storage.CreationCollisionOption.replaceExisting)
+   //          .then(function (file) {
+   //              return Windows.Storage.FileIO.writeTextAsync(file, data);
+   //          });
+   // };
 
-   var syncItemsFromFile = function () {
-      roamingFolder.getFileAsync(filename)
-            .then(function (file) {
-                return Windows.Storage.FileIO.readTextAsync(file);
-            }).done(function (text) {
-                var items_json = JSON.parse(text);
-            }, function (error) { WinJS.log && WinJS.log(error, "syncItemsFromFile", "info");
-       });
-   };
+   // var syncItemsFromFile = function () {
+   //    roamingFolder.getFileAsync(filename)
+   //          .then(function (file) {
+   //              return Windows.Storage.FileIO.readTextAsync(file);
+   //          }).done(function (text) {
+   //              var items_json = JSON.parse(text);
+   //          }, function (error) { WinJS.log && WinJS.log(error, "syncItemsFromFile", "info");
+   //     });
+   // };
 
     app.start();
 }());
