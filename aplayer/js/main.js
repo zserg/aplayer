@@ -825,6 +825,7 @@
                      groupedListView.forceLayout();
                      groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
                      groupedZoomedOutListView.forceLayout();
+                     overlay.style.display="none";
                 });
 
             });
@@ -910,6 +911,7 @@
 
                 groupedListView.forceLayout();
                 groupedZoomedOutListView.forceLayout();
+                var overlay = document.querySelector("#overlay");  // Your html element on the page.
 
             });
 
