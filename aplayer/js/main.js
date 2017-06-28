@@ -83,7 +83,6 @@
     var updateLibrary;
     var groupedListView;
     var semanticZoomView;
-
     var fileErrorHandler;
     var trackHistory = null;
     //var dbItems;
@@ -94,6 +93,9 @@
     var dataList;
     var libraryCreated = false;
     var restoreTrack;
+    var currentItemIndex = 0;
+    var nextItemIndex = 0;
+    var prevItemIndex = 0;
 
     var mode_data =
       [
@@ -190,6 +192,10 @@
           cmd.winControl.onclick = ("click", createLibrary);
           cmd = document.getElementById("cmdClear");
           cmd.winControl.onclick = ("click", clearHistory);
+          cmd = document.getElementById("cmdNext");
+          cmd.winControl.onclick = ("click", nextTrack);
+          cmd = document.getElementById("cmdPrev");
+          cmd.winControl.onclick = ("click", prevTrack);
 
           appBarPlay = appBar.getCommandById("cmdPlay");
 
@@ -318,7 +324,7 @@
          if (filePath){
            autoplay = false;
            restoreState = true;
-           openAudioFromPath(filePath);
+           openAudioFromPath(filePath, false);
          }
        };
 
@@ -421,24 +427,40 @@
       }
    };
 
+  var makeNextPrevIndex = function () {
+    if (currentItemIndex == myData.length-1){
+       nextItemIndex = 0;
+       prevItemIndex = currentItemIndex-1;
+    }else if (currentItemIndex == 0){
+       nextItemIndex = currentItemIndex+1;
+       prevItemIndex = myData.length-1;
+    }else{
+       nextItemIndex = currentItemIndex+1;
+       prevItemIndex = currentItemIndex-1;
+    }
+  };
+
   itemInvokedHandler = function (eventObject) {
-                eventObject.detail.itemPromise.done(function (invokedItem) {
-                autoplay = true;
-                putItemIntoHistory(invokedItem.data)
-                storeHistory();
-                openAudioFromPath(invokedItem.data.path, true);
-                    // Access item data from the itemPromise
-                var piv = document.getElementsByClassName("win-pivot");
-                var myPiv = piv[0];
-                myPiv.winControl.selectedIndex = 0;
-                  WinJS.log && WinJS.log("The item at index " + invokedItem.index + " is "
-                      + invokedItem.data.title + " with a text value of "
-                      + invokedItem.data.text, "sample", "status");
-                });
-            };
+    eventObject.detail.itemPromise.done(function (invokedItem) {
+        currentItemIndex = invokedItem.index;
+        makeNextPrevIndex();
+
+        autoplay = true;
+        putItemIntoHistory(invokedItem.data)
+        storeHistory();
+        openAudioFromPath(invokedItem.data.path, true);
+        // Access item data from the itemPromise
+        var piv = document.getElementsByClassName("win-pivot");
+        var myPiv = piv[0];
+        myPiv.winControl.selectedIndex = 0;
+          WinJS.log && WinJS.log("The item at index " + invokedItem.index + " is "
+              + invokedItem.data.title + " with a text value of "
+              + invokedItem.data.text, "sample", "status");
+        });
+};
 
 
-    function openAudio(file) {
+    function openAudio(file, play) {
         if (file) {
             filePlayed = file;
             filePath = filePlayed.path;
@@ -447,22 +469,18 @@
                 mPlayerSession.position = lastPosition;
                 restoreState = false;
             }
-            if (autoplay) {
-                mplayerPlay();
-            }
-            //readBookmarks();// read bookmarks from IndexedDB
             slider.addEventListener("change", sliderChange, false);
             file.properties.getMusicPropertiesAsync().done(function (mprops){
-              var title = mprops.title;
-              var album = mprops.album;
-              var artist = mprops.artist;
-              var info_el = document.getElementById("track-info");
-              info_el.innerHTML = "<p>"+title+"</p>"+"<p>"+artist+"</p>";
-              var r_count_el = document.getElementById("couter-right");
-              r_count_el.innerHTML = ms2time(mprops.duration);
+                var title = mprops.title;
+                var album = mprops.album;
+                var artist = mprops.artist;
+                var info_el = document.getElementById("track-info");
+                info_el.innerHTML = "<p>"+title+"</p>"+"<p>"+artist+"</p>";
+                var r_count_el = document.getElementById("couter-right");
+                r_count_el.innerHTML = ms2time(mprops.duration);
 
-              var trackKey = title+album+artist+mprops.duration;
-              readBookmarks(trackKey);// read bookmarks from IndexedDB
+                var trackKey = title+album+artist+mprops.duration;
+                readBookmarks(trackKey);// read bookmarks from IndexedDB
             });
 
            file.getThumbnailAsync(
@@ -477,6 +495,12 @@
                      }
                    }
           );
+            if (play) {
+              window.setTimeout(function () { mplayerPlay();}, 100);
+            }else{
+                mplayerPause();
+            }
+
 
         } else {
             createLibrary();
@@ -488,8 +512,17 @@
 
     }
 
-    openAudioFromPath = function (filePath) {
-            Windows.Storage.StorageFile.getFileFromPathAsync(filePath).then(openAudio, fileErrorHandler);
+    openAudioFromPath = function (filePath, startPlay) {
+       if (startPlay) {
+           Windows.Storage.StorageFile.getFileFromPathAsync(filePath).then(
+             function (file) { openAudio(file, true); },
+             fileErrorHandler);
+       }else{
+           Windows.Storage.StorageFile.getFileFromPathAsync(filePath).then(
+             function (file) { openAudio(file, false); },
+             fileErrorHandler);
+       }
+
     };
 
     fileErrorHandler = function (file) {
@@ -1070,6 +1103,32 @@
         request.onsuccess = function () { WinJS.log && WinJS.log("success", "storeBookmark", "info");};
         request.onerror = function () { WinJS.log && WinJS.log("request onerror", "storeBookmark", "error");};
     };
+
+   var nextTrack = function (item) {
+      var path = myData[nextItemIndex].path;
+      currentItemIndex = nextItemIndex;
+      makeNextPrevIndex();
+      if(mPlayerSession.playbackState == Windows.Media.Playback.MediaPlayerState.playing){
+        openAudioFromPath(path, true);
+      }else
+        openAudioFromPath(path, false);
+
+   };
+   var prevTrack = function (item) {
+      if (mPlayerSession.position < 1000.0){
+         var path = myData[prevItemIndex].path;
+         currentItemIndex = prevItemIndex;
+      }else{
+         var path = myData[currentItemIndex].path;
+      }
+
+      makeNextPrevIndex();
+      if(mPlayerSession.playbackState == Windows.Media.Playback.MediaPlayerState.playing){
+        openAudioFromPath(path, true);
+      }else
+        openAudioFromPath(path, false);
+   };
+
 
    // var writeDbToFile = function (data) {
    //    roamingFolder.createFileAsync(filename, Windows.Storage.CreationCollisionOption.replaceExisting)
