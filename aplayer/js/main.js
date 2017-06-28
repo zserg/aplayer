@@ -50,7 +50,7 @@
 
     var butt_mode = null;
     var appBar = null;
-    var createDB;
+    var openDB;
     var mediaButtonPressed;
     var onPositionChanged;
     var ms2time;
@@ -92,6 +92,8 @@
     var setupEvHandlers;
     var appBarPlay;
     var dataList;
+    var libraryCreated = false;
+    var restoreTrack;
 
     var mode_data =
       [
@@ -129,8 +131,11 @@
             args.setPromise(WinJS.UI.processAll().then(
               function () {
                   setupEvHandlers();
-                  createDB();
-                  createLibrary();
+                  openDB().then(function (){
+                      readHistory();
+                      restoreTrack();
+                  });
+                  createLibrary(false);
               }
             ));
         }
@@ -182,7 +187,7 @@
           cmd = document.getElementById("cmdRew");
           cmd.winControl.onclick = ("click", rewClickEv);
           cmd = document.getElementById("cmdSync");
-          cmd.winControl.onclick = ("click", updateLibrary);
+          cmd.winControl.onclick = ("click", createLibrary);
           cmd = document.getElementById("cmdClear");
           cmd.winControl.onclick = ("click", clearHistory);
 
@@ -222,47 +227,49 @@
       };
 
 
-      createDB = function () {
-        //WinJS.log && WinJS.log("createDB start", "IndexedDB", "info");
-        // Create the request to open the database, named BookDB. If it doesn't exist, create it and immediately
-        // upgrade to version 1.
-        console.log("11");
-        var dbRequest = window.indexedDB.open("PlayerDB", 2);
+      openDB = function () {
+        var version = 2
+        var promise = new Promise( function (resolve, reject) {
+          // Opening DB
+           var dbRequest = window.indexedDB.open("PlayerDB", version);
 
-        // Add asynchronous callback functions
-        dbRequest.onerror = function (evt) {
-           WinJS.log && WinJS.log("Error creating database.", "custom", "error");
-           };
-        dbRequest.onsuccess = function (evt) {
-             WinJS.log && WinJS.log("Database created successfully.", "custom", "error");
+          // Handling onupgradeneeded
+
+          dbRequest.onupgradeneeded = function (evt) {
+                  db = evt.target.result;
+
+                  // Get the version update transaction handle, since we want to create the schema as part of the same transaction.
+                  var txn = evt.target.transaction;
+
+                  // Create the object store, with an index on the file path. Note that we set the returned object store to a variable
+                  // in order to make further calls (index creation) on that object store.
+                  if (db.objectStoreNames.contains("tracks")) {
+                      db.deleteObjectStore("tracks")
+                  }else{
+                      db.createObjectStore("tracks", {keyPath: "path"});
+                  }
+
+                  if (db.objectStoreNames.contains("history")) {
+                      db.deleteObjectStore("history");
+                  }else{
+                      db.createObjectStore("history", {keyPath: "name"});
+                  }
+          };
+
+          // opening succedes
+          dbRequest.onsuccess = function (evt) {
              db = evt.target.result;
-             readHistory();
+             resolve();
             };
-        dbRequest.onupgradeneeded = function (evt) { dbVersionUpgrade(evt);};
-        dbRequest.onblocked = function () { WinJS.log && WinJS.log("Database create blocked.", "sample", "error");};
 
-    };
+          // On error
+          dbRequest.onerror = function (evt) {
+             reject("Database opening error");
+             };
+        });
+        return promise;
+      };
 
-    // Whenever an IndexedDB is created, the version is set to "", but can be immediately upgraded by calling createDB.
-    dbVersionUpgrade = function (evt) {
-        db = evt.target.result;
-
-        // Get the version update transaction handle, since we want to create the schema as part of the same transaction.
-        var txn = evt.target.transaction;
-
-        // Create the object store, with an index on the file path. Note that we set the returned object store to a variable
-        // in order to make further calls (index creation) on that object store.
-        if (!db.objectStoreNames.contains("tracks")) {
-            db.createObjectStore("tracks", {keyPath: "path"});
-        }
-
-        if (!db.objectStoreNames.contains("history")) {
-            db.createObjectStore("history", {keyPath: "name"});
-        }
-
-        // Once the creation of the object stores is finished (they are created asynchronously), log success.
-        txn.oncomplete = function () { WinJS.log && WinJS.log("Database schema created.", "sample", "status");};
-    };
 
     //dbSuccess = function (evt) {
     //    db = evt.target.result;
@@ -299,6 +306,22 @@
     //    }
 
     //    };
+
+    restoreTrack = function () {
+         filePath = localSettings.values.lastFile;
+         lastPosition = localSettings.values.lastPosition;
+         mode = localSettings.values.mode;
+         setMode();
+         if (!lastPosition) {
+             lastPosition = 0;
+         }
+         if (filePath){
+           autoplay = false;
+           restoreState = true;
+           openAudioFromPath(filePath);
+         }
+       };
+
 
     readBookmarks = function (trackKey) {
         WinJS.log && WinJS.log("readBookmarks start", "readData", "info");
@@ -456,7 +479,7 @@
           );
 
         } else {
-            updateLibrary();
+            createLibrary();
             var piv = document.getElementsByClassName("win-pivot");
             var myPiv = piv[0];
             myPiv.winControl.selectedIndex = 2;
@@ -470,7 +493,7 @@
     };
 
     fileErrorHandler = function (file) {
-        updateLibrary();
+        createLibrary();
         var piv = document.getElementsByClassName("win-pivot");
         var myPiv = piv[0];
         myPiv.winControl.selectedIndex = 2;
@@ -766,6 +789,9 @@
 
   createLibrary = function (){
         console.log("createLibrary");
+        var overlay = document.querySelector("#overlay");  // Your html element on the page.
+        overlay.style.display="";
+
         var queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
         queryOptions.folderDepth = search.FolderDepth.deep;
         var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
@@ -815,17 +841,20 @@
                       });
                       //myAlbumsData["Unknown"].thumbnail = "/images/xplayer.svg";
 
-                      createLibraryElements();
+                    if (!libraryCreated){
+                       createLibraryElements();
+                    }
 
                      console.log("dataBinding");
                      dataList = new WinJS.Binding.List(myData);
                      var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
                      groupedListView.groupDataSource = groupedDataList.groups.dataSource;
                      groupedListView.itemDataSource = groupedDataList.dataSource;
-                     groupedListView.forceLayout();
+                     //groupedListView.forceLayout();
                      groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
-                     groupedZoomedOutListView.forceLayout();
+                     //groupedZoomedOutListView.forceLayout();
                      overlay.style.display="none";
+                     libraryCreated = true;
                 });
 
             });
@@ -834,89 +863,89 @@
   };
 
 
-  updateLibrary = function (){
-        var queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
-        queryOptions.folderDepth = search.FolderDepth.deep;
-        var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
-        var filePromises = [];
-        myData = [];
-        query.getFilesAsync().done(function (files) {
-            // Get image properties
-           files.forEach(function (file) {
-              props = file.properties;
-              myData.push({path:file.path, name:file.displayName});
-              filePromises.push(props.getMusicPropertiesAsync());
-              });
+  // updateLibrary = function (){
+  //       var queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
+  //       queryOptions.folderDepth = search.FolderDepth.deep;
+  //       var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
+  //       var filePromises = [];
+  //       myData = [];
+  //       query.getFilesAsync().done(function (files) {
+  //           // Get image properties
+  //          files.forEach(function (file) {
+  //             props = file.properties;
+  //             myData.push({path:file.path, name:file.displayName});
+  //             filePromises.push(props.getMusicPropertiesAsync());
+  //             });
 
-           Promise.all(filePromises).then(function (musicProperties){
-                musicProperties.forEach(function (musicProp, ndx) {
-                    myData[ndx].title = musicProp.title || myData[ndx].name;
-                    myData[ndx].album = musicProp.album || "Unknown";
-                    myData[ndx].artist = musicProp.artist || "Unknown";
-                    myData[ndx].duration = ms2time(musicProp.duration);
-                });
+  //          Promise.all(filePromises).then(function (musicProperties){
+  //               musicProperties.forEach(function (musicProp, ndx) {
+  //                   myData[ndx].title = musicProp.title || myData[ndx].name;
+  //                   myData[ndx].album = musicProp.album || "Unknown";
+  //                   myData[ndx].artist = musicProp.artist || "Unknown";
+  //                   myData[ndx].duration = ms2time(musicProp.duration);
+  //               });
 
-                dataList = new WinJS.Binding.List(myData);
-                var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
+  //               dataList = new WinJS.Binding.List(myData);
+  //               var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
 
-                groupedListView.groupDataSource = groupedDataList.groups.dataSource;
-                groupedListView.itemDataSource = groupedDataList.dataSource;
-                groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
+  //               groupedListView.groupDataSource = groupedDataList.groups.dataSource;
+  //               groupedListView.itemDataSource = groupedDataList.dataSource;
+  //               groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
 
-                groupedListView.forceLayout();
+  //               groupedListView.forceLayout();
 
-		// dbItems.forEach(function(item) {
-                  // var itemFound = myData.find(function(track) {
-                     // return item.path == track.path;
-                  // });
-                  // if(itemFound === undefined){
-                    // deleteFromDb(item);
-                  // }
-                // });
+		// // dbItems.forEach(function(item) {
+  //                 // var itemFound = myData.find(function(track) {
+  //                    // return item.path == track.path;
+  //                 // });
+  //                 // if(itemFound === undefined){
+  //                   // deleteFromDb(item);
+  //                 // }
+  //               // });
 
-            });
+  //           });
 
-        });
-  };
+  //       });
+  // };
 
-  var getLibraryData = function (){
-        var queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
-        queryOptions.folderDepth = search.FolderDepth.deep;
-        var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
-        var filePromises = [];
-        var myData = [];
-        query.getFilesAsync().done(function (files) {
-            // Get image properties
-           files.forEach(function (file) {
-              props = file.properties;
-              myData.push({path:file.path, name:file.displayName});
-              filePromises.push(props.getMusicPropertiesAsync());
-              });
+  // var getLibraryData = function (){
+  //       var queryOptions = new search.QueryOptions(search.CommonFileQuery.OrderByTitle, [".mp3"]);
+  //       queryOptions.folderDepth = search.FolderDepth.deep;
+  //       var query = Windows.Storage.KnownFolders.musicLibrary.createFileQueryWithOptions(queryOptions);
+  //       var filePromises = [];
+  //       var myData = [];
+  //       query.getFilesAsync().done(function (files) {
+  //           // Get image properties
+  //          files.forEach(function (file) {
+  //             props = file.properties;
+  //             myData.push({path:file.path, name:file.displayName});
+  //             filePromises.push(props.getMusicPropertiesAsync());
+  //             });
 
-           Promise.all(filePromises).then(function (musicProperties){
-                musicProperties.forEach(function (musicProp, ndx) {
-                    myData[ndx].title = musicProp.title || myData[ndx].name;
-                    myData[ndx].album = musicProp.album || "Unknown";
-                    myData[ndx].artist = musicProp.artist || "Unknown";
-                    myData[ndx].duration = ms2time(musicProp.duration);
-                });
+  //          Promise.all(filePromises).then(function (musicProperties){
+  //               musicProperties.forEach(function (musicProp, ndx) {
+  //                   myData[ndx].title = musicProp.title || myData[ndx].name;
+  //                   myData[ndx].album = musicProp.album || "Unknown";
+  //                   myData[ndx].artist = musicProp.artist || "Unknown";
+  //                   myData[ndx].duration = ms2time(musicProp.duration);
+  //               });
 
-                var dataList = new WinJS.Binding.List(myData);
-                var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
+  //               var dataList = new WinJS.Binding.List(myData);
+  //               var groupedDataList = dataList.createGrouped(getGroupKey, getGroupData);
 
-                groupedListView.groupDataSource = groupedDataList.groups.dataSource;
-                groupedListView.itemDataSource = groupedDataList.dataSource;
+  //               groupedListView.groupDataSource = groupedDataList.groups.dataSource;
+  //               groupedListView.itemDataSource = groupedDataList.dataSource;
 
-                groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
+  //               groupedZoomedOutListView.itemDataSource = groupedDataList.groups.dataSource;
 
-                groupedListView.forceLayout();
-                groupedZoomedOutListView.forceLayout();
-                var overlay = document.querySelector("#overlay");  // Your html element on the page.
+  //               groupedListView.forceLayout();
+  //               groupedZoomedOutListView.forceLayout();
+  //               var overlay = document.querySelector("#overlay");  // Your html element on the page.
 
-            });
+  //           });
 
-        });
-  };
+  //       });
+  // };
 
   var createLibraryElements = function () {
 
