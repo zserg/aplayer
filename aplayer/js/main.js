@@ -22,6 +22,7 @@
     var mPlayer = null;
     var mPlayerSession = null;
     var dragInProgress = false;
+    var changeInProgress = false;
     //var playPos = 0;
     var histView = null;
     var groupedZoomedOutListView;
@@ -39,6 +40,7 @@
     var TRACK_TO_END = 0;
     var CHAPTER_TO_END = 1;
     var CHAPTER_CYCLE = 2;
+    var PLAYLIST = 3;
     var autoplay = false;
     var lastPosition = 0;
     var restoreState = false;
@@ -99,9 +101,10 @@
 
     var mode_data =
       [
-        {next:CHAPTER_TO_END, image: "url('/images/mode0_v2.svg')"},
-        {next:CHAPTER_CYCLE,  image: "url('/images/mode1_v2.svg')"},
-        {next:TRACK_TO_END,   image: "url('/images/mode2_v2.svg')"}
+        {next:CHAPTER_TO_END, image: "url('/images/mode0_v2.svg')"}, // TRACK_TO_END
+        {next:CHAPTER_CYCLE,  image: "url('/images/mode1_v2.svg')"}, // CHAPTER_TO_END
+        {next:PLAYLIST,       image: "url('/images/mode2_v2.svg')"}, // CHAPTER_CYCLE
+        {next:TRACK_TO_END,   image: "url('/images/mode0_v2.svg')"} // PLAYLIST
       ];
 
     app.onactivated = function (args) {
@@ -152,6 +155,7 @@
         localSettings.values.lastFile = filePath;
         localSettings.values.lastPosition = mPlayerSession.position;
         localSettings.values.mode = mode;
+        localSettings.values.index = currentItemIndex;
 	// getAllItems(function (items) {
 	//     var len = items.length;
 	//     for (var i = 0; i < len; i += 1) {
@@ -193,7 +197,7 @@
           cmd = document.getElementById("cmdClear");
           cmd.winControl.onclick = ("click", clearHistory);
           cmd = document.getElementById("cmdNext");
-          cmd.winControl.onclick = ("click", nextTrack);
+          cmd.winControl.onclick = ("click", function () { nextTrack(false);});
           cmd = document.getElementById("cmdPrev");
           cmd.winControl.onclick = ("click", prevTrack);
 
@@ -317,6 +321,8 @@
          filePath = localSettings.values.lastFile;
          lastPosition = localSettings.values.lastPosition;
          mode = localSettings.values.mode;
+         currentItemIndex = localSettings.values.index;
+         makeNextPrevIndex();
          setMode();
          if (!lastPosition) {
              lastPosition = 0;
@@ -442,7 +448,8 @@
 
   itemInvokedHandler = function (eventObject) {
     eventObject.detail.itemPromise.done(function (invokedItem) {
-        currentItemIndex = invokedItem.index;
+        currentItemIndex = parseInt(invokedItem.key, 10);
+        console.log("Current",currentItemIndex);
         makeNextPrevIndex();
 
         autoplay = true;
@@ -495,6 +502,7 @@
                      }
                    }
           );
+            changeInProgress = false;
             if (play) {
               window.setTimeout(function () { mplayerPlay();}, 100);
             }else{
@@ -563,14 +571,14 @@
     var onStateChanged = function () {
         switch (mPlayerSession.playbackState) {
           case Windows.Media.Playback.MediaPlayerState.paused:
-                console.log("paused");
+                //console.log("paused");
                 //onPositionChanged();
                 appBarPlay.icon = "play";
                 appBarPlay.label = "Play";
                 break;
 
           case Windows.Media.Playback.MediaPlayerState.playing:
-                console.log("play");
+                //console.log("play");
                 appBarPlay.icon = "pause";
                 appBarPlay.label = "Pause";
                 break;
@@ -579,32 +587,42 @@
     };
 
     onPositionChanged = function () {
-      if(!dragInProgress){
+      if(!dragInProgress && !changeInProgress){
          slider.value = mPlayerSession.position.toFixed(2);
          var l_count_el = document.getElementById("couter-left");
          l_count_el.innerHTML = ms2time(mPlayerSession.position);
          var r_count_el = document.getElementById("couter-right");
          r_count_el.innerHTML = ms2time(mPlayerSession.naturalDuration - mPlayerSession.position);
-         var time = new Date();
-         time.setTime((mPlayerSession.position).toFixed(0));
 
          if((endBm !== null) && (mPlayerSession.position > trackData.bookmarks[endBm]) ||
             (endBm === null) && (mPlayerSession.position >= mPlayerSession.naturalDuration)) {
-               mplayerPause();
-               if(startBm !== null){
-                  mPlayerSession.position = trackData.bookmarks[startBm];
-               }else{
-                  mPlayerSession.position = 0;
-               }
-
-               if(mode === CHAPTER_CYCLE){
-                  window.setTimeout(function () { mplayerPlay();}, 1000);
-               }
+              changeInProgress = true;
+              positionProcess();
             }
-      }
+      };
     };
 
+    var positionProcess = function (){
+          if (mode == PLAYLIST && mPlayerSession.position >= mPlayerSession.naturalDuration){
+            console.log("cp0");
+            nextTrack(true);
+          }else{
+             mplayerPause();
+             changeInProgress = false;
+             if(startBm !== null){
+                mPlayerSession.position = trackData.bookmarks[startBm];
+             }else{
+                mPlayerSession.position = 0;
+             }
 
+             if(mode === CHAPTER_CYCLE){
+                window.setTimeout(function () {
+                  changeInProgress = false;
+                  mplayerPlay();
+                }, 1000);
+             }
+          }
+        }
 
   sliderMouseUp = function ()
     {
@@ -662,7 +680,7 @@
 
       if (trackData.bookmarks){
           var bmLength = trackData.bookmarks.length;
-          if (mode == TRACK_TO_END){
+          if (mode == TRACK_TO_END || mode == PLAYLIST){
             startBm = null;
             endBm = null;
           }else{
@@ -680,8 +698,8 @@
           }
           var chapB = document.getElementById("chapter-start");
           var chapE = document.getElementById("chapter-end");
-          chapB.innerHTML = (startBm!==null ? startBm : "B");
-          chapE.innerHTML = (endBm!==null ? endBm : "E");
+          chapB.innerHTML = (mode == PLAYLIST) ? " " : (startBm!==null ? startBm : "B");
+          chapE.innerHTML = (mode == PLAYLIST) ? " " : (endBm!==null   ? endBm   : "E");
       }
     };
 
@@ -1042,7 +1060,7 @@
     var storeHistory = function () {
         // Create a transaction with which to query the IndexedDB.
         WinJS.log && WinJS.log("storeHistory start", "storeBookmark", "info");
-        console.log("storeHistory");
+        //console.log("storeHistory");
         var txn = db.transaction(["history"], "readwrite");
         var objectStore = txn.objectStore("history");
 
@@ -1110,17 +1128,19 @@
         request.onerror = function () { WinJS.log && WinJS.log("request onerror", "storeBookmark", "error");};
     };
 
-   var nextTrack = function (item) {
+   var nextTrack = function (start) {
       var path = myData[nextItemIndex].path;
       currentItemIndex = nextItemIndex;
+      console.log("(next) current",currentItemIndex, path);
       makeNextPrevIndex();
+      console.log(path);
       if(mPlayerSession.playbackState == Windows.Media.Playback.MediaPlayerState.playing){
-        openAudioFromPath(path, true);
+        openAudioFromPath(path, start);
       }else
-        openAudioFromPath(path, false);
+        openAudioFromPath(path, start);
 
    };
-   var prevTrack = function (item) {
+   var prevTrack = function () {
       if (mPlayerSession.position < 1000.0){
          var path = myData[prevItemIndex].path;
          currentItemIndex = prevItemIndex;
@@ -1128,6 +1148,7 @@
          var path = myData[currentItemIndex].path;
       }
 
+      console.log("(prev) current",currentItemIndex, path);
       makeNextPrevIndex();
       if(mPlayerSession.playbackState == Windows.Media.Playback.MediaPlayerState.playing){
         openAudioFromPath(path, true);
