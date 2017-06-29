@@ -662,15 +662,20 @@
 
       if (trackData.bookmarks){
           var bmLength = trackData.bookmarks.length;
-          startBm = null;
-          endBm = null;
-          for(i=0; i< bmLength;i+=1){
-            if(trackData.bookmarks[i] <= cur_pos) {
-               startBm = i;
-            }
-            if(trackData.bookmarks[i] > cur_pos) {
-               endBm = i;
-               break;
+          if (mode == TRACK_TO_END){
+            startBm = null;
+            endBm = null;
+          }else{
+            startBm = null;
+            endBm = null;
+            for(i=0; i< bmLength;i+=1){
+              if(trackData.bookmarks[i] <= cur_pos) {
+                 startBm = i;
+              }
+              if(trackData.bookmarks[i] > cur_pos) {
+                 endBm = i;
+                 break;
+              }
             }
           }
           var chapB = document.getElementById("chapter-start");
@@ -761,6 +766,7 @@
     rewClickEv = function () {
          butt_rew.classList.toggle("buttonActive");
          mPlayerSession.position-=5000.0;
+         findChapter();
          if(mPlayerSession.playbackState === Windows.Media.Playback.MediaPlayerState.playing){
              mplayerPause();
              window.setTimeout(function () { mplayerPlay();}, 1000);
