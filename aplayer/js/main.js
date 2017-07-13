@@ -197,7 +197,7 @@
           cmd = document.getElementById("cmdClear");
           cmd.winControl.onclick = ("click", clearHistory);
           cmd = document.getElementById("cmdNext");
-          cmd.winControl.onclick = ("click", function () { nextTrack(false);});
+          cmd.winControl.onclick = ("click", function () { nextTrack(true);});
           cmd = document.getElementById("cmdPrev");
           cmd.winControl.onclick = ("click", prevTrack);
 
@@ -504,8 +504,13 @@
           );
             changeInProgress = false;
             if (play) {
-              window.setTimeout(function () { mplayerPlay();}, 100);
+              console.log("play");
+              window.setTimeout(function () {
+                         mplayerPlay();
+                         changeInProgress = false;
+                         }, 1000);
             }else{
+              console.log("pause");
                 mplayerPause();
             }
 
@@ -617,7 +622,6 @@
 
              if(mode === CHAPTER_CYCLE){
                 window.setTimeout(function () {
-                  changeInProgress = false;
                   mplayerPlay();
                 }, 1000);
              }
@@ -799,6 +803,7 @@
         cmd.icon = "pause";
         cmd.label = "Pause";
         mPlayer.play();
+        changeInProgress = false;
     };
 
     mplayerPause = function () {
@@ -869,6 +874,7 @@
                     myData[ndx].album = musicProp.album || "Unknown";
                     myData[ndx].artist = musicProp.artist || "Unknown";
                     myData[ndx].duration = ms2time(musicProp.duration);
+                    myData[ndx].tracknumber = musicProp.trackNumber || 0;
                     var data = {};
                     data.file = myData[ndx].file;
                     myAlbumsData[myData[ndx].album] = data;
@@ -901,6 +907,21 @@
                     if (!libraryCreated){
                        createLibraryElements();
                     }
+
+                     // Sort myData by album, track number, title
+                     myData.sort(function (a, b){
+                       if (a.album < b.album ||
+                           a.album == b.album && a.tracknumber < b.tracknumber ||
+                           a.album == b.album && a.tracknumber == b.tracknumber && a.title < b.title) {
+                             return -1;
+                           }else if (a.album > b.album ||
+                           a.album == b.album && a.tracknumber > b.tracknumber ||
+                           a.album == b.album && a.tracknumber == b.tracknumber && a.title > b.title) {
+                             return 1;
+                           }else{
+                             return 0;
+                           }
+                     });
 
                      console.log("dataBinding");
                      dataList = new WinJS.Binding.List(myData);
@@ -1129,6 +1150,7 @@
     };
 
    var nextTrack = function (start) {
+      changeInProgress = true;
       var path = myData[nextItemIndex].path;
       currentItemIndex = nextItemIndex;
       console.log("(next) current",currentItemIndex, path);
@@ -1141,6 +1163,7 @@
 
    };
    var prevTrack = function () {
+      changeInProgress = true;
       if (mPlayerSession.position < 1000.0){
          var path = myData[prevItemIndex].path;
          currentItemIndex = prevItemIndex;
@@ -1153,7 +1176,7 @@
       if(mPlayerSession.playbackState == Windows.Media.Playback.MediaPlayerState.playing){
         openAudioFromPath(path, true);
       }else
-        openAudioFromPath(path, false);
+        openAudioFromPath(path, true);
    };
 
 
