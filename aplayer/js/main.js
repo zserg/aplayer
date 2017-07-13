@@ -502,12 +502,10 @@
                      }
                    }
           );
-            changeInProgress = false;
             if (play) {
               console.log("play");
               window.setTimeout(function () {
                          mplayerPlay();
-                         changeInProgress = false;
                          }, 1000);
             }else{
               console.log("pause");
@@ -600,7 +598,8 @@
          r_count_el.innerHTML = ms2time(mPlayerSession.naturalDuration - mPlayerSession.position);
 
          if((endBm !== null) && (mPlayerSession.position > trackData.bookmarks[endBm]) ||
-            (endBm === null) && (mPlayerSession.position >= mPlayerSession.naturalDuration)) {
+            (endBm === null) && (mPlayerSession.position >= mPlayerSession.naturalDuration &&
+                                 mPlayerSession.naturalDuration != 0)) {
               changeInProgress = true;
               positionProcess();
             }
@@ -1156,6 +1155,8 @@
       console.log("(next) current",currentItemIndex, path);
       makeNextPrevIndex();
       console.log(path);
+      mplayerPause();
+      mPlayerSession.position = 0;
       if(mPlayerSession.playbackState == Windows.Media.Playback.MediaPlayerState.playing){
         openAudioFromPath(path, start);
       }else
