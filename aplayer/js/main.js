@@ -98,6 +98,7 @@
     var currentItemIndex = 0;
     var nextItemIndex = 0;
     var prevItemIndex = 0;
+    var createLibrary_active;
 
     var mode_data =
       [
@@ -140,7 +141,7 @@
                       readHistory();
                       restoreTrack();
                   });
-                  createLibrary(false);
+                  createLibrary();
               }
             ));
         }
@@ -513,13 +514,16 @@
             }
 
 
-        } else {
-            createLibrary();
-            var piv = document.getElementsByClassName("win-pivot");
-            var myPiv = piv[0];
-            myPiv.winControl.selectedIndex = 2;
-            WinJS.log && WinJS.log("Audio Tag Did Not Load Properly, Libary updated", "sample", "info");
         }
+      // else {
+      //       if (!createLibrary_active){
+      //         createLibrary();
+      //         var piv = document.getElementsByClassName("win-pivot");
+      //         var myPiv = piv[0];
+      //         myPiv.winControl.selectedIndex = 2;
+      //         WinJS.log && WinJS.log("Audio Tag Did Not Load Properly, Libary updated", "sample", "info");
+      //       }
+      //   }
 
     }
 
@@ -537,11 +541,14 @@
     };
 
     fileErrorHandler = function (file) {
+      if(!createLibrary_active)
+      {
         createLibrary();
         var piv = document.getElementsByClassName("win-pivot");
         var myPiv = piv[0];
         myPiv.winControl.selectedIndex = 2;
         WinJS.log && WinJS.log("File not found, Library updated", "sample", "info");
+      }
     };
 
     getFile = function (file) {
@@ -849,6 +856,7 @@
   };
 
   createLibrary = function (){
+        createLibrary_active = true;
         console.log("createLibrary");
         var overlay = document.querySelector("#overlay");  // Your html element on the page.
         overlay.style.display="";
@@ -932,6 +940,7 @@
                      //groupedZoomedOutListView.forceLayout();
                      overlay.style.display="none";
                      libraryCreated = true;
+                     createLibrary_active = false;
                 });
 
             });
