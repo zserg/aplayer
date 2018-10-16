@@ -13,4 +13,5 @@ xPlayer - the audio player with per-track bookmarks support. Play modes between 
 
 https://www.microsoft.com/en-us/p/xplayer-2/9n77bv4d1103?activetab=pivot%3aoverviewtab
 
-![Alt text](/misc/xplayer2.gif?raw=true "Image#1")
+![Alt text](/misc/xplayer3.jpeg?raw=true "Image#1")
+![Alt text](/misc/xplayer2.jpeg?raw=true "Image#1")
