@@ -9,7 +9,7 @@ xPlayer - the audio player with per-track bookmarks support. Play modes between 
   - begin to end
   - between bookmarks one-time/cycle
 - "jump 5 seconds back" button
-- convinient big buttons "play-pause-back"
+- convenient latge "play-pause-back" buttons 
 
 https://www.microsoft.com/en-us/p/xplayer-2/9n77bv4d1103?activetab=pivot%3aoverviewtab
 
